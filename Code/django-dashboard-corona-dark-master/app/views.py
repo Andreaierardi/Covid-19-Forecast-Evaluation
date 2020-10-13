@@ -12,6 +12,21 @@ import pandas
 import json
 import re
 
+data = pandas.read_csv('app//shampoo.csv')
+
+#def print_from_button(request):
+
+    #if request.GET.get('print_btn'):
+        #print( int(request.GET.get('mytextbox')) )
+        #print('Button clicked')
+    #    if "values" in request.session:
+    #        context = {"printed" : 1}
+
+        #data_json = json.dumps(data)
+    #context = {"values" : values, "index" : labels}
+
+#    return render(request, 'index.html', context)
+
 #@login_required(login_url="/login/")
 def index(request):
 
@@ -24,7 +39,6 @@ def index(request):
         #cells = row.split(',')
 
 
-    data = pandas.read_csv('app//shampoo.csv')
     values = list(data["Sales"])
     labels = list(data["Month"])
 
@@ -33,7 +47,6 @@ def index(request):
 
     return render(request, 'index.html',context)
 
-    #return HttpResponse(html_template.render(context, request), {"data": js_data})
 
 
 #@login_required(login_url="/login/")
