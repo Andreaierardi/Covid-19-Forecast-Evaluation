@@ -8,15 +8,33 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
 from django.http import HttpResponse
 from django import template
+import pandas
+import json
+import re
 
 #@login_required(login_url="/login/")
 def index(request):
-    
+
     context = {}
     context['segment'] = 'index'
 
-    html_template = loader.get_template( 'index.html' )
-    return HttpResponse(html_template.render(context, request))
+    #raw_data = open('app//shampoo.csv', 'rb').read()
+    #rows  = re.split('\n', raw_data)
+    #for idx, row in enumerate(rows):
+        #cells = row.split(',')
+
+
+    data = pandas.read_csv('app//shampoo.csv')
+    values = list(data["Sales"])
+    labels = list(data["Month"])
+
+    #data_json = json.dumps(data)
+    context = {"values" : values, "index" : labels}
+
+    return render(request, 'index.html',context)
+
+    #return HttpResponse(html_template.render(context, request), {"data": js_data})
+
 
 #@login_required(login_url="/login/")
 def pages(request):
