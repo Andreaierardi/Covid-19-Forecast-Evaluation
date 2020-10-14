@@ -6,7 +6,7 @@ Template used: https://github.com/app-generator/django-dashboard-corona-dark
 
 
 ## Run server locally
-<code>
+``` pyhon 
 $ # Install modules - SQLite Storage
   
 $ pip3 install -r requirements.txt
@@ -35,4 +35,4 @@ $
 
 $ # Access the web app in browser: http://127.0.0.1:8000/
 
-</code>
+```
