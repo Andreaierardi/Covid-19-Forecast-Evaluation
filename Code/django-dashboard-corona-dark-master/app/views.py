@@ -13,7 +13,8 @@ import json
 import re
 
 data = pandas.read_csv('app//shampoo.csv')
-
+values = list()
+labels = list()
 #def print_from_button(request):
 
     #if request.GET.get('print_btn'):
@@ -26,6 +27,15 @@ data = pandas.read_csv('app//shampoo.csv')
     #context = {"values" : values, "index" : labels}
 
 #    return render(request, 'index.html', context)
+
+def print_button():
+    if(request.GET.get('print_btn')):
+        print('Button clicked')
+        values = list(data["Sales"])
+
+        values = values.append(10)
+        context = {"values" : values, "index" : labels}
+        return HttpResponseRedirect(request.path_info)
 
 #@login_required(login_url="/login/")
 def index(request):

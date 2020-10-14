@@ -135,7 +135,7 @@
             <h4 class="card-title">Transaction History</h4>
             <div id="container2" style="width:100%; height:400px;"></div>
             <form method="get">
-            <button type="submit" name="print_btn" value="Click"  class="btn btn-primary btn-fw">Primary</button>
+            <button type="button" name="print_btn" value="Click" onclick="refresh()" class="btn btn-primary btn-fw" ">Primary</button>
             </form>
             </div>
           </div>
@@ -143,6 +143,12 @@
       </div>
 
       <script>
+        function refresh()
+        {
+          console.log("OK")
+          _index = {{index|safe}}
+          _values = {{values|safe}}
+        }
         /* _printed = {{printed|safe}}
         if( _printed == 1 )
         {
