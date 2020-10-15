@@ -12,8 +12,11 @@ import pandas
 import json
 import re
 
-data = pandas.read_csv('app//shampoo.csv')
+global data
+data = ""
+global values
 values = list()
+global labels
 labels = list()
 #def print_from_button(request):
 
@@ -28,16 +31,22 @@ labels = list()
 
 #    return render(request, 'index.html', context)
 
-def print_button():
+
+def print_btn(request):
     if(request.GET.get('print_btn')):
-        print('Button clicked')
+        data = pandas.read_csv('app//shampoo.csv')
+
+        values = list(data["Sales"])
+        labels = list(data["Month"])
         values = list(data["Sales"])
 
         values = values.append(10)
+        labels = labels.append("ciao")
+        #data_json = json.dumps(data)
         context = {"values" : values, "index" : labels}
-        return HttpResponseRedirect(request.path_info)
+        return render(request, 'index.html',context)
 
-#@login_required(login_url="/login/")
+    #@login_required(login_url="/login/")
 def index(request):
 
     context = {}
@@ -48,12 +57,12 @@ def index(request):
     #for idx, row in enumerate(rows):
         #cells = row.split(',')
 
+    if(data != ""):
+        values = list(data["Sales"])
+        labels = list(data["Month"])
 
-    values = list(data["Sales"])
-    labels = list(data["Month"])
-
-    #data_json = json.dumps(data)
-    context = {"values" : values, "index" : labels}
+        #data_json = json.dumps(data)
+        context = {"values" : values, "index" : labels}
 
     return render(request, 'index.html',context)
 
