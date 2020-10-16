@@ -14,5 +14,7 @@ urlpatterns = [
     re_path(r'^.*\.html', views.pages, name='pages'),
     # The home page
     path('', views.index, name='home'),
-    path('', views.print_btn, name='print_btn')
+    path('get/ajax/button', views.print_btn, name='print_btn'),
+    path('get/ajax/button2', views.print_btn2, name='print_btn2')
+
 ]

@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="/static/assets/vendors/owl-carousel-2/owl.carousel.min.css">
   <link rel="stylesheet" href="/static/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 {% endblock plugin_stylesheets %}
 
 <!-- Specific CSS goes HERE -->
@@ -134,36 +136,159 @@
           <div class="card-body">
             <h4 class="card-title">Transaction History</h4>
             <div id="container2" style="width:100%; height:400px;"></div>
-            <form method="get" action= "{% url 'print_btn'  %}"">
-            <button type="submit" name="print_btn" value="Click" class="btn btn-primary btn-fw" ">Primary</button>
-            </form>
+</div>
+            <div class="card-body">
+                <div class="template-demo">
+                  <div class="form-group">
+
+          <form id="test-form"   class="forms-sample">
+
+             <button type="submit" name="print_btn"  class="btn btn-primary btn-fw  mr-2" ">Chart1</button>
+           </form>
+         </div>
+         <div class="form-group">
+
+             <form id="test-form2"  class="forms-sample">
+
+             <button type="submit" name="print_btn2"  class="btn btn-success btn-rounded btn-fw  mr-2"  ">Chart2</button>
+
+          </form>
+        </div>
+
+      </div>
+
+
             </div>
           </div>
         </div>
       </div>
 
+      <script>
+        var _values = {}
+        var myChart = Highcharts.chart('container2', {
+            chart: {
+                type: 'spline',
+                zoomType: 'x'
 
+            },
+            title: {
+                text: 'Shampoo'
+            }
+          }
+)
+          /*
+              On submiting the form, send the POST ajax
+              request to server and after successfull submission
+              display the object.
+          */
+          $("#test-form2").submit(function (e) {
+              // preventing from page reload and default actions
+              e.preventDefault();
+              // serialize the data for sending the form data.
+              var serializedData = $(this).serialize();
+              // make POST ajax call
+              $.ajax({
+                  type: 'GET',
+                  url: "{% url 'print_btn2' %}",
+                  data: serializedData,
+                  success: function (response) {
+
+                      console.log(response["values"])
+                      _values = response["values"]
+                      var myChart = Highcharts.chart('container2', {
+                          chart: {
+                              type: 'spline',
+                              zoomType: 'x'
+
+                          },
+                          title: {
+                              text: 'Shampoo2'
+                          },
+
+                          series: [{
+                              name: 'Shampoo2',
+                              data: _values,
+                          }]
+                      });
+
+                  },
+                  error: function (response) {
+                      // alert the error if any error occured
+                      alert(response["responseJSON"]["error"]);
+                  }
+              })
+          })
+
+
+          $("#test-form").submit(function (e) {
+              // preventing from page reload and default actions
+              e.preventDefault();
+              // serialize the data for sending the form data.
+              var serializedData = $(this).serialize();
+              // make POST ajax call
+              $.ajax({
+                  type: 'GET',
+                  url: "{% url 'print_btn' %}",
+                  data: serializedData,
+                  success: function (response) {
+                      // on successfull creating object
+                      // 1. clear the form.
+                      //$("#friend-form").trigger('reset');
+                      // 2. focus to nickname input
+                      //$("#id_nick_name").focus();
+
+                      // display the newly friend to table.
+                      //var values = JSON.parse(response["values"]);
+                      //var index = JSON.parse(response["index"]);
+                      console.log(response["values2"])
+                      _values = response["values2"]
+                      var myChart = Highcharts.chart('container2', {
+                          chart: {
+                              type: 'spline',
+                              zoomType: 'x'
+
+                          },
+                          title: {
+                              text: 'Shampoo1'
+                          },
+
+                          series: [{
+                              name: 'Shampoo1',
+                              data: _values,
+                              color: '#FF0000'
+
+                          }]
+                      });
+
+                  },
+                  error: function (response) {
+                      // alert the error if any error occured
+                      alert(response["responseJSON"]["error"]);
+                  }
+              })
+          })
+      </script>
       <script>
 
-        document.addEventListener('DOMContentLoaded', function () {
+
           _index = {{index|safe}}
-          _values = {{values|safe}}
-          var myChart = Highcharts.chart('container2', {
-              chart: {
-                  type: 'spline',
-                  zoomType: 'x'
+           _values = {{values|safe}}
+           var myChart = Highcharts.chart('container2', {
+               chart: {
+                   type: 'spline',
+                   zoomType: 'x'
 
-              },
-              title: {
-                  text: 'Shampoo'
-              },
+               },
+               title: {
+                   text: 'Shampoo2'
+               },
 
-              series: [{
-                  name: 'Shampoo',
-                  data: _values
-              }]
-          });
-      });
+               series: [{
+                   name: 'Shampoo2',
+                   data: _values,
+               }]
+           });
+
       </script>
 
 
@@ -177,7 +302,7 @@
             <div id="container" style="width:100%; height:400px;"></div>
             <script>
               document.addEventListener('DOMContentLoaded', function () {
-                var myChart = Highcharts.chart('container', {
+                var myChart2 = Highcharts.chart('container', {
                     chart: {
                         type: 'bar'
                     },

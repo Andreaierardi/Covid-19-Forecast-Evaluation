@@ -11,7 +11,7 @@ from django import template
 import pandas
 import json
 import re
-
+from django.http import JsonResponse
 data = pandas.read_csv('app//shampoo.csv')
 values = list()
 labels = list()
@@ -29,19 +29,48 @@ labels = list()
 #    return render(request, 'index.html', context)
 
 
-def print_btn(request):
-    if(request.GET.get('print_btn')):
-
+def print_btn2(request):
+    print(request.method == "GET")
+    if  request.method == "GET":
+        #res = request.POST
+        data = pandas.read_csv('app//shampoo.csv')
 
         values = list(data["Sales"])
         labels = list(data["Month"])
-        values = list(data["Sales"])
 
-        values = values.append(10)
-        labels = labels.append("ciao")
+        print(values)
         #data_json = json.dumps(data)
         context = {"values" : values, "index" : labels}
-        return render(request, 'index.html',context)
+
+        return JsonResponse(context)
+
+
+def print_btn(request):
+    print(request.method == "GET")
+    if  request.method == "GET":
+        #res = request.POST
+        data2 = pandas.read_csv('app//shampoo2.csv')
+
+        values2 = list(data2["Sales"])
+        labels2 = list(data2["Month"])
+
+        print(values2)
+        #data_json = json.dumps(data)
+        context2 = {"values2" : values2, "index2" : labels2}
+
+        return JsonResponse(context2)
+    #if(request.GET.get('print_btn')):
+        #return JsonResponse({"values": values}, status=200)
+
+        #values = list(data["Sales"])
+    #    labels = list(data["Month"])
+    #    values = list(data["Sales"])
+
+        #values = values.append(10)
+        #labels = labels.append("ciao")
+        #data_json = json.dumps(data)
+        #context = {"values" : values, "index" : labels}
+        #return render(request, 'index.html',context)
 
     #@login_required(login_url="/login/")
 def index(request):
