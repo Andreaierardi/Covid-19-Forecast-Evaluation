@@ -12,11 +12,8 @@ import pandas
 import json
 import re
 
-global data
-data = ""
-global values
+data = pandas.read_csv('app//shampoo.csv')
 values = list()
-global labels
 labels = list()
 #def print_from_button(request):
 
@@ -34,7 +31,7 @@ labels = list()
 
 def print_btn(request):
     if(request.GET.get('print_btn')):
-        data = pandas.read_csv('app//shampoo.csv')
+
 
         values = list(data["Sales"])
         labels = list(data["Month"])
@@ -57,12 +54,11 @@ def index(request):
     #for idx, row in enumerate(rows):
         #cells = row.split(',')
 
-    if(data != ""):
-        values = list(data["Sales"])
-        labels = list(data["Month"])
+    values = list(data["Sales"])
+    labels = list(data["Month"])
 
         #data_json = json.dumps(data)
-        context = {"values" : values, "index" : labels}
+    context = {"values" : values, "index" : labels}
 
     return render(request, 'index.html',context)
 
