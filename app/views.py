@@ -18,6 +18,48 @@ data = pandas.read_csv('app//shampoo.csv')
 values = list()
 labels = list()
 
+def print_btn3(request, country):
+    print("OKKKKK")
+    print(country)
+
+    if  request.method == "GET":
+    #    x = request.GET['print_btn3']
+    #    print(x)
+        if country==1:
+            data = pandas.read_csv('app//shampoo.csv')
+
+            values = list(data["Sales"])
+            labels = list(data["Month"])
+            color= '#2f7ed8'
+
+
+        if country==2:
+            data = pandas.read_csv('app//shampoo2.csv')
+
+            values = list(data["Sales"])
+            labels = list(data["Month"])
+            color= '#FF0000'
+
+        else:
+            data = pandas.read_csv('app//shampoo.csv')
+
+            values = list(data["Sales"])
+            labels = list(data["Month"])
+            color= '#2f7ed8'
+
+        print(values)
+        context = {"values" : values, "index" : labels, "color": color}
+        #else:
+        #    data2 = pandas.read_csv('app//shampoo2.csv')
+
+        #    values2 = list(data2["Sales"])
+        #    labels2 = list(data2["Month"])
+
+        #    print(values2)
+        #    context2 = {"values2" : values2, "index2" : labels2}
+        return JsonResponse(context)
+
+    #return JsonResponse(context)
 
 def print_btn2(request):
     print(request.method == "GET")
