@@ -140,7 +140,7 @@
           <div class="form-group">
 
             <form id="test-form3"   class="forms-sample">
-              <select   id="select_country" onchange='$("#test-form3").submit(exec())' class="custom-select col-md-4" name="print_btn3">
+              <select   id="select_country" onchange='$("#test-form3").submit(exec())' class="js-example-basic-single col-md-4" name="print_btn3">
                 <option value="0" selected>Open this select menu</option>
                 <option  value="1">One</option>
                 <option  value="2">Two</option>
@@ -150,6 +150,7 @@
           </div>
 
           <div id="container2" style="width:100%; height:400px;"></div>
+
         </div>
         <div class="card-body">
           <div class="template-demo">
@@ -177,6 +178,19 @@
         </div>
       </div>
     </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body" >
+          <h4 class="card-title">Line chart</h4>
+          <canvas id="lineChart" height="80vh"></canvas>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -214,13 +228,74 @@
                   title: {
                     text: 'Shampoo2'
                   },
-
+                  xAxis: {
+                         categories: _labels,
+                  },
                   series: [{
                     name: 'Shampoo2',
                     data: _values,
                     color: _color
                   }]
                 });
+
+                var data = {
+                  labels:_index,
+                  datasets: [{
+                    label: '# of Shampoo',
+                    data: _values,
+                    backgroundColor: [
+                      'rgba(255, 99, 132, 0.2)',
+                      'rgba(54, 162, 235, 0.2)',
+                      'rgba(255, 206, 86, 0.2)',
+                      'rgba(75, 192, 192, 0.2)',
+                      'rgba(153, 102, 255, 0.2)',
+                      'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                      _color,
+
+                    ],
+                    borderWidth: 1,
+                    fill: false
+                  }]
+                }
+
+                var options = {
+                  scales: {
+                    yAxes: [{
+                      ticks: {
+                        beginAtZero: true
+                      },
+                      gridLines: {
+                        color: "rgba(204, 204, 204,0.1)"
+                      }
+                    }],
+                    xAxes: [{
+                      gridLines: {
+                        color: "rgba(204, 204, 204,0.1)"
+                      }
+                    }]
+                  },
+                  legend: {
+                    display: false
+                  },
+                  elements: {
+                    point: {
+                      radius: 0
+                    }
+                  }
+                };
+
+                  if ($("#lineChart").length) {
+                  var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
+                  var ctx = document.getElementById("lineChart");
+                  ctx.height = 500;
+                  var lineChart = new Chart(lineChartCanvas, {
+                    type: 'line',
+                    data: data,
+                    options: options
+                  })
+                }
 
               },
               error: function (response) {
@@ -951,18 +1026,22 @@
 
           <!-- Specific Plugin JS goes HERE  -->
           {% block plugin_javascripts %}
-
           <script src="/static/assets/vendors/chart.js/Chart.min.js"></script>
           <script src="/static/assets/vendors/progressbar.js/progressbar.min.js"></script>
           <script src="/static/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
           <script src="/static/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
           <script src="/static/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
 
+          <script src="/static/assets/vendors/select2/select2.min.js"></script>
+          <script src="/static/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
           {% endblock plugin_javascripts %}
 
           <!-- Specific Page JS goes HERE  -->
           {% block javascripts %}
+          <script src="/static/assets/js/chart.js"></script>
 
           <script src="/static/assets/js/dashboard.js"></script>
-
+          <script src="/static/assets/js/file-upload.js"></script>
+          <script src="/static/assets/js/typeahead.js"></script>
+          <script src="/static/assets/js/select2.js"></script>
           {% endblock javascripts %}
