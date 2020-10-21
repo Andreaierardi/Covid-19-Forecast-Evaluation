@@ -6,7 +6,7 @@ Template used: https://github.com/app-generator/django-dashboard-corona-dark
 
 
 ## Run server locally
-``` pyhon 
+```console
 # Install modules - SQLite Storage
 pip3 install -r requirements.txt
 # Create tables
