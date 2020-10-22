@@ -13,33 +13,42 @@ import json
 import re
 from django.http import JsonResponse
 
-
 data = pandas.read_csv('app//shampoo.csv')
+data2 = pandas.read_csv('app//shampoo2.csv')
+
+temperature = pandas.read_csv('app//daily-min-temperatures.csv')
 values = list()
 labels = list()
 
-def print_btn3(request, country):
+def getforebench(request, forecast, benchmark):
     print("OKKKKK")
-    print(country)
+    print(forecast)
+    print(benchmark)
+    data = pandas.read_csv('app//shampoo.csv')
 
     if  request.method == "GET":
-    #    x = request.GET['print_btn3']
-    #    print(x)
-        if country==1:
-            data = pandas.read_csv('app//shampoo.csv')
+        if forecast==1 and benchmark==0:
 
             values = list(data["Sales"])
             labels = list(data["Month"])
             color= '#2f7ed8'
 
 
-        if country==2:
-            data = pandas.read_csv('app//shampoo2.csv')
+        elif forecast==2 and benchmark==0:
 
-            values = list(data["Sales"])
-            labels = list(data["Month"])
+            values = list(data2["Sales"])
+            labels = list(data2["Month"])
             color= '#FF0000'
 
+        elif forecast==0 and benchmark==4:
+            values = list(temperature["Temp"])
+            labels = list(temperature["Date"])
+            color= '#2f7ed8'
+
+        elif forecast==0 and benchmark==5:
+            values = list(temperature["Temp"])
+            labels = list(temperature["Date"])
+            color= '#FF0000'
         else:
             data = pandas.read_csv('app//shampoo.csv')
 
@@ -49,44 +58,8 @@ def print_btn3(request, country):
 
         print(values)
         context = {"values" : values, "index" : labels, "color": color}
-        #else:
-        #    data2 = pandas.read_csv('app//shampoo2.csv')
-
-        #    values2 = list(data2["Sales"])
-        #    labels2 = list(data2["Month"])
-
-        #    print(values2)
-        #    context2 = {"values2" : values2, "index2" : labels2}
-        return JsonResponse(context)
-
-    #return JsonResponse(context)
-
-def print_btn2(request):
-    print(request.method == "GET")
-    if  request.method == "GET":
-        data = pandas.read_csv('app//shampoo.csv')
-
-        values = list(data["Sales"])
-        labels = list(data["Month"])
-
-        print(values)
-        context = {"values" : values, "index" : labels}
 
         return JsonResponse(context)
-
-
-def print_btn(request):
-    print(request.method == "GET")
-    if  request.method == "GET":
-        data2 = pandas.read_csv('app//shampoo2.csv')
-
-        values2 = list(data2["Sales"])
-        labels2 = list(data2["Month"])
-
-        print(values2)
-        context2 = {"values2" : values2, "index2" : labels2}
-
-        return JsonResponse(context2)
 
 
 #@login_required(login_url="/login/")

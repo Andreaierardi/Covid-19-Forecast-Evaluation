@@ -44,6 +44,209 @@
 
 
 
+
+
+
+  <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Charts Test</h4>
+
+
+          <form id="fore-bench-form"   class="forms-sample">
+            <div class="row">
+              <div class="col-md-6">
+                <label>Forecast </label>
+
+                <div class="form-group">
+                  <select   id="select_forecast" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
+                    <option value="0" selected>Open this select menu</option>
+                    <option  value="1">One</option>
+                    <option  value="2">Two</option>
+                    <option  value="3">Three</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label>Benchmark model </label>
+                <div class="form-group">
+
+                  <select   id="select_bench" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
+                    <option value="0" selected>Open this select menu</option>
+                    <option  value="4">Four</option>
+                    <option  value="5">Five</option>
+                    <option  value="6">Six</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </form>
+
+          <div id="container2" style="width:100%; height:400px;"></div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body" >
+          <h4 class="card-title">Line chart</h4>
+          <canvas id="lineChart" height="80vh"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+
+
+
+
+
+    function send_forecast_bench_form() {
+      // preventing from page reload and default actions
+
+      // serialize the data for sending the form data.
+      var serializedData = $(this).serialize();
+      var fore = document.getElementById("select_forecast");
+      var bench = document.getElementById("select_bench");
+      var fore_value = fore.value;
+      var bench_value = bench.value;
+      console.log(fore_value)
+      console.log(bench_value)
+
+      // make POST ajax call
+      $.ajax({
+        type: 'GET',
+        // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
+        url: "get/ajax/fore-bench/"+fore_value+"/"+bench_value,
+        data: "",
+        success: function (response) {
+
+          console.log(response["color"])
+          _values = response["values"]
+          _color = response["color"]
+          _labels = response["index"]
+          var myChart = Highcharts.chart('container2', {
+            chart: {
+              type: 'spline',
+              zoomType: 'x'
+
+            },
+            title: {
+              text: 'Shampoo2'
+            },
+            xAxis: {
+              categories: _labels,
+            },
+            series: [{
+              name: 'Shampoo2',
+              data: _values,
+              color: _color
+            }]
+          });
+
+          var data = {
+            labels:_index,
+            datasets: [{
+              label: '# of Shampoo',
+              data: _values,
+              backgroundColor: [
+              'rgba(255, 99, 132, 0.2)',
+            
+              ],
+              borderColor: [
+              _color,
+
+              ],
+              borderWidth: 1,
+              fill: false
+            }]
+          }
+
+          var options2 = {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                },
+                gridLines: {
+                  color: "rgba(204, 204, 204,0.1)"
+                }
+              }],
+              xAxes: [{
+                gridLines: {
+                  color: "rgba(204, 204, 204,0.1)"
+                }
+              }]
+            },
+            legend: {
+              display: false
+            },
+            elements: {
+              point: {
+                radius: 0
+              }
+            }
+          };
+
+          if ($("#lineChart").length) {
+            var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
+            var ctx = document.getElementById("lineChart");
+            ctx.height = 500;
+            var lineChart = new Chart(lineChartCanvas, {
+              type: 'line',
+              data: data,
+              options: options2
+            })
+          }
+
+        },
+        error: function (response) {
+          // alert the error if any error occured
+          alert(response["responseJSON"]["error"]);
+        }
+      })
+    }
+
+
+
+
+  </script>
+  <script>
+
+
+    _index = {{index|safe}}
+    _values = {{values|safe}}
+    var myChart = Highcharts.chart('container2', {
+      chart: {
+        type: 'spline',
+        zoomType: 'x'
+
+      },
+      title: {
+        text: 'Shampoo2'
+      },
+
+      series: [{
+        name: 'Shampoo2',
+        data: _values,
+      }]
+    });
+
+  </script>
+
+
+
   <div class="row">
     <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
       <div class="card">
@@ -128,313 +331,6 @@
       </div>
     </div>
   </div>
-
-
-  <div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title">Charts Test</h4>
-
-
-          <div class="form-group">
-
-            <form id="test-form3"   class="forms-sample">
-              <select   id="select_country" onchange='$("#test-form3").submit(exec())' class="js-example-basic-single col-md-4" name="print_btn3">
-                <option value="0" selected>Open this select menu</option>
-                <option  value="1">One</option>
-                <option  value="2">Two</option>
-                <option  value="3">Three</option>
-              </select>
-            </form>
-          </div>
-
-          <div id="container2" style="width:100%; height:400px;"></div>
-
-        </div>
-        <div class="card-body">
-          <div class="template-demo">
-            <div class="form-group">
-
-              <form id="test-form"   class="forms-sample">
-
-
-
-                <button type="submit" name="print_btn"  class="btn btn-primary btn-fw  mr-2" ">Chart1</button>
-              </form>
-            </div>
-            <div class="form-group">
-
-              <form id="test-form2"  class="forms-sample">
-
-                <button type="submit" name="print_btn2"  class="btn btn-success btn-rounded btn-fw  mr-2"  ">Chart2</button>
-
-              </form>
-            </div>
-
-          </div>
-
-
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body" >
-          <h4 class="card-title">Line chart</h4>
-          <canvas id="lineChart" height="80vh"></canvas>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-
-
-
-
-
-          function exec() {
-            // preventing from page reload and default actions
-
-            // serialize the data for sending the form data.
-            var serializedData = $(this).serialize();
-            var e = document.getElementById("select_country");
-            var strUser = e.value;
-            console.log(strUser)
-            // make POST ajax call
-            $.ajax({
-              type: 'GET',
-             url: "get/ajax/button3/"+strUser,
-
-              data: strUser,
-              success: function (response) {
-
-                console.log(response["color"])
-                _values = response["values"]
-                _color = response["color"]
-                _labels = response["index"]
-                var myChart = Highcharts.chart('container2', {
-                  chart: {
-                    type: 'spline',
-                    zoomType: 'x'
-
-                  },
-                  title: {
-                    text: 'Shampoo2'
-                  },
-                  xAxis: {
-                         categories: _labels,
-                  },
-                  series: [{
-                    name: 'Shampoo2',
-                    data: _values,
-                    color: _color
-                  }]
-                });
-
-                var data = {
-                  labels:_index,
-                  datasets: [{
-                    label: '# of Shampoo',
-                    data: _values,
-                    backgroundColor: [
-                      'rgba(255, 99, 132, 0.2)',
-                      'rgba(54, 162, 235, 0.2)',
-                      'rgba(255, 206, 86, 0.2)',
-                      'rgba(75, 192, 192, 0.2)',
-                      'rgba(153, 102, 255, 0.2)',
-                      'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                      _color,
-
-                    ],
-                    borderWidth: 1,
-                    fill: false
-                  }]
-                }
-
-                var options2 = {
-                  scales: {
-                    yAxes: [{
-                      ticks: {
-                        beginAtZero: true
-                      },
-                      gridLines: {
-                        color: "rgba(204, 204, 204,0.1)"
-                      }
-                    }],
-                    xAxes: [{
-                      gridLines: {
-                        color: "rgba(204, 204, 204,0.1)"
-                      }
-                    }]
-                  },
-                  legend: {
-                    display: false
-                  },
-                  elements: {
-                    point: {
-                      radius: 0
-                    }
-                  }
-                };
-
-                  if ($("#lineChart").length) {
-                  var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
-                  var ctx = document.getElementById("lineChart");
-                  ctx.height = 500;
-                  var lineChart = new Chart(lineChartCanvas, {
-                    type: 'line',
-                    data: data,
-                    options: options2
-                  })
-                }
-
-              },
-              error: function (response) {
-                // alert the error if any error occured
-                alert(response["responseJSON"]["error"]);
-              }
-            })
-          }
-
-
-
-    var _values = {}
-    var myChart = Highcharts.chart('container2', {
-      chart: {
-        type: 'spline',
-        zoomType: 'x'
-
-      },
-      title: {
-        text: 'Shampoo'
-      }
-    }
-    )
-    /*
-    On submiting the form, send the POST ajax
-    request to server and after successfull submission
-    display the object.
-    */
-    $("#test-form2").submit(function (e) {
-      // preventing from page reload and default actions
-      e.preventDefault();
-      // serialize the data for sending the form data.
-      var serializedData = $(this).serialize();
-      // make POST ajax call
-      $.ajax({
-        type: 'GET',
-        url: "{% url 'print_btn2' %}",
-        data: serializedData,
-        success: function (response) {
-
-          console.log(response["values"])
-          _values = response["values"]
-          var myChart = Highcharts.chart('container2', {
-            chart: {
-              type: 'spline',
-              zoomType: 'x'
-
-            },
-            title: {
-              text: 'Shampoo2'
-            },
-
-            series: [{
-              name: 'Shampoo2',
-              data: _values,
-            }]
-          });
-
-        },
-        error: function (response) {
-          // alert the error if any error occured
-          alert(response["responseJSON"]["error"]);
-        }
-      })
-    })
-
-
-    $("#test-form").submit(function (e) {
-      // preventing from page reload and default actions
-      e.preventDefault();
-      // serialize the data for sending the form data.
-      var serializedData = $(this).serialize();
-      // make POST ajax call
-      $.ajax({
-        type: 'GET',
-        url: "{% url 'print_btn' %}",
-        data: serializedData,
-        success: function (response) {
-          // on successfull creating object
-          // 1. clear the form.
-          //$("#friend-form").trigger('reset');
-          // 2. focus to nickname input
-          //$("#id_nick_name").focus();
-
-          // display the newly friend to table.
-          //var values = JSON.parse(response["values"]);
-          //var index = JSON.parse(response["index"]);
-          console.log(response["values2"])
-          _values = response["values2"]
-          var myChart = Highcharts.chart('container2', {
-            chart: {
-              type: 'spline',
-              zoomType: 'x'
-
-            },
-            title: {
-              text: 'Shampoo1'
-            },
-
-            series: [{
-              name: 'Shampoo1',
-              data: _values,
-              color: '#FF0000'
-
-            }]
-          });
-
-        },
-        error: function (response) {
-          // alert the error if any error occured
-          alert(response["responseJSON"]["error"]);
-        }
-      })
-    })
-  </script>
-  <script>
-
-
-    _index = {{index|safe}}
-    _values = {{values|safe}}
-    var myChart = Highcharts.chart('container2', {
-      chart: {
-        type: 'spline',
-        zoomType: 'x'
-
-      },
-      title: {
-        text: 'Shampoo2'
-      },
-
-      series: [{
-        name: 'Shampoo2',
-        data: _values,
-      }]
-    });
-
-  </script>
-
-
 
 
   <div class="row">
