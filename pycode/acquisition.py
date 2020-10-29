@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from datetime import date
 
+## Real data ## 
 state = ['US', 'California', 'Florida', 'New York', 'Texas']
 w0 = 5
 loss = ['MSE', 'MAE', 'MAPE', 'LINEX']
@@ -20,11 +21,19 @@ daily_s = pd.Series(raw_data[raw_data['location_name'] == state[i] ].iloc[:,3].v
 daily_s = daily_s[daily_s>0]
 
 # switch aggregation range to weekly (every Saturday)
-s = daily_s[daily_s.index.weekday == 5]
+D = daily_s[daily_s.index.weekday == 5]
 
-prova1 = pd.ExcelFile('Matlab to python/data_models-Florida.xlsx')
 
-prova1.sheet_names
+## Forecast data ##
+# Forecasted deaths: FD
+FD = pd.read_csv('https://www.cdc.gov/coronavirus/2019-ncov/covid-data/files/2020-10-19-model-data.csv')
 
-prova2 = prova1.parse('Ensamble')
-prova2
+
+
+
+# prova1 = pd.ExcelFile('Matlab to python/data_models-Florida.xlsx')
+
+# prova1.sheet_names
+
+# prova2 = prova1.parse('Ensamble')
+# prova2
