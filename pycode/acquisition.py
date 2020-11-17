@@ -4,9 +4,9 @@ from datetime import date
 
 ## Real data: begins with "R"
 # Real Deaths: RD
-RD = pd.read_csv("https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-truth/truth-Cumulative%20Deaths.csv")
+RD = pd.read_csv("https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-truth/truth-Cumulative%20Deaths.csv",  low_memory=False)
 # Real Cases: RC
-RC = pd.read_csv("https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-truth/truth-Cumulative%20Cases.csv")
+RC = pd.read_csv("https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-truth/truth-Cumulative%20Cases.csv", low_memory=False)
 
 Rstates = RD.location_name.unique()
 
