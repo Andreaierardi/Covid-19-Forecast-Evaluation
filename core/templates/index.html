@@ -57,31 +57,81 @@
           <form id="fore-bench-form"   class="forms-sample">
             <div class="row">
               <div class="col-md-6">
-                <label>Forecast </label>
+                <label>Location </label>
+
+
 
                 <div class="form-group">
                   <select   id="select_forecast" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
-                    <option value="0" selected>Open this select menu</option>
-                    <option  value="1">One</option>
-                    <option  value="2">Two</option>
-                    <option  value="3">Three</option>
+
+                    <option  value="-1" selected> Choose a state </option>
+                  {% for item in states %}
+                   <option value="{{ item }}" > {{ item }}</option>
+                   {% endfor %}
+
                   </select>
                 </div>
               </div>
 
+
+
               <div class="col-md-6">
-                <label>Benchmark model </label>
+                <label>Forecast Model </label>
                 <div class="form-group">
 
                   <select   id="select_bench" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
-                    <option value="0" selected>Open this select menu</option>
-                    <option  value="4">Four</option>
-                    <option  value="5">Five</option>
-                    <option  value="6">Six</option>
+                    <option  value="-1" selected> Choose a model </option>
+
+                    {% for model in models %}
+                     <option value="{{ model }}" > {{ model }}</option>
+                     {% endfor %}
                   </select>
                 </div>
               </div>
             </div>
+
+
+            <div class="row">
+              <div class="col-md-6">
+
+
+
+                <label class="col-sm-3 col-form-label">Target</label>
+                  <div class="form-group row">
+
+                    <div class="col-sm-4">
+                      <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' checked class="form-check-input"  id= "select_type" name="membershipRadios" value="C" checked> Cases</label>
+                      </div>
+                    </div>
+                    <div class="col-sm-5">
+                      <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="D"> Deaths </label>
+                      </div>
+                    </div>
+                  </div>
+
+              </div>
+
+
+
+              <div class="col-md-6">
+                <label>Forecast Date </label>
+                <div class="form-group">
+
+                  <select   id="select_bench2" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-3" name="getforebench">
+                    <option  value="-1" selected> Choose a date </option>
+
+                  <!--  {% for date in dates %}
+                     <option value="{{ date }}" > {{ data }}</option>
+                     {% endfor %} -->
+                  </select>
+                </div>
+              </div>
+            </div>
+
 
           </form>
 
@@ -119,16 +169,21 @@
       var serializedData = $(this).serialize();
       var fore = document.getElementById("select_forecast");
       var bench = document.getElementById("select_bench");
+      var type = document.forms['fore-bench-form'].elements['membershipRadios']
+
       var fore_value = fore.value;
       var bench_value = bench.value;
+      var type_value = type.value;
+
       console.log(fore_value)
       console.log(bench_value)
+      console.log(type_value)
 
       // make POST ajax call
       $.ajax({
         type: 'GET',
         // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
-        url: "get/ajax/fore-bench/"+fore_value+"/"+bench_value,
+        url: "get/ajax/fore-bench/"+fore_value+"/"+bench_value+"/"+type_value,
         data: "",
         success: function (response) {
 
@@ -162,7 +217,7 @@
               data: _values,
               backgroundColor: [
               'rgba(255, 99, 132, 0.2)',
-            
+
               ],
               borderColor: [
               _color,

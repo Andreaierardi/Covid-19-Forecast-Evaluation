@@ -13,53 +13,40 @@ import json
 import re
 from django.http import JsonResponse
 
+import pycode.acquisition as acquisition
+
 data = pandas.read_csv('app//shampoo.csv')
 data2 = pandas.read_csv('app//shampoo2.csv')
 
 temperature = pandas.read_csv('app//daily-min-temperatures.csv')
 values = list()
 labels = list()
+states = acquisition.Fstates
 
-def getforebench(request, forecast, benchmark):
+models = acquisition.Fmodels
+
+def getforebench(request, forecast, benchmark,type):
     print("OKKKKK")
     print(forecast)
     print(benchmark)
-    data = pandas.read_csv('app//shampoo.csv')
 
     if  request.method == "GET":
-        if forecast==1 and benchmark==0:
 
-            values = list(data["Sales"])
-            labels = list(data["Month"])
-            color= '#2f7ed8'
+        if(forecast!="-1"):
+            if(benchmark!="-1"):
+                data = acquisition. getFS(type, benchmark, forecast, acquisition.FD.forecast_date[1])
+                color= '#2f7ed8'
 
+                context = {"values" : data.values.tolist(), "index" : data.index.tolist(), "color": color,"models":models.tolist(), "states": states.tolist()}
 
-        elif forecast==2 and benchmark==0:
+            else:
+                data = acquisition.getRS(type,forecast)
 
-            values = list(data2["Sales"])
-            labels = list(data2["Month"])
-            color= '#FF0000'
+                color= '#2f7ed8'
 
-        elif forecast==0 and benchmark==4:
-            values = list(temperature["Temp"])
-            labels = list(temperature["Date"])
-            color= '#2f7ed8'
+                context = {"values" : data.values.tolist(), "index" : data.index.tolist(), "color": color,"models":models.tolist(), "states": states.tolist()}
 
-        elif forecast==0 and benchmark==5:
-            values = list(temperature["Temp"])
-            labels = list(temperature["Date"])
-            color= '#FF0000'
-        else:
-            data = pandas.read_csv('app//shampoo.csv')
-
-            values = list(data["Sales"])
-            labels = list(data["Month"])
-            color= '#2f7ed8'
-
-        print(values)
-        context = {"values" : values, "index" : labels, "color": color}
-
-        return JsonResponse(context)
+            return JsonResponse(context)
 
 
 #@login_required(login_url="/login/")
@@ -68,10 +55,9 @@ def index(request):
     context = {}
     context['segment'] = 'index'
 
-    values = list(data["Sales"])
-    labels = list(data["Month"])
 
-    context = {"values" : values, "index" : labels}
+
+    context = { "states": states, "models":models.tolist()}
 
     return render(request, 'index.html',context)
 

@@ -15,5 +15,5 @@ urlpatterns = [
     # The home page
     path('', views.index, name='home'),
 
-    path('get/ajax/fore-bench/<int:forecast>/<int:benchmark>', views.getforebench, name='getforebench')
+    path('get/ajax/fore-bench/<str:forecast>/<str:benchmark>/<str:type>', views.getforebench, name='getforebench')
 ]
