@@ -21,9 +21,9 @@ states = ['US', 'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Color
 
 ## Forecast data: begins with "F"
 # Forecasted cases: FC
-FC = pd.read_csv("https://www.cdc.gov/coronavirus/2019-ncov/downloads/cases-updates/2020-10-19-all-forecasted-cases-model-data.csv")[lambda x: x.location_name.isin(states+['National'])]
+FC = pd.read_csv("https://www.cdc.gov/coronavirus/2019-ncov/downloads/cases-updates/2020-10-19-all-forecasted-cases-model-data.csv", low_memory=False)[lambda x: x.location_name.isin(states+['National'])]
 # Forecasted deaths: FD
-FD = pd.read_csv('https://www.cdc.gov/coronavirus/2019-ncov/covid-data/files/2020-10-19-model-data.csv')[lambda x: x.location_name.isin(states+['National'])]
+FD = pd.read_csv('https://www.cdc.gov/coronavirus/2019-ncov/covid-data/files/2020-10-19-model-data.csv', low_memory=False)[lambda x: x.location_name.isin(states+['National'])]
 
 # Define unique lists
 Fmodels = list(np.unique(np.concatenate((FC.model.values, FD.model.values))))

@@ -144,17 +144,7 @@
   </div>
 
 
-  <div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body" >
-          <h4 class="card-title">Line chart</h4>
-          <canvas id="lineChart" height="80vh"></canvas>
-        </div>
-      </div>
-    </div>
 
-  </div>
 
   <script>
 
@@ -191,6 +181,12 @@
           _values = response["values"]
           _color = response["color"]
           _labels = response["index"]
+
+      //    var i;
+        //  for (i = 0; i < _labels.length; i++) {
+        //      _labels[i] = new Date(_labels[i]).toLocaleDateString("en-US").split("/");
+        //  }
+          console.log(_labels)
           var myChart = Highcharts.chart('container2', {
             chart: {
               type: 'spline',
@@ -201,69 +197,26 @@
               text: 'Shampoo2'
             },
             xAxis: {
-              categories: _labels,
+              type: "datetime",
+              categories: _labels
             },
             series: [{
               name: 'Shampoo2',
               data: _values,
               color: _color
-            }]
+            }],
+            plotOptions: {
+    line: {
+        dataLabels: {
+            enabled: true
+        }
+      }
+    }
           });
 
-          var data = {
-            labels:_index,
-            datasets: [{
-              label: '# of Shampoo',
-              data: _values,
-              backgroundColor: [
-              'rgba(255, 99, 132, 0.2)',
 
-              ],
-              borderColor: [
-              _color,
 
-              ],
-              borderWidth: 1,
-              fill: false
-            }]
-          }
 
-          var options2 = {
-            scales: {
-              yAxes: [{
-                ticks: {
-                  beginAtZero: true
-                },
-                gridLines: {
-                  color: "rgba(204, 204, 204,0.1)"
-                }
-              }],
-              xAxes: [{
-                gridLines: {
-                  color: "rgba(204, 204, 204,0.1)"
-                }
-              }]
-            },
-            legend: {
-              display: false
-            },
-            elements: {
-              point: {
-                radius: 0
-              }
-            }
-          };
-
-          if ($("#lineChart").length) {
-            var lineChartCanvas = $("#lineChart").get(0).getContext("2d");
-            var ctx = document.getElementById("lineChart");
-            ctx.height = 500;
-            var lineChart = new Chart(lineChartCanvas, {
-              type: 'line',
-              data: data,
-              options: options2
-            })
-          }
 
         },
         error: function (response) {

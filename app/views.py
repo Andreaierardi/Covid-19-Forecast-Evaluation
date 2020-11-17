@@ -15,10 +15,8 @@ from django.http import JsonResponse
 
 import pycode.acquisition as acquisition
 
-data = pandas.read_csv('app//shampoo.csv')
-data2 = pandas.read_csv('app//shampoo2.csv')
 
-temperature = pandas.read_csv('app//daily-min-temperatures.csv')
+
 values = list()
 labels = list()
 states = acquisition.Fstates
@@ -31,22 +29,23 @@ def getforebench(request, forecast, benchmark,type):
     print(benchmark)
 
     if  request.method == "GET":
+        if(type!=None):
+            if(forecast!="-1"):
+                if(benchmark!="-1"):
+                    data2 = acquisition.getFS(type, benchmark, forecast, acquisition.FD.forecast_date[1])
+                    color= '#2f7ed8'
+                    lab = data2.index.strftime("%Y-%m-%d").tolist()
+                    context = {"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states}
+                    return JsonResponse(context)
 
-        if(forecast!="-1"):
-            if(benchmark!="-1"):
-                data = acquisition. getFS(type, benchmark, forecast, acquisition.FD.forecast_date[1])
-                color= '#2f7ed8'
+                else:
+                    data = acquisition.getRS(type,forecast)
 
-                context = {"values" : data.values.tolist(), "index" : data.index.tolist(), "color": color,"models":models.tolist(), "states": states.tolist()}
+                    color= '#2f7ed8'
 
-            else:
-                data = acquisition.getRS(type,forecast)
+                    context = {"values" : data.values.tolist(), "index" : data.index.strftime("%Y-%m-%d").tolist(), "color": color,"models":models, "states": states}
 
-                color= '#2f7ed8'
-
-                context = {"values" : data.values.tolist(), "index" : data.index.tolist(), "color": color,"models":models.tolist(), "states": states.tolist()}
-
-            return JsonResponse(context)
+                    return JsonResponse(context)
 
 
 #@login_required(login_url="/login/")
@@ -57,7 +56,7 @@ def index(request):
 
 
 
-    context = { "states": states, "models":models.tolist()}
+    context = { "states": states, "models":models}
 
     return render(request, 'index.html',context)
 
