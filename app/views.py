@@ -25,7 +25,7 @@ states = acquisition.Fstates
 
 models = acquisition.Fmodels
 
-def getforebench(request, forecast, benchmark):
+def getforebench(request, forecast, benchmark,type):
     print("OKKKKK")
     print(forecast)
     print(benchmark)
@@ -34,13 +34,13 @@ def getforebench(request, forecast, benchmark):
 
         if(forecast!="-1"):
             if(benchmark!="-1"):
-                data = acquisition. getFS('D', benchmark, forecast, acquisition.FD.forecast_date[1])
+                data = acquisition. getFS(type, benchmark, forecast, acquisition.FD.forecast_date[1])
                 color= '#2f7ed8'
 
                 context = {"values" : data.values.tolist(), "index" : data.index.tolist(), "color": color,"models":models.tolist(), "states": states.tolist()}
 
             else:
-                data = acquisition.getRS('D',forecast)
+                data = acquisition.getRS(type,forecast)
 
                 color= '#2f7ed8'
 

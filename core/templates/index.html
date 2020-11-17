@@ -102,13 +102,13 @@
                     <div class="col-sm-4">
                       <div class="form-check">
                         <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="membershipRadios" id="membershipRadios1" value="option" checked> Cases</label>
+                          <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' checked class="form-check-input"  id= "select_type" name="membershipRadios" value="C" checked> Cases</label>
                       </div>
                     </div>
                     <div class="col-sm-5">
                       <div class="form-check">
                         <label class="form-check-label">
-                          <input type="radio" class="form-check-input" name="membershipRadios" id="membershipRadios2" value="option2"> Deaths </label>
+                          <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="D"> Deaths </label>
                       </div>
                     </div>
                   </div>
@@ -124,9 +124,9 @@
                   <select   id="select_bench2" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-3" name="getforebench">
                     <option  value="-1" selected> Choose a date </option>
 
-                    {% for date in dates %}
+                  <!--  {% for date in dates %}
                      <option value="{{ date }}" > {{ data }}</option>
-                     {% endfor %}
+                     {% endfor %} -->
                   </select>
                 </div>
               </div>
@@ -169,16 +169,21 @@
       var serializedData = $(this).serialize();
       var fore = document.getElementById("select_forecast");
       var bench = document.getElementById("select_bench");
+      var type = document.forms['fore-bench-form'].elements['membershipRadios']
+
       var fore_value = fore.value;
       var bench_value = bench.value;
+      var type_value = type.value;
+
       console.log(fore_value)
       console.log(bench_value)
+      console.log(type_value)
 
       // make POST ajax call
       $.ajax({
         type: 'GET',
         // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
-        url: "get/ajax/fore-bench/"+fore_value+"/"+bench_value,
+        url: "get/ajax/fore-bench/"+fore_value+"/"+bench_value+"/"+type_value,
         data: "",
         success: function (response) {
 
