@@ -87,7 +87,6 @@ def getFS(type, model, state, Fdate):
 
 
 
-
 #=================================================================================================================#
 ## Real data: begins with "R"
 # Retrieve only the States (raw data also contains counties)
