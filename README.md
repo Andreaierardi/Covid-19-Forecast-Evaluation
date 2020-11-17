@@ -7,12 +7,8 @@ Template used: https://github.com/app-generator/django-dashboard-corona-dark
 
 ## Run server locally
 ```console
-# Install modules - SQLite Storage
+# Install modules 
 pip3 install -r requirements.txt
-
-# Create tables
-python manage.py makemigrations
-python manage.py migrate
 
 # Start the application (development mode)
 python manage.py runserver # default port 8000
