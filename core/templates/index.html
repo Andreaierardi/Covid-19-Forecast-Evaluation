@@ -188,7 +188,9 @@
           _color = response["color"]
           _labels = response["index"]
           _name = response["name"]
+          _data = response["data"]
 
+          console.log(_data)
           console.log(_labels)
           var myChart = Highcharts.chart('container2', {
             chart: {
@@ -196,12 +198,13 @@
               zoomType: 'x'
 
             },
+          
             title: {
               text: _name
             },
             xAxis: {
               type: "datetime",
-             categories: _labels
+              categories: _labels
             },
             series: [{
               name: 'Shampoo2',

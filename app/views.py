@@ -33,12 +33,12 @@ def getforebench(request, forecast, benchmark,type,date):
     if(benchmark=="-1"):
             benchmark_name=""
     else:
-        benchmark_name = benchmark
+        benchmark_name = benchmark+"-"
     if(type=="D"):
         type_name = "Deaths"
     if(type=="C"):
         type_name = "Cases"
-    name= forecast +"-"+ benchmark_name +"-"+  type_name+"-"+  date
+    name= forecast +"-"+ benchmark_name +  type_name+"-"+  date
 
 
     if  request.method == "GET":
@@ -53,8 +53,8 @@ def getforebench(request, forecast, benchmark,type,date):
                         color= '#2f7ed8'
                         lab = data2.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
-
-                        context = {"name": name,"errors":err,"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+                        data = [{'date': country, 'value': wins} for country, wins in zip(lab,data2.values.tolist() )]
+                        context = {"data": data,"name": name,"errors":err,"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
                     else:
