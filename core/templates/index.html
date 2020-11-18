@@ -195,16 +195,27 @@
           var myChart = Highcharts.chart('container2', {
             chart: {
               type: 'spline',
-              zoomType: 'x'
+              zoomType: 'x',
+              backgroundColor: '#191c24',
+
 
             },
-          
             title: {
-              text: _name
-            },
+                text: _name,
+                 style: {
+                    color: '#FFF',
+                    font: 'bold'
+                 }
+              },
+            //  yAxis:
+            //  {
+            ////    gridLineWidth: 1
+          //    },
             xAxis: {
               type: "datetime",
-              categories: _labels
+              categories: _labels,
+              gridLineWidth: 1
+
             },
             series: [{
               name: 'Shampoo2',
