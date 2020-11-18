@@ -20,34 +20,48 @@ import pycode.acquisition as acquisition
 values = list()
 labels = list()
 states = acquisition.Fstates
-
 models = acquisition.Fmodels
+dates = acquisition.Fdates
 
-def getforebench(request, forecast, benchmark,type):
-    print("OKKKKK")
+def getforebench(request, forecast, benchmark,type,date):
+
+    print("Parameter from Get request")
     print(forecast)
     print(benchmark)
-
+    print(type)
+    print(date)
     if  request.method == "GET":
         if(type!=None):
             if(forecast!="-1"):
-                if(benchmark!="-1"):
-                    data2 = acquisition.getFS(type, benchmark, forecast, acquisition.FD.forecast_date[1])
-                    color= '#2f7ed8'
-                    lab = data2.index.strftime("%Y-%m-%d").tolist()
-                    context = {"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states}
-                    return JsonResponse(context)
+                if(date!="-1"):
+                    if(benchmark!="-1"):
+                        data2 = acquisition.getFS(type, benchmark, forecast, date)
+                        if(data2 is None):
+                            err = "Not model found for the selected state"
+                            return JsonResponse({"errors": err})
+                        color= '#2f7ed8'
+                        lab = data2.index.strftime("%Y-%m-%d").tolist()
+                        err = "no"
 
+                        context = {"errors":err,"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+                        return JsonResponse(context)
+
+                    else:
+                        data = acquisition.getRS(type,forecast)
+                        if(data is None):
+                            err = "NotFound"
+                            return JsonResponse({"errors": err})
+                        color= '#2f7ed8'
+                        err = "no"
+                        context = {"errors":err,"values" : data.values.tolist(), "index" : data.index.strftime("%Y-%m-%d").tolist(), "color": color,"models":models, "states": states, "dates":dates}
+
+                        return JsonResponse(context)
                 else:
-                    data = acquisition.getRS(type,forecast)
-
-                    color= '#2f7ed8'
-
-                    context = {"values" : data.values.tolist(), "index" : data.index.strftime("%Y-%m-%d").tolist(), "color": color,"models":models, "states": states}
-
-                    return JsonResponse(context)
-
-
+                    err = "Select a Forecast date"
+                    return JsonResponse({"errors": err})
+            else:
+                err = "Select a Location"
+                return JsonResponse({"errors": err})
 #@login_required(login_url="/login/")
 def index(request):
 
@@ -56,7 +70,7 @@ def index(request):
 
 
 
-    context = { "states": states, "models":models}
+    context = { "states": states, "models":models, "dates":dates}
 
     return render(request, 'index.html',context)
 

@@ -121,12 +121,12 @@
                 <label>Forecast Date </label>
                 <div class="form-group">
 
-                  <select   id="select_bench2" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-3" name="getforebench">
-                    <option  value="-1" selected> Choose a date </option>
+                  <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-3" name="getforebench">
+                    <option selected value="-1" > Choose a date </option>
 
-                  <!--  {% for date in dates %}
-                     <option value="{{ date }}" > {{ data }}</option>
-                     {% endfor %} -->
+                 {% for date in dates %}
+                     <option  value="{{ date }}" > {{ date }}</option>
+                     {% endfor %}
                   </select>
                 </div>
               </div>
@@ -160,32 +160,35 @@
       var fore = document.getElementById("select_forecast");
       var bench = document.getElementById("select_bench");
       var type = document.forms['fore-bench-form'].elements['membershipRadios']
+      var date = document.getElementById("select_date");
 
       var fore_value = fore.value;
       var bench_value = bench.value;
       var type_value = type.value;
+      var date_value = date.value;
 
       console.log(fore_value)
       console.log(bench_value)
       console.log(type_value)
+      console.log(date_value)
 
       // make POST ajax call
       $.ajax({
         type: 'GET',
         // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
-        url: "get/ajax/fore-bench/"+fore_value+"/"+bench_value+"/"+type_value,
+        url: "get/ajax/fore-bench/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value,
         data: "",
         success: function (response) {
 
+          _err = response["errors"]
+          if(_err=="no")
+          {
           console.log(response["color"])
           _values = response["values"]
           _color = response["color"]
           _labels = response["index"]
 
-      //    var i;
-        //  for (i = 0; i < _labels.length; i++) {
-        //      _labels[i] = new Date(_labels[i]).toLocaleDateString("en-US").split("/");
-        //  }
+
           console.log(_labels)
           var myChart = Highcharts.chart('container2', {
             chart: {
@@ -197,8 +200,8 @@
               text: 'Shampoo2'
             },
             xAxis: {
-              type: "datetime",
-              categories: _labels
+              type: "datetime"//,
+            //  categories: _labels
             },
             series: [{
               name: 'Shampoo2',
@@ -212,7 +215,11 @@
         }
       }
     }
-          });
+          } );
+        }
+        else {
+          alert(_err)
+        }
 
 
 
@@ -228,28 +235,6 @@
 
 
 
-
-  </script>
-  <script>
-
-
-    _index = {{index|safe}}
-    _values = {{values|safe}}
-    var myChart = Highcharts.chart('container2', {
-      chart: {
-        type: 'spline',
-        zoomType: 'x'
-
-      },
-      title: {
-        text: 'Shampoo2'
-      },
-
-      series: [{
-        name: 'Shampoo2',
-        data: _values,
-      }]
-    });
 
   </script>
 
