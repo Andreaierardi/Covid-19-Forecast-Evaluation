@@ -30,6 +30,17 @@ def getforebench(request, forecast, benchmark,type,date):
     print(benchmark)
     print(type)
     print(date)
+    if(benchmark=="-1"):
+            benchmark_name=""
+    else:
+        benchmark_name = benchmark
+    if(type=="D"):
+        type_name = "Deaths"
+    if(type=="C"):
+        type_name = "Cases"
+    name= forecast +"-"+ benchmark_name +"-"+  type_name+"-"+  date
+
+
     if  request.method == "GET":
         if(type!=None):
             if(forecast!="-1"):
@@ -37,13 +48,13 @@ def getforebench(request, forecast, benchmark,type,date):
                     if(benchmark!="-1"):
                         data2 = acquisition.getFS(type, benchmark, forecast, date)
                         if(data2 is None):
-                            err = "Not model found for the selected state"
+                            err = "No models found for the selected state"
                             return JsonResponse({"errors": err})
                         color= '#2f7ed8'
                         lab = data2.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
 
-                        context = {"errors":err,"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+                        context = {"name": name,"errors":err,"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
                     else:
@@ -53,7 +64,7 @@ def getforebench(request, forecast, benchmark,type,date):
                             return JsonResponse({"errors": err})
                         color= '#2f7ed8'
                         err = "no"
-                        context = {"errors":err,"values" : data.values.tolist(), "index" : data.index.strftime("%Y-%m-%d").tolist(), "color": color,"models":models, "states": states, "dates":dates}
+                        context = {"name": name,"errors":err,"values" : data.values.tolist(), "index" : data.index.strftime("%Y-%m-%d").tolist(), "color": color,"models":models, "states": states, "dates":dates}
 
                         return JsonResponse(context)
                 else:
