@@ -64,8 +64,8 @@
                 <div class="form-group">
                   <select   id="select_forecast" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
 
-                    <option  value="-1" selected> Choose a state </option>
-                    {% for item in states %}
+                    <option  value="{{ states.0 }}" selected> {{ states.0 }}</option>
+                    {% for item in states|slice:"1:" %}
                     <option value="{{ item }}" > {{ item }}</option>
                     {% endfor %}
 
@@ -121,10 +121,10 @@
                     <label>Forecast Date </label>
                     <div class="form-group">
 
-                      <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-3" name="getforebench">
-                        <option selected value="-1" > Choose a date </option>
+                      <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-4" name="getforebench">
+                        <option selected value="{{ dates.0 }}" >{{ dates.0}}</option>
 
-                        {% for date in dates %}
+                        {% for date in dates|slice:'1:'  %}
                         <option  value="{{ date }}" > {{ date }}</option>
                         {% endfor %}
                       </select>
@@ -148,7 +148,7 @@
 
       <script>
 
-
+        send_forecast_bench_form()
 
 
 
