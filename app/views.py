@@ -50,11 +50,13 @@ def getforebench(request, forecast, benchmark,type,date):
                         if(data2 is None):
                             err = "No models found for the selected state"
                             return JsonResponse({"errors": err})
-                        color= '#2f7ed8'
+                        color= '#ba2116'
                         lab = data2.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
+                        values = data2.values[:,0]
+                        quantiles = data2.values[:,1:]
                         data = [{'date': country, 'value': wins} for country, wins in zip(lab,data2.values.tolist() )]
-                        context = {"data": data,"name": name,"errors":err,"values" : data2.values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+                        context = {"data": data,"name": name,"errors":err,"quantiles":quantiles.tolist(), "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
                     else:
