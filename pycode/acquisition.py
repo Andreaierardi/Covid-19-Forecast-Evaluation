@@ -21,6 +21,10 @@ states = ['US', 'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Color
 
 ## Forecast data: begins with "F"
 # Forecasted cases: FC
+tb = pd.read_table("https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/contacts.txt",
+                  header=0, sep='\s\s+')
+Fteams = tb.team.values
+
 FC = pd.read_csv(
     "https://www.cdc.gov/coronavirus/2019-ncov/downloads/cases-updates/2020-10-19-all-forecasted-cases-model-data.csv")[
     lambda x: x.location_name.isin(states + ['National'])]
@@ -43,8 +47,10 @@ def getFS(type, model, state, Fdate):
     Parameters
     ----------
     type : str
-        'C' for cumulative cases. 
-        'D' for cumulative deaths.
+        'cc' for cumulative cases.
+        'cd' for cumulative deaths.
+        'ic' for incidental cases.
+        'id' for incidental deaths.
     model : str
         The model of the forecast
     state : str
@@ -65,11 +71,18 @@ def getFS(type, model, state, Fdate):
     """
     if (state == 'US'):
         state = 'National'
-    if (type == 'C'):
-        out = FC[(FC.model == model) & (FC.location_name == state) & (FC.forecast_date == Fdate)]
-    elif (type == 'D'):
+    if (type == 'cc'):
+        out = FC[(FC.model == model) & (FC.location_name == state) & (FC.forecast_date == Fdate) & FC.target.apply(
+            str.endswith, args=('cum case', 0))]
+    elif (type == 'cd'):
         out = FD[(FD.model == model) & (FD.location_name == state) & (FD.forecast_date == Fdate) & FD.target.apply(
             str.endswith, args=('cum death', 0))]
+    elif (type == 'ic'):
+        out = FC[(FC.model == model) & (FC.location_name == state) & (FC.forecast_date == Fdate) & FC.target.apply(
+            str.endswith, args=('inc case', 0))]
+    elif (type == 'id'):
+        out = FD[(FD.model == model) & (FD.location_name == state) & (FD.forecast_date == Fdate) & FD.target.apply(
+            str.endswith, args=('inc death', 0))]
     else:
         return None
     if (out.empty):
