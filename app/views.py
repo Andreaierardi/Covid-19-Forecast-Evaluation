@@ -15,40 +15,69 @@ from django.http import JsonResponse
 
 import pycode.acquisition as acquisition
 
-data = pandas.read_csv('app//shampoo.csv')
-data2 = pandas.read_csv('app//shampoo2.csv')
 
-temperature = pandas.read_csv('app//daily-min-temperatures.csv')
+
 values = list()
 labels = list()
 states = acquisition.Fstates
-
 models = acquisition.Fmodels
+dates = acquisition.Fdates
 
-def getforebench(request, forecast, benchmark,type):
-    print("OKKKKK")
+def getforebench(request, forecast, benchmark,type,date):
+
+    print("Parameter from Get request")
     print(forecast)
     print(benchmark)
+    print(type)
+    print(date)
+    if(benchmark=="-1"):
+            benchmark_name=""
+    else:
+        benchmark_name = benchmark+"-"
+    if(type=="D"):
+        type_name = "Deaths"
+    if(type=="C"):
+        type_name = "Cases"
+    name= forecast +"-"+ benchmark_name +  type_name+"-"+  date
+
 
     if  request.method == "GET":
+        if(type!=None):
+            if(forecast!="-1" and benchmark!="-1"):
+                if(date!="-1"):
+                        data = acquisition.getRS(type,forecast)
+                        data2 = acquisition.getFS(type, benchmark, forecast, date)
+                        if(data2 is None):
+                            err = "No models found for the selected state"
+                            return JsonResponse({"errors": err})
+                        if(data is None):
+                            err = "NotFound"
+                            return JsonResponse({"errors": err})
 
-        if(forecast!="-1"):
-            if(benchmark!="-1"):
-                data = acquisition. getFS(type, benchmark, forecast, acquisition.FD.forecast_date[1])
-                color= '#2f7ed8'
+                        color= '#ba2116'
+                        color2= '#2f7ed8'
 
-                context = {"values" : data.values.tolist(), "index" : data.index.tolist(), "color": color,"models":models.tolist(), "states": states.tolist()}
+                        names1 = benchmark
+                        names2= forecast
+                        lab = data2.index.strftime("%Y-%m-%d").tolist()
+                        err = "no"
+                        values = data2.values[:,0]
+                        quantiles = data2.values[:,1:]
 
+                        values2 =  data.values.tolist()
+                        index2 = data.index.strftime("%Y-%m-%d").tolist()
+                        print(index2)
+                        context = {"names1": names1, "names2":names2,"name": name,"errors":err,"values2": values2, "index2":index2, "color2":color2,"quantiles":quantiles.tolist(), "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+                        return JsonResponse(context)
+
+
+
+                else:
+                    err = "Select a Forecast date"
+                    return JsonResponse({"errors": err})
             else:
-                data = acquisition.getRS(type,forecast)
-
-                color= '#2f7ed8'
-
-                context = {"values" : data.values.tolist(), "index" : data.index.tolist(), "color": color,"models":models.tolist(), "states": states.tolist()}
-
-            return JsonResponse(context)
-
-
+                err = "Select a Location"
+                return JsonResponse({"errors": err})
 #@login_required(login_url="/login/")
 def index(request):
 
@@ -57,7 +86,7 @@ def index(request):
 
 
 
-    context = { "states": states, "models":models.tolist()}
+    context = { "states": states, "models":models, "dates":dates}
 
     return render(request, 'index.html',context)
 
