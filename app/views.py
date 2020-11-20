@@ -23,6 +23,21 @@ states = acquisition.Fstates
 models = acquisition.Fmodels
 dates = acquisition.Fdates
 
+
+namedict = {
+  "cc": "Cumulative Cases",
+  "cd": "Cumulative Deaths",
+  "ic": "Incidental Cases",
+  "id": "Incidental Deaths"
+}
+
+dict_case = {
+  "cc": "C",
+  "cd": "D",
+  "ic": "C",
+  "id": "D"
+}
+
 def getforebench(request, forecast, benchmark,type,date):
 
     print("Parameter from Get request")
@@ -34,10 +49,9 @@ def getforebench(request, forecast, benchmark,type,date):
             benchmark_name=""
     else:
         benchmark_name = benchmark+"-"
-    if(type=="D"):
-        type_name = "Deaths"
-    if(type=="C"):
-        type_name = "Cases"
+
+    type_name = namedict[type]
+
     name= forecast +"-"+ benchmark_name +  type_name+"-"+  date
 
 
@@ -45,7 +59,7 @@ def getforebench(request, forecast, benchmark,type,date):
         if(type!=None):
             if(forecast!="-1" and benchmark!="-1"):
                 if(date!="-1"):
-                        data = acquisition.getRS(type,forecast)
+                        data = acquisition.getRS(dict_case[type],forecast)
                         data2 = acquisition.getFS(type, benchmark, forecast, date)
                         if(data2 is None):
                             err = "No models found for the selected state"
@@ -78,6 +92,8 @@ def getforebench(request, forecast, benchmark,type,date):
             else:
                 err = "Select a Location"
                 return JsonResponse({"errors": err})
+
+                
 #@login_required(login_url="/login/")
 def index(request):
 
