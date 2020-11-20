@@ -76,13 +76,13 @@
 
 
               <div class="col-md-6">
-                <label>Forecast Model </label>
+                <label>Forecast Team </label>
                 <div class="form-group">
 
                   <select   id="select_bench" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
-                    <option  value="-1" selected> Choose a model </option>
+                    <option  value="{{models.0}}" selected> {{models.0}} </option>
 
-                    {% for model in models %}
+                    {% for model in models|slice:'1:' %}
                     <option value="{{ model }}" > {{ model }}</option>
                     {% endfor %}
                   </select>
@@ -167,10 +167,7 @@
           var type_value = type.value;
           var date_value = date.value;
 
-          console.log(fore_value)
-          console.log(bench_value)
-          console.log(type_value)
-          console.log(date_value)
+
 
           // make POST ajax call
           $.ajax({
@@ -183,25 +180,49 @@
               _err = response["errors"]
               if(_err=="no")
               {
-                console.log(response["color"])
                 _values = response["values"]
                 _color = response["color"]
                 _labels = response["index"]
-                _name = response["name"]
-                _data = response["data"]
 
-                console.log(_values)
-                var labels = []
-                _labels.forEach((e) => {
-                  var date = new Date(e).getTime()/1000
-                  labels.push(date)
-                  console.log(date)
-                })
-                let timestamps = [1568666854141, 1568595225048, 1568594645595];
-                timestamps = timestamps.map(function(d) { return new Date(d) } )
-                console.log(_data)
+                _values2 = response["values2"]
+                _color2 = response["color2"]
+                _labels2 = response["index2"]
+
+                _name = response["name"]
+                _names1 = response["names1"]
+                _names2 = response["names2"]
+
+                console.log("REAL")
+
                 console.log(_labels)
-                var myChart = Highcharts.chart('container2', {
+                console.log(_values)
+
+                console.log("FORECAST")
+                console.log(_labels2)
+                console.log(_values2)
+
+                var series = []
+                for(var i=0; i<_labels.length; ++i) {
+                  var stringdate = _labels[i]
+                  var d = new Date(stringdate).getTime()
+                  console.log(d)
+                  series.push([d,_values[i]])
+                }
+
+                response["series"] =series
+                var series2 = []
+                for(var i=0; i<_labels2.length; ++i) {
+                  var stringdate2 = _labels2[i]
+                  var n2 = new Date(stringdate2).getTime()
+                  series2.push([n2,_values2[i]])
+                }
+                response["series2"] =series2
+
+                console.log(series)
+
+                console.log(series2)
+
+                myChart = Highcharts.chart('container2', {
                   chart: {
                     type: 'spline',
                     zoomType: 'x',
@@ -220,16 +241,22 @@
                   {
                     gridLineWidth: 0.1
                   },
-                  xAxis: {
-                    type: "datetime",
-                    categories: _labels,
-                    gridLineWidth: 0.1
 
+                  xAxis: {
+                    type: 'datetime',
+                    gridLineWidth: 0.1
                   },
+
+
                   series: [{
-                    name: _name,
-                    data: _values,
+                    name: _names1,
+                    data: series,
                     color: _color
+                  }, {
+                    name: _names2,
+                    data: series2,
+                    color: _color2,
+
                   }],
                   plotOptions: {
                     line: {
@@ -239,11 +266,11 @@
                     }
                   }
                 } );
+
               }
               else {
                 alert(_err)
               }
-
 
 
 
@@ -262,7 +289,7 @@
       </script>
 
 
-
+<!--
       <div class="row">
         <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
           <div class="card">
@@ -933,7 +960,7 @@
                   </div>
                 </div>
               </div>
-
+-->
               {% endblock content %}
 
               <!-- Specific Plugin JS goes HERE  -->

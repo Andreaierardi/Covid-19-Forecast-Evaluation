@@ -43,32 +43,35 @@ def getforebench(request, forecast, benchmark,type,date):
 
     if  request.method == "GET":
         if(type!=None):
-            if(forecast!="-1"):
+            if(forecast!="-1" and benchmark!="-1"):
                 if(date!="-1"):
-                    if(benchmark!="-1"):
+                        data = acquisition.getRS(type,forecast)
                         data2 = acquisition.getFS(type, benchmark, forecast, date)
                         if(data2 is None):
                             err = "No models found for the selected state"
                             return JsonResponse({"errors": err})
+                        if(data is None):
+                            err = "NotFound"
+                            return JsonResponse({"errors": err})
+
                         color= '#ba2116'
+                        color2= '#2f7ed8'
+
+                        names1 = benchmark
+                        names2= forecast
                         lab = data2.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
                         values = data2.values[:,0]
                         quantiles = data2.values[:,1:]
-                        data = [{'date': country, 'value': wins} for country, wins in zip(lab,data2.values.tolist() )]
-                        context = {"data": data,"name": name,"errors":err,"quantiles":quantiles.tolist(), "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+
+                        values2 =  data.values.tolist()
+                        index2 = data.index.strftime("%Y-%m-%d").tolist()
+                        print(index2)
+                        context = {"names1": names1, "names2":names2,"name": name,"errors":err,"values2": values2, "index2":index2, "color2":color2,"quantiles":quantiles.tolist(), "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
-                    else:
-                        data = acquisition.getRS(type,forecast)
-                        if(data is None):
-                            err = "NotFound"
-                            return JsonResponse({"errors": err})
-                        color= '#2f7ed8'
-                        err = "no"
-                        context = {"name": name,"errors":err,"values" : data.values.tolist(), "index" : data.index.strftime("%Y-%m-%d").tolist(), "color": color,"models":models, "states": states, "dates":dates}
 
-                        return JsonResponse(context)
+
                 else:
                     err = "Select a Forecast date"
                     return JsonResponse({"errors": err})
