@@ -207,6 +207,36 @@
 
                 }
 
+
+                x = document.getElementById("select_bench")
+                              last = x.options[x.selectedIndex].value
+                            //  last = x.options[0].value
+                              while (x.options.length > 0) {
+
+                                  x.remove(x.options.length - 1);
+                              }
+
+                              new_options =  response["models"]
+
+                              console.log("LAst")
+                              console.log(last)
+                              for (i = 0; i < new_options.length; i++) {
+
+
+                                     var opt = document.createElement('option');
+
+                                     opt.text = new_options[i]
+                                     opt.value = new_options[i]
+                                     if(new_options[i]== last)
+                                     {
+                                      console.log("ENTRA")
+                                       opt.selected = true
+                                       console.log("NEW is", opt.value)
+                                     }
+                                     x.add(opt, null);
+                              }
+
+                              
                 _values = response["values"]
                 _color = response["color"]
                 _labels = response["index"]
@@ -218,7 +248,7 @@
                 _name = response["name"]
                 _names1 = response["names1"]
                 _names2 = response["names2"]
-
+                _models = response["models"]
                 console.log("REAL")
 
                 console.log(_labels)
@@ -228,6 +258,7 @@
                 console.log(_labels2)
                 console.log(_values2)
 
+                console.log(_models)
                 var series = []
                 for(var i=0; i<_labels.length; ++i) {
                   var stringdate = _labels[i]

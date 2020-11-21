@@ -24,7 +24,8 @@ states = acquisition.Fstates
 models = acquisition.Fmodels
 dates = acquisition.Fdates
 
-
+FC = acquisition.FC
+FD = acquisition.FD
 namedict = {
   "cc": "Cumulative Cases",
   "cd": "Cumulative Deaths",
@@ -47,9 +48,24 @@ def getforebench(request, forecast, benchmark,type,date):
     print(type)
     print(date)
 
+    models = acquisition.Fmodels
+
+    if(type=="cc" ):
+        filter_state = FC[FC.location_name == forecast]
+        models = filter_state.model.unique().tolist()
+    if (type=="ic"):
+        filter_state = FC[FC.location_name == forecast]
+        models = filter_state.model.unique().tolist()
+    if(type=="cd"):
+        filter_state = FD[FD.location_name == forecast]
+        models = filter_state.model.unique().tolist()
+    if(type=="id"):
+        filter_state = FD[FD.location_name == forecast]
+        models = filter_state.model.unique().tolist()
     type_name = namedict[type]
 
     name= forecast +"-"+ benchmark +"-"+  type_name+"-"+  date
+
 
 
     if  request.method == "GET":
