@@ -99,33 +99,36 @@
                 <label class="col-sm-3 col-form-label">Target</label>
                 <div class="form-group row">
 
+
                   <div class="col-sm-4">
                     <div class="form-check">
                       <label class="form-check-label">
-                        <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' checked class="form-check-input"  id= "select_type" name="membershipRadios" value="cc" checked> Cumulative Cases</label>
+                        <input type="radio" checked onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type1" class="form-check-input" name="membershipRadios"  value="ic"> Incident Cases </label>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-5">
+                      <div class="form-check">
+                        <label class="form-check-label">
+                          <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="id">Incident  Deaths </label>
+                        </div>
+                      </div>
+
+                  <div class="col-sm-4">
+                    <div class="form-check">
+                      <label class="form-check-label">
+                        <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())'  class="form-check-input"  id= "select_type3" name="membershipRadios" value="cc"> Cumulative Cases</label>
                       </div>
                     </div>
                     <div class="col-sm-5">
                       <div class="form-check">
                         <label class="form-check-label">
-                          <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="cd">  Cumulative Deaths </label>
+                          <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="cd">  Cumulative Deaths </label>
                         </div>
                       </div>
 
 
-                      <div class="col-sm-4">
-                        <div class="form-check">
-                          <label class="form-check-label">
-                            <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type3" class="form-check-input" name="membershipRadios"  value="ic"> Incidental Cases </label>
-                          </div>
-                        </div>
 
-                        <div class="col-sm-5">
-                          <div class="form-check">
-                            <label class="form-check-label">
-                              <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="id">Incidental  Deaths </label>
-                            </div>
-                          </div>
                     </div>
 
                   </div>
@@ -172,6 +175,8 @@
 
           // serialize the data for sending the form data.
           var serializedData = $(this).serialize();
+
+
           var fore = document.getElementById("select_forecast");
           var bench = document.getElementById("select_bench");
           var type = document.forms['fore-bench-form'].elements['membershipRadios']
@@ -195,6 +200,13 @@
               _err = response["errors"]
               if(_err=="no")
               {
+                if(response["quantiles"][0] == -1)
+                {
+                  _check_quantiles = false
+                  alert("No quantiles info")
+
+                }
+
                 _values = response["values"]
                 _color = response["color"]
                 _labels = response["index"]

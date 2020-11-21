@@ -9,6 +9,7 @@ from django.template import loader
 from django.http import HttpResponse
 from django import template
 import pandas
+import numpy as np
 import json
 import re
 from django.http import JsonResponse
@@ -27,8 +28,8 @@ dates = acquisition.Fdates
 namedict = {
   "cc": "Cumulative Cases",
   "cd": "Cumulative Deaths",
-  "ic": "Incidental Cases",
-  "id": "Incidental Deaths"
+  "ic": "Incident Cases",
+  "id": "Incident Deaths"
 }
 
 dict_case = {
@@ -45,14 +46,10 @@ def getforebench(request, forecast, benchmark,type,date):
     print(benchmark)
     print(type)
     print(date)
-    if(benchmark=="-1"):
-            benchmark_name=""
-    else:
-        benchmark_name = benchmark+"-"
 
     type_name = namedict[type]
 
-    name= forecast +"-"+ benchmark_name +  type_name+"-"+  date
+    name= forecast +"-"+ benchmark +"-"+  type_name+"-"+  date
 
 
     if  request.method == "GET":
@@ -77,11 +74,16 @@ def getforebench(request, forecast, benchmark,type,date):
                         err = "no"
                         values = data2.values[:,0]
                         quantiles = data2.values[:,1:]
+                        check_quantiles =np.isnan(np.sum(quantiles))
+                        if(check_quantiles):
+                            quantiles = [-1]
+
+                        else:
+                            quantiles = quantiles.tolist()
 
                         values2 =  data.values.tolist()
                         index2 = data.index.strftime("%Y-%m-%d").tolist()
-                        print(index2)
-                        context = {"names1": names1, "names2":names2,"name": name,"errors":err,"values2": values2, "index2":index2, "color2":color2,"quantiles":quantiles.tolist(), "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+                        context = {"names1": names1, "names2":names2,"name": name,"errors":err,"values2": values2, "index2":index2, "color2":color2,"quantiles":quantiles, "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
@@ -93,7 +95,7 @@ def getforebench(request, forecast, benchmark,type,date):
                 err = "Select a Location"
                 return JsonResponse({"errors": err})
 
-                
+
 #@login_required(login_url="/login/")
 def index(request):
 
