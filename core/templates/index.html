@@ -207,7 +207,45 @@
 
                 }
 
+                _radio_filter = response["radio_filter"]
+                radio_list = document.forms['fore-bench-form'].elements['membershipRadios']
 
+                for (i = 0; i < radio_list.length; i++)
+                {
+                  for(j = 0 ; j < _radio_filter.length; j++)
+                  {
+                    if(radio_list[i].value == _radio_filter[j])
+                    {
+                      radio_list[i].disabled = true
+                      console.log("disattivo",radio_list[i].value )
+
+                    }
+
+
+                  }
+
+                }
+
+                _radio_activate = response["radio_activate"]
+                radio_list = document.forms['fore-bench-form'].elements['membershipRadios']
+
+                for (i = 0; i < radio_list.length; i++)
+                {
+                  for(j = 0 ; j < _radio_activate.length; j++)
+                  {
+                    if(radio_list[i].value == _radio_activate[j])
+                    {
+                      radio_list[i].disabled = false
+                      console.log("attivo",radio_list[i].value )
+
+                    }
+
+
+                  }
+
+                }
+                console.log("REMOVE RADIO")
+                console.log(_radio_filter)
                 x = document.getElementById("select_bench")
                               last = x.options[x.selectedIndex].value
                             //  last = x.options[0].value
@@ -220,6 +258,8 @@
 
                               console.log("LAst")
                               console.log(last)
+
+                              check_last = true
                               for (i = 0; i < new_options.length; i++) {
 
 
@@ -232,11 +272,17 @@
                                       console.log("ENTRA")
                                        opt.selected = true
                                        console.log("NEW is", opt.value)
+                                       check_last = false
                                      }
                                      x.add(opt, null);
                               }
 
-                              
+                              if(check_last)
+                              {
+                                x.options[0].selected = true
+                              }
+
+
                 _values = response["values"]
                 _color = response["color"]
                 _labels = response["index"]
@@ -333,6 +379,46 @@
               }
               else {
                 alert(_err)
+
+                x = document.getElementById("select_bench")
+                              last = x.options[x.selectedIndex].value
+                            //  last = x.options[0].value
+                              while (x.options.length > 0) {
+
+                                  x.remove(x.options.length - 1);
+                              }
+
+                              new_options =  response["models"]
+
+                              console.log("LAst")
+                              console.log(last)
+
+                              check_last = true
+                              for (i = 0; i < new_options.length; i++) {
+
+
+                                     var opt = document.createElement('option');
+
+                                     opt.text = new_options[i]
+                                     opt.value = new_options[i]
+                                     if(new_options[i]== last)
+                                     {
+                                      console.log("ENTRA")
+                                       opt.selected = true
+                                       console.log("NEW is", opt.value)
+                                       check_last = false
+                                     }
+                                     x.add(opt, null);
+                              }
+
+                              if(check_last)
+                              {
+                                x.options[0].selected = true
+                              }
+
+                              send_forecast_bench_form()
+
+            
               }
 
 
@@ -342,6 +428,7 @@
             error: function (response) {
               // alert the error if any error occured
               alert(response["responseJSON"]["error"]);
+
             }
           })
         }

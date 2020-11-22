@@ -27,12 +27,18 @@ dates = acquisition.Fdates
 FC = acquisition.FC
 FD = acquisition.FD
 namedict = {
-  "cc": "Cumulative Cases",
-  "cd": "Cumulative Deaths",
-  "ic": "Incident Cases",
-  "id": "Incident Deaths"
+  "cc": "cum case",
+  "cd": "cum death",
+  "ic": "inc case",
+  "id": "inc death"
 }
 
+namedict_inv = {
+  "cum case":"cc",
+  "cum death": "cd",
+  "inc case": "ic",
+  "inc death": "id"
+}
 dict_case = {
   "cc": "C",
   "cd": "D",
@@ -50,18 +56,47 @@ def getforebench(request, forecast, benchmark,type,date):
 
     models = acquisition.Fmodels
 
+    filter_FC = FC[FC.location_name == forecast]
+    filter_FC = filter_FC[filter_FC.model == benchmark]
+
+    filter_FD = FD[FD.location_name == forecast]
+    filter_FD = filter_FD[filter_FD.model == benchmark]
+
+    radio_filter = []
+    for i in ["cum death","inc death"]:
+        if not filter_FD[filter_FD.target.apply(str.endswith, args=(i, 0)) == True].model.unique().tolist():
+            radio_filter.append(namedict_inv[i])
+
+    for i in ["cum case","inc case"]:
+        if not filter_FC[filter_FC.target.apply(str.endswith, args=(i, 0)) == True].model.unique().tolist():
+            radio_filter.append(namedict_inv[i])
+
+    radio_activate = []
+    for i in ["cum case","inc case","cum death","inc death"]:
+        print(namedict_inv[i])
+        print(radio_filter)
+        if namedict_inv[i] not in radio_filter:
+            radio_activate.append(namedict_inv[i])
+    print("RADIOS ACT: ",radio_activate)
+
+
     if(type=="cc" ):
-        filter_state = FC[FC.location_name == forecast]
+        tmp = FC[FC.location_name == forecast ]
+        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
     if (type=="ic"):
-        filter_state = FC[FC.location_name == forecast]
+        tmp = FC[FC.location_name == forecast ]
+        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
     if(type=="cd"):
-        filter_state = FD[FD.location_name == forecast]
+        tmp = FD[FD.location_name == forecast ]
+        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
     if(type=="id"):
-        filter_state = FD[FD.location_name == forecast]
+        tmp = FD[FD.location_name == forecast ]
+        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
+    
     type_name = namedict[type]
 
     name= forecast +"-"+ benchmark +"-"+  type_name+"-"+  date
@@ -76,10 +111,10 @@ def getforebench(request, forecast, benchmark,type,date):
                         data2 = acquisition.getFS(type, benchmark, forecast, date)
                         if(data2 is None):
                             err = "No models found for the selected state"
-                            return JsonResponse({"errors": err})
+                            return JsonResponse({"errors": err, "models": models})
                         if(data is None):
                             err = "NotFound"
-                            return JsonResponse({"errors": err})
+                            return JsonResponse({"errors": err, "models": models})
 
                         color= '#ba2116'
                         color2= '#2f7ed8'
@@ -99,7 +134,7 @@ def getforebench(request, forecast, benchmark,type,date):
 
                         values2 =  data.values.tolist()
                         index2 = data.index.strftime("%Y-%m-%d").tolist()
-                        context = {"names1": names1, "names2":names2,"name": name,"errors":err,"values2": values2, "index2":index2, "color2":color2,"quantiles":quantiles, "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+                        context = {"radio_activate":radio_activate,"radio_filter": radio_filter, "names1": names1, "names2":names2,"name": name,"errors":err,"values2": values2, "index2":index2, "color2":color2,"quantiles":quantiles, "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
