@@ -46,21 +46,21 @@ dict_case = {
   "id": "D"
 }
 
-def getforebench(request, forecast, benchmark,type,date):
+def getforebench(request, state, team,type,date):
 
     print("Parameter from Get request")
-    print(forecast)
-    print(benchmark)
+    print(state)
+    print(team)
     print(type)
     print(date)
 
     models = acquisition.Fmodels
 
-    filter_FC = FC[FC.location_name == forecast]
-    filter_FC = filter_FC[filter_FC.model == benchmark]
+    filter_FC = FC[FC.location_name == state]
+    filter_FC = filter_FC[filter_FC.model == team]
 
-    filter_FD = FD[FD.location_name == forecast]
-    filter_FD = filter_FD[filter_FD.model == benchmark]
+    filter_FD = FD[FD.location_name == state]
+    filter_FD = filter_FD[filter_FD.model == team]
 
     radio_filter = []
     for i in ["cum death","inc death"]:
@@ -73,42 +73,41 @@ def getforebench(request, forecast, benchmark,type,date):
 
     radio_activate = []
     for i in ["cum case","inc case","cum death","inc death"]:
-        print(namedict_inv[i])
-        print(radio_filter)
         if namedict_inv[i] not in radio_filter:
             radio_activate.append(namedict_inv[i])
-    print("RADIOS ACT: ",radio_activate)
 
 
     if(type=="cc" ):
-        tmp = FC[FC.location_name == forecast ]
+        tmp = FC[FC.location_name == state ]
         filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
     if (type=="ic"):
-        tmp = FC[FC.location_name == forecast ]
+        tmp = FC[FC.location_name == state ]
         filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
     if(type=="cd"):
-        tmp = FD[FD.location_name == forecast ]
+        tmp = FD[FD.location_name == state ]
         filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
     if(type=="id"):
-        tmp = FD[FD.location_name == forecast ]
+        tmp = FD[FD.location_name == state ]
         filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
         models = filter_state.model.unique().tolist()
-    
+
+
+    new_models = models
     type_name = namedict[type]
 
-    name= forecast +"-"+ benchmark +"-"+  type_name+"-"+  date
+    name= state +"-"+ team +"-"+  type_name+"-"+  date
 
 
 
     if  request.method == "GET":
         if(type!=None):
-            if(forecast!="-1" and benchmark!="-1"):
+            if(state!="-1" and team!="-1"):
                 if(date!="-1"):
-                        data = acquisition.getRS(dict_case[type],forecast)
-                        data2 = acquisition.getFS(type, benchmark, forecast, date)
+                        data = acquisition.getRS(dict_case[type],state)
+                        data2 = acquisition.getFS(type, team, state, date)
                         if(data2 is None):
                             err = "No models found for the selected state"
                             return JsonResponse({"errors": err, "models": models})
@@ -119,8 +118,8 @@ def getforebench(request, forecast, benchmark,type,date):
                         color= '#ba2116'
                         color2= '#2f7ed8'
 
-                        names1 = benchmark
-                        names2= forecast
+                        names1 = team
+                        names2= state
                         lab = data2.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
                         values = data2.values[:,0]
