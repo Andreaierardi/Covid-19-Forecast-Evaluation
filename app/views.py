@@ -15,8 +15,8 @@ import re
 from django.http import JsonResponse
 
 import pycode.acquisition as acquisition
-
-
+import datetime
+import time
 
 values = list()
 labels = list()
@@ -46,22 +46,8 @@ dict_case = {
   "id": "D"
 }
 
-def getforebench(request, state, team,type,date):
 
-    print("Parameter from Get request")
-    print(state)
-    print(team)
-    print(type)
-    print(date)
-
-    models = acquisition.Fmodels
-
-    filter_FC = FC[FC.location_name == state]
-    filter_FC = filter_FC[filter_FC.model == team]
-
-    filter_FD = FD[FD.location_name == state]
-    filter_FD = filter_FD[filter_FD.model == team]
-
+def radio_filtering(filter_FC, filter_FD):
     radio_filter = []
     for i in ["cum death","inc death"]:
         if not filter_FD[filter_FD.target.apply(str.endswith, args=(i, 0)) == True].model.unique().tolist():
@@ -75,34 +61,55 @@ def getforebench(request, state, team,type,date):
     for i in ["cum case","inc case","cum death","inc death"]:
         if namedict_inv[i] not in radio_filter:
             radio_activate.append(namedict_inv[i])
+    return (radio_filter, radio_activate)
 
-
+def update_models(tmpC, tmpD, type):
     if(type=="cc" ):
-        tmp = FC[FC.location_name == state ]
-        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        models = filter_state.model.unique().tolist()
+        filter_state= tmpC[tmpC.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
+        model = filter_state.model.unique().tolist()
     if (type=="ic"):
-        tmp = FC[FC.location_name == state ]
-        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        models = filter_state.model.unique().tolist()
+        filter_state= tmpC[tmpC.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
+        model = filter_state.model.unique().tolist()
     if(type=="cd"):
-        tmp = FD[FD.location_name == state ]
-        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        models = filter_state.model.unique().tolist()
+        filter_state= tmpD[tmpD.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
+        model = filter_state.model.unique().tolist()
     if(type=="id"):
-        tmp = FD[FD.location_name == state ]
-        filter_state= tmp[tmp.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        models = filter_state.model.unique().tolist()
+        filter_state= tmpD[tmpD.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
+        model = filter_state.model.unique().tolist()
+    return model
+
+def convert_dateTotime(lis):
+    first_date = datetime.datetime(1970, 1, 1)
+    return [ int( (datetime.datetime.strptime(d, "%Y-%m-%d") - first_date).total_seconds())*1000 for d in lis ]
 
 
-    new_models = models
-    type_name = namedict[type]
+def getforebench(request, state, team,type,date):
 
-    name= state +"-"+ team +"-"+  type_name+"-"+  date
+    print("Parameter from Get request")
+    print(state)
+    print(team)
+    print(type)
+    print(date)
+
+    models = acquisition.Fmodels
+
+    tmpC = filter_FC = FC[FC.location_name == state]
+    filter_FC = filter_FC[filter_FC.model == team]
+
+    tmpD = filter_FD = FD[FD.location_name == state]
+    filter_FD = filter_FD[filter_FD.model == team]
+
+
+    radio_filter, radio_activate = radio_filtering(filter_FC, filter_FD)
+
+    models = update_models(tmpC, tmpD, type)
+
+    name= state +"-"+ team +"-"+  namedict[type] +"-"+  date
 
 
 
     if  request.method == "GET":
+
         if(type!=None):
             if(state!="-1" and team!="-1"):
                 if(date!="-1"):
@@ -120,9 +127,9 @@ def getforebench(request, state, team,type,date):
 
                         names1 = team
                         names2= state
-                        lab = data2.index.strftime("%Y-%m-%d").tolist()
+                        index = data2.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
-                        values = data2.values[:,0]
+                        values = data2.values[:,0].tolist()
                         quantiles = data2.values[:,1:]
                         check_quantiles =np.isnan(np.sum(quantiles))
                         if(check_quantiles):
@@ -133,7 +140,13 @@ def getforebench(request, state, team,type,date):
 
                         values2 =  data.values.tolist()
                         index2 = data.index.strftime("%Y-%m-%d").tolist()
-                        context = {"radio_activate":radio_activate,"radio_filter": radio_filter, "names1": names1, "names2":names2,"name": name,"errors":err,"values2": values2, "index2":index2, "color2":color2,"quantiles":quantiles, "values" : values.tolist(), "index" : lab, "color": color,"models":models, "states": states, "dates":dates}
+
+                        index = convert_dateTotime(index)
+                        index2 = convert_dateTotime(index2)
+                        series = list(zip(index,values))
+                        series2 = list(zip(index2,values2))
+
+                        context = { "radio_activate":radio_activate,"radio_filter": radio_filter, "names1": names1, "names2":names2,"name": name,"errors":err,"series":series, "series2":series2, "color2":color2,"quantiles":quantiles,  "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
