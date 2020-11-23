@@ -100,7 +100,7 @@ def getforebench(request, state, team,type,date):
     filter_FD = filter_FD[filter_FD.model == team]
 
 
-    radio_filter, radio_activate = radio_filtering(filter_FC, filter_FD)
+    radio_filter, radio_activate = radio_filtering(FC, FD)
 
     models = update_models(tmpC, tmpD, type)
 
