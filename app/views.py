@@ -18,6 +18,9 @@ import pycode.acquisition as acquisition
 import datetime
 import time
 
+
+#============= VARIABLE INITIALISATION  ====================
+
 values = list()
 labels = list()
 states = acquisition.Fstates
@@ -26,6 +29,10 @@ dates = acquisition.Fdates
 
 FC = acquisition.FC
 FD = acquisition.FD
+
+
+
+# Useful dictionaries for the abbrevations
 namedict = {
   "cc": "cum case",
   "cd": "cum death",
@@ -47,6 +54,25 @@ dict_case = {
 }
 
 
+#============= UTILITY FUNCTIONS ====================
+
+"""
+Gets the radio buttons avaiable for the selected state to pass to the JS client
+
+    Parameters
+    ----------
+    filter_FC : pandas.DataFrame
+        The dataframe for the cases filtered by State
+    filter_FD : pansad.dataframe
+        The dataframe for the deaths filtered by State
+
+    Returns
+    -------
+    list
+        a list containing two list:
+            - list of strings of radio buttons to activate
+            - list of stirngs of radio buttons to deactivate
+"""
 def radio_filtering(filter_FC, filter_FD):
     radio_filter = []
     for i in ["cum death","inc death"]:
@@ -63,6 +89,27 @@ def radio_filtering(filter_FC, filter_FD):
             radio_activate.append(namedict_inv[i])
     return (radio_filter, radio_activate)
 
+
+
+"""
+Gets the list of the model avaiable for the selected state and type of data to pass to the JS client
+
+    Parameters
+    ----------
+    tmpC : pandas.DataFrame
+        The dataframe for the cases filtered by State
+    tmpD : pansad.dataframe
+        The dataframe for the deaths filtered by State
+    type : str
+        The string of the type for the selected dataset
+
+    Returns
+    -------
+    list
+        a list of string containing the models avaiable for the type and state selected:
+
+"""
+
 def update_models(tmpC, tmpD, type):
     if(type=="cc" ):
         filter_state= tmpC[tmpC.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
@@ -78,19 +125,57 @@ def update_models(tmpC, tmpD, type):
         model = filter_state.model.unique().tolist()
     return model
 
+
+
+""" Convert a list of date string to a list of time passed from the Unix Epoch (00:00:00 UTC on 1 January 1970) to pass in a correct form to the JS client
+
+    Parameters
+    ----------
+    lis : list
+        The list containing the dates in string format
+
+
+    Returns
+    -------
+    list
+        a list of string containing the converted date to Unix Epoch time
+
+"""
 def convert_dateTotime(lis):
     first_date = datetime.datetime(1970, 1, 1)
     return [ int( (datetime.datetime.strptime(d, "%Y-%m-%d") - first_date).total_seconds())*1000 for d in lis ]
 
 
-def getforebench(request, state, team,type,date):
+#============= DJANGO SERVER FUNCTIONS  ====================
 
+"""
+Get the forecast data for the selected state, team and type to then plot in the JS client
+
+Parameters
+----------
+request : django.http.HttpResponse
+    The request Object from the JS client
+state: str
+    the string for the selected state
+team: str
+    the string for the selected team
+type: str
+    the string for the selected type
+date: str
+    the string for the selected date
+
+Returns
+-------
+django.http.JsonResponse:
+    the response to the client in JSON format
+
+"""
+def getforecastplot(request, state, team,type,date):
     print("Parameter from Get request")
     print(state)
     print(team)
     print(type)
     print(date)
-
     models = acquisition.Fmodels
 
     tmpC = filter_FC = FC[FC.location_name == state]
@@ -157,6 +242,8 @@ def getforebench(request, state, team,type,date):
             else:
                 err = "Select a Location"
                 return JsonResponse({"errors": err})
+
+
 
 
 #@login_required(login_url="/login/")
