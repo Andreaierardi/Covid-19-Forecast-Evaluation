@@ -19,6 +19,29 @@ import datetime
 import time
 
 
+import os
+
+from zoltpy import util
+import zoltpy
+
+
+host = os.environ.get('Z_HOST')
+username = os.environ.get('Z_USERNAME')
+password = os.environ.get('Z_PASSWORD')
+conn = util.authenticate()
+print('\n* API CONNECTED')
+
+
+#project_name = 'COVID-19 Forecasts'
+#model_abbr = 'BPagano-RtDriven'
+#timezero_date = '2020-11-22'
+
+#project = [project for project in conn.projects if project.name == project_name][0]
+#json_io_dict = util.download_forecast(conn, project_name,model_abbr , timezero_date)
+#df2 = util.dataframe_from_json_io_dict(json_io_dict)
+
+#print(df2)
+
 #============= VARIABLE INITIALISATION  ====================
 
 values = list()
@@ -176,6 +199,7 @@ def getforecastplot(request, state, team,type,date):
     print(team)
     print(type)
     print(date)
+
     models = acquisition.Fmodels
 
     tmpC = filter_FC = FC[FC.location_name == state]

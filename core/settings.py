@@ -9,6 +9,15 @@ from decouple import config
 from unipath import Path
 import dj_database_url
 
+import environ
+
+env = environ.Env()
+# reading .env file
+environ.Env.read_env()
+
+Z_PASSWORD = env("Z_PASSWORD")
+Z_USERNAME = env("Z_USERNAME")
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = Path(__file__).parent
