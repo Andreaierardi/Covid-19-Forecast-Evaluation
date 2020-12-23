@@ -26,7 +26,11 @@ cv = NaN(2,3);
 
 T = size(d, 1);
 
+%mean(d)
+
 num = sqrt(T)* mean(d);
+
+num
 
 
 %% Fixed-b test using Weighted Covariance Estimate and Bartlett kernel

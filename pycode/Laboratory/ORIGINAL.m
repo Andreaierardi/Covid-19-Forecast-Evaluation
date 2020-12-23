@@ -163,7 +163,7 @@ subplot(2,2,h)
             end
             d = L(:,end)-L(:,1:end-1);
             d
-            L
+            %L
             for k = 1 : numel(forecast_names)
                 [test(:,k,h,ll), cv(:,:,h), reject(:,k,h,ll)] = dm_fsa_cv(d(:,k));
             end

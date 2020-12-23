@@ -1,5 +1,6 @@
 from scipy.io import loadmat
 import math
+import statsmodels.api as sm
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -80,6 +81,11 @@ for model in forecast_models:
             loss_function_tensor[3, 0, forecast_interval, j] = (TT['dr'][j]-bench[forecast_interval,j])**2
             d_tensor[model_number, 0, forecast_interval, j] = loss_function_tensor[3, 0, forecast_interval, j]-loss_function_tensor[model_number,0, forecast_interval, j]
 
+        num = np.sqrt(15)*np.mean(d_tensor[model_number, 0, forecast_interval,12+forecast_interval-1:27+forecast_interval-1])
+        print(model, forecast_interval, num, forecast_interval)
+
+
+
             #print(TT['dr'][j]-bench[forecast_interval, j])
             #print(j,poly(j))
             
@@ -97,8 +103,14 @@ for model in forecast_models:
 
 
 #print(error_tensor[0, ])
-print(loss_function_tensor[3, 0, ])
-print(d_tensor[0, 0, ])
+
+print(d_tensor[0, 0, 1, 11:28])
+print(d_tensor[0, 0, 2, 12:29])
+print(d_tensor[0, 0, 3, 13:30])
+print(d_tensor[0, 0, 4, 14:31])
+#print(d_tensor[0, 0, ])
+
+#print("peppo",np.mean(d_tensor[0, 0, 1, ]))
 #print(loss_function_tensor[0, 0, ]-loss_function_tensor[3, 0, ])
        
 
