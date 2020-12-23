@@ -63,11 +63,11 @@ for ss = 1 :5
         bench(1:size(date,1),1)=NaN;
         for t = 1: length(dr)+1-w
             fhat = fit((t:t+w-1)', dr(t:t+w-1), 'poly2');
+            fhat
             bench(t+w-1+h,1) = max([dr(t+w-1) fhat(t+w-1+h)]);
-            %fhat
-            %bench
         end
         temp = timetable(datetime(date), bench(1:size(date,1)));
+        temp
         temp.Properties.VariableNames = {strcat('q_',num2str(h))};
         TT = synchronize(TT,temp);
         clear temp
@@ -162,6 +162,8 @@ subplot(2,2,h)
                 L = exp(a*100*e./ data(ind,:)) - a*100*e./ data(ind,:) -1 ;
             end
             d = L(:,end)-L(:,1:end-1);
+            d
+            L
             for k = 1 : numel(forecast_names)
                 [test(:,k,h,ll), cv(:,:,h), reject(:,k,h,ll)] = dm_fsa_cv(d(:,k));
             end
