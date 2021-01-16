@@ -2,6 +2,7 @@ from scipy.io import loadmat
 import math
 import statsmodels.api as sm
 import numpy as np
+import pylab 
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
@@ -10,12 +11,24 @@ import pandas as pd
 
 tensor = loadmat('sample_data.mat')
 TT=pd.read_excel('TT_vector.xlsx')
-#print(tensor['date'])
-
-#print(len(tensor['dr'])+1)
 
 
-#print(tensor['h'].item(0))
+def TD_Bartlett(Z):
+    nlags=0
+    #waceband=sqrt(41)
+    T = 15
+    A = Z - Z.mean(axis=1, keepdims=True)
+    sample_var = np.dot(A,A.T)/T
+    #print("sample_var",sample_var)
+    omegahat = sample_var
+    lag=4
+
+    for ii in range(1,lag):
+        gamma = ((np.dot(A[:, ii: T+1], A[:, 0:T-ii].T))+ np.dot(A[:, 0:T-ii], A[:, ii: T+1].T))/T
+        weights= 1- (ii/(lag-1))
+        omegahat = omegahat + np.dot(weights,gamma)
+    return(omegahat)
+
 
 
 x = np.arange(43)
@@ -39,16 +52,16 @@ print(bench[2, 0:41])
 print(bench[3, 0:41])
 print(bench[4, 0:41])
 
-error_tensor = np.full((3, 5, 41), 0)
-loss_function_tensor = np.full((4, 4, 5, 41), 0.0)
-d_tensor = np.full((4, 4, 5, 41), 0.0)
+error_tensor = np.full((11, 5, 41), 0)
+loss_function_tensor = np.full((11, 4, 5, 41), 0.0)
+d_tensor = np.full((11, 4, 5, 41), 0.0)
 figure, axes = plt.subplots(nrows=4, sharex=True,sharey=True)
 plt.xticks(rotation=90)
 plt.grid()
 max_for=5 
 back=5
 model_number = 0
-forecast_models = ['Columbia_', 'JHU_', 'LANL_']
+forecast_models = ['Ensamble_','Columbia_', 'JHU_', 'LANL_','MIT_','MOBS_','UCLA_','UMASS-MB_','YYG_']
 
      
 
@@ -78,11 +91,17 @@ for model in forecast_models:
         for j in range(start, end+back+1):
             error_tensor[model_number, forecast_interval,j] = TT['dr'][j]-TT[model_used][j]
             loss_function_tensor[model_number,0, forecast_interval, j] = (TT['dr'][j]-TT[model_used][j])**2
-            loss_function_tensor[3, 0, forecast_interval, j] = (TT['dr'][j]-bench[forecast_interval,j])**2
-            d_tensor[model_number, 0, forecast_interval, j] = loss_function_tensor[3, 0, forecast_interval, j]-loss_function_tensor[model_number,0, forecast_interval, j]
+            loss_function_tensor[10, 0, forecast_interval, j] = (TT['dr'][j]-bench[forecast_interval,j])**2
+            d_tensor[model_number, 0, forecast_interval, j] = loss_function_tensor[10, 0, forecast_interval, j]-loss_function_tensor[model_number,0, forecast_interval, j]
 
-        num = np.sqrt(15)*np.mean(d_tensor[model_number, 0, forecast_interval,12+forecast_interval-1:27+forecast_interval-1])
-        print(model, forecast_interval, num, forecast_interval)
+        #num = np.sqrt(15)*np.mean(d_tensor[model_number, 0, forecast_interval,12+forecast_interval-1:27+forecast_interval-1])
+        #WCEb = TD_Bartlett(d_tensor[0:9, 0, 1, 12:27])
+        #print(np.sqrt(WCEb))
+        #test_1 = num/np.sqrt(WCEb)
+        #print(test_1)
+        #print(model, forecast_interval, num, forecast_interval)
+
+        #num = np.sqrt(15)*np.mean(d_tensor[model_number, 0, forecast_interval,12+forecast_interval-1:27+forecast_interval-1])
 
 
 
@@ -100,15 +119,26 @@ for model in forecast_models:
 
     model_number = model_number+1
 
+model_number = 0
+
+#print(WCEb)
+
+test_tensor_1 = np.full((9, 4), 0.0)
+
+for model in forecast_models:
+    for forecast_interval in range(1, max_for):
+        model_used = model+str(forecast_interval)
+        num = np.sqrt(15)*np.mean(d_tensor[model_number, 0, forecast_interval,12+forecast_interval-1:27+forecast_interval-1])
+        den = TD_Bartlett(d_tensor[0:9, 0, forecast_interval, 12+forecast_interval-1:27+forecast_interval-1])
+        #print(num)
+        #print(den[model_number, model_number])
+        test_tensor_1[model_number, forecast_interval-1] = num / math.sqrt(den[model_number, model_number])
+        
+    model_number = model_number+1
+print(test_tensor_1)
+#print(TD_Bartlett(d_tensor[0:9, 0, 1, 12:27]))
 
 
-#print(error_tensor[0, ])
-
-print(d_tensor[0, 0, 1, 11:28])
-print(d_tensor[0, 0, 2, 12:29])
-print(d_tensor[0, 0, 3, 13:30])
-print(d_tensor[0, 0, 4, 14:31])
-#print(d_tensor[0, 0, ])
 
 #print("peppo",np.mean(d_tensor[0, 0, 1, ]))
 #print(loss_function_tensor[0, 0, ]-loss_function_tensor[3, 0, ])
@@ -125,3 +155,4 @@ print(d_tensor[0, 0, 4, 14:31])
 #print((x[0, 0: 41]))
 #print(poly)
 #
+

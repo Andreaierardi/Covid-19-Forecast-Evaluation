@@ -140,7 +140,8 @@ subplot(2,2,h)
     %% forecast evaluation
 
     disp(['----------- ', state,' ------------'] );
-    for ll=1:4
+    %%for ll=1:4
+      for ll=1:1
         loss = Loss{ll};
         if strcmp(loss,'LINEX')
             a = 0.50;
@@ -149,7 +150,8 @@ subplot(2,2,h)
             disp(['----------- ', loss,' ------------']);
         end
 
-        for h=1:max_h
+        %for h=1:max_h
+        for h=1:4
             ind = sum(isnan([data forecasts(:,:,h)]),2)==0;
             e = data(ind,:)-forecasts(ind,:,h);
             if strcmp(loss,'MSE')

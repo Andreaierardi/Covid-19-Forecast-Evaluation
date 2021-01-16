@@ -15,6 +15,7 @@ function omegahat = NeweyWest(Z,nlags,bartlett)
 % de-mean the variables
 Z = Z - ones(size(Z,1),1)*mean(Z);
 
+
 % sample variance
 samplevar = Z'*Z/T; 
 

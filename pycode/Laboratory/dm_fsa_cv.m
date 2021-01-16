@@ -40,6 +40,7 @@ if exist ('wceband', 'var') == 0
 end
 
 WCEb = NeweyWest(d,wceband,1);
+num/WCEb 
 test(1) = num / sqrt(WCEb);
 
 b = wceband/T;
