@@ -30,6 +30,8 @@ T = size(d, 1);
 
 num = sqrt(T)* mean(d);
 
+num
+
 
 %% Fixed-b test using Weighted Covariance Estimate and Bartlett kernel
 
@@ -37,7 +39,8 @@ if exist ('wceband', 'var') == 0
     wceband = floor(T^(1/2));
 end
 
-WCEb = NeweyWest(d,wceband,1); 
+WCEb = NeweyWest(d,wceband,1);
+num/WCEb 
 test(1) = num / sqrt(WCEb);
 
 b = wceband/T;
@@ -59,17 +62,13 @@ AA = dftmtx(T);
 w = AA*d; % discrete fourier transform of d
 pdm = w.* conj(w)/ (2*pi*T);
 
-
 WPE = sum(pdm(2:wpeband+1,:))/wpeband * 2*pi;
 
-%num
-%WPE
-%wpeband 
+num
+WPE
+wp
 
 test(2) = num / sqrt(WPE);
-
-%num 
-%sqrt(WPE)
 
 cv(2,:) = [icdf('t',[0.90],2*wpeband) icdf('t',[0.95],2*wpeband) icdf('t',[0.975],2*wpeband)];
 

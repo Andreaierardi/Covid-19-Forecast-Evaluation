@@ -5,9 +5,10 @@ import numpy as np
 import pylab 
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
-                               AutoMinorLocator)
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,AutoMinorLocator)
 import pandas as pd
+from scipy.linalg import dft
+from scipy.fft import fft
 
 tensor = loadmat('sample_data.mat')
 TT=pd.read_excel('TT_vector.xlsx')
@@ -47,10 +48,10 @@ for h in range(1, 5):
         bench[h,t+w+h-1] = max(y[t+w-1], poly(t+w+h-1))
         #print(poly[t+w+h-1])
         
-print(bench[1,0:41])
-print(bench[2, 0:41])
-print(bench[3, 0:41])
-print(bench[4, 0:41])
+#print(bench[1,0:41])
+#print(bench[2, 0:41])
+#print(bench[3, 0:41])
+#print(bench[4, 0:41])
 
 error_tensor = np.full((11, 5, 41), 0)
 loss_function_tensor = np.full((11, 4, 5, 41), 0.0)
@@ -123,7 +124,7 @@ model_number = 0
 
 #print(WCEb)
 
-test_tensor_1 = np.full((9, 4), 0.0)
+test_tensor = np.full((2,9,4), 0.0)
 
 for model in forecast_models:
     for forecast_interval in range(1, max_for):
@@ -132,13 +133,50 @@ for model in forecast_models:
         den = TD_Bartlett(d_tensor[0:9, 0, forecast_interval, 12+forecast_interval-1:27+forecast_interval-1])
         #print(num)
         #print(den[model_number, model_number])
-        test_tensor_1[model_number, forecast_interval-1] = num / math.sqrt(den[model_number, model_number])
+        test_tensor[0,model_number, forecast_interval-1] = num / math.sqrt(den[model_number, model_number])
         
     model_number = model_number+1
-print(test_tensor_1)
+
+b = 3/15
+
+CV_WCE_b_97 = 1.9600 + 2.9694*b + 0.4160*b**2 - 0.5324*b**3
+CV_WCE_b_95 = 1.6449 + 2.1859*b + 0.3142*b**2 - 0.3427*b**3
+CV_WCE_b_90 = 1.2816 + 1.3040*b + 0.5135*b**2 - 0.3386*b**3
+
+
+#print(test_tensor_1)
+#print(CV_WCE_b_97, CV_WCE_b_95, CV_WCE_b_90)
 #print(TD_Bartlett(d_tensor[0:9, 0, 1, 12:27]))
 
 
+
+wpeband=2
+
+M = dft(15)
+#print(M)
+
+
+#d_tensor_F = M @ d_tensor[0:9, 0, 1,12:27]
+
+
+d_tensor_F = np.full((5, 9, 15), 0.0)
+
+model_number = 0
+
+for model in forecast_models:
+    for forecast_interval in range(1, max_for):
+        model_used = model+str(forecast_interval)
+        num = np.sqrt(15)*np.mean(d_tensor[model_number, 0, forecast_interval,12+forecast_interval-1:27+forecast_interval-1])
+        d_tensor_F[forecast_interval, ] = np.absolute(fft(
+            d_tensor[0:9, 0, forecast_interval, 12+forecast_interval-1:27+forecast_interval-1]))**2/(2*math.pi*15)
+        test_tensor[1, model_number, forecast_interval-1] = num / math.sqrt(sum(d_tensor_F[forecast_interval, model_number, 1:wpeband+1])/wpeband*2*math.pi)
+    model_number = model_number+1
+
+print(test_tensor)
+
+#print(d_tensor_F)
+    #pdm = (np.absolute(d_tensor_F[forecast_interval, ])**2)/(2*3.1415*15)
+#print("peppo", d_tensor_F)
 
 #print("peppo",np.mean(d_tensor[0, 0, 1, ]))
 #print(loss_function_tensor[0, 0, ]-loss_function_tensor[3, 0, ])
