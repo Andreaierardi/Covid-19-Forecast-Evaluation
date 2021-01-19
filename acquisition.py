@@ -114,6 +114,18 @@ with open('data/unique_lists/locations.pkl', 'wb') as f:
     pickle.dump(locations, f)
 f.close()
 
+# Timezeros list 
+timezeros = get_dates()
+with open('data/unique_lists/timezeros.pkl', 'wb') as f:
+    pickle.dump(timezeros, f)
+f.close()
+
+# Targets list
+targets = get_targets()
+with open('data/unique_lists/targets.pkl', 'wb') as f:
+    pickle.dump(targets, f)
+f.close()
+
 
 ## Correspondence lists
 
