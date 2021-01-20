@@ -110,9 +110,11 @@ f.close()
 # Locations dictionary {name: unit}
 locations = pd.read_csv("https://raw.githubusercontent.com/reichlab/zoltpy/master/zoltpy/locations.csv")
 locations = dict(locations.dropna()[['location_name', 'location']].to_dict('split')['data'])
+locations_inv = {v: k for k, v in locations.items()}
 with open('data/unique_lists/locations.pkl', 'wb') as f:
     pickle.dump(locations, f)
 f.close()
+
 
 # Timezeros list 
 timezeros = get_dates()
@@ -127,10 +129,92 @@ with open('data/unique_lists/targets.pkl', 'wb') as f:
 f.close()
 
 
-## Correspondence lists
+#### CORRESPONDENCE dictionary ####
 
+corr_dict = {}
 
+for date in timezeros:
+    try:
+        currd = pd.read_parquet("data/"+str(date)+".parquet")
+    except:
+        print('File not found')
+        continue
+    
+    print(str(date))
+    
+    for row in currd.values:
+        try:
+            modloc = (row[0], locations_inv[row[3]]) # MODEL AND LOCATION NAME
+        except:
+            continue
+        if modloc in corr_dict.keys():
+            corr_dict[modloc].add((row[1], # TIMEZERO
+                                   row[4].split('ahead ',1)[1], #TARGET
+                                   row[10])) # QUANTILE (None for point estimates)
+        else:
+            corr_dict[modloc] = {row[1], # TIMEZERO
+                                 row[4].split('ahead ',1)[1], #TARGET
+                                 row[10]} # QUANTILE (None for point estimates) 
+            
+            
+def Fexists(model, location, timezero='any', target='any', quantile='any'):
+    if (model, location) not in corr_dict.keys():
+        return False
+    
+    flagTZ, flagTA, flagQU = False, False, False
+    
+    if timezero is not 'any':
+        for tup in list(corr_dict[(model, location)]):
+            try:
+                if timezero == tup[0]:
+                    flagTZ = True
+                    break
+            except:
+                continue
+    else:
+        flagTZ = True
+    
+    if flagTZ == False:
+        return False
+        
+    if target is not 'any':
+        for tup in list(corr_dict[(model, location)]):
+            try:
+                if target == tup[1]:
+                    flagTA = True
+                    break
+            except:
+                continue
+    else:
+        flagTA = True
+        
+    if flagTA == False:
+        return False
+        
+    if quantile is not 'any':
+        for tup in list(corr_dict[(model, location)]):
+            try:
+                if quantile == tup[2]:
+                    flagQU = True
+                    break
+            except:
+                continue
+    else:
+        flagQU = True
+    
+    if flagQU == False:
+        return False
+        
+    return True
+        
 
+# Examples of usage of Fexists:
+# Fexists(model='UT-Mobility', location='Connecticut')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc hospitalized')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', quantile = '0.1')
+# Fexists('UT-Mobility', 'Connecticut', quantile = '0.2')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc death', quantile='0.95')
 
 
 
