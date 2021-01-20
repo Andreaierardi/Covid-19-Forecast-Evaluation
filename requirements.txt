@@ -13,3 +13,5 @@ pandas
 gunicorn
 django-environ
 git+https://github.com/reichlab/zoltpy/
+requests
+pymmwr
