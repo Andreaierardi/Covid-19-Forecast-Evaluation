@@ -1,7 +1,15 @@
 ### Imports and function definition
 import os
-%env Z_USERNAME = fabiocaironi
-%env Z_PASSWORD = p19Q@eKyo95w
+#%env Z_USERNAME = fabiocaironi
+#%env Z_PASSWORD = p19Q@eKyo95w
+
+os.environ["Z_USERNAME"] = "fabiocaironi"
+os.environ["Z_PASSWORD"] = "p19Q@eKyo95w"
+
+host = os.environ.get('Z_HOST')
+username = os.environ.get('Z_USERNAME')
+password = os.environ.get('Z_PASSWORD')
+
 import json
 from zoltpy import util
 import zoltpy
@@ -11,6 +19,18 @@ import pyarrow.parquet as pq
 import pickle
 import time
 from zoltpy.connection import QueryType
+
+
+# Locations dictionary {name: unit}
+locations = pd.read_csv("https://raw.githubusercontent.com/reichlab/zoltpy/master/zoltpy/locations.csv")
+locations = dict(locations.dropna()[['location_name', 'location']].to_dict('split')['data'])
+locations_inv = {v: k for k, v in locations.items()}
+with open('data/unique_lists/locations.pkl', 'wb') as f:
+    pickle.dump(locations, f)
+f.close()
+
+
+
 
 def get_project():
   conn = util.authenticate()
@@ -57,7 +77,7 @@ def get_targets():
 def retrieve_data():
   dates = get_dates()
   targs = get_targets()
-  
+  loc =   list(locations.values())[1:len(locations.values())]
   missing = []
 
   print("Number of dates:" ,len(project.timezeros))
@@ -71,7 +91,7 @@ def retrieve_data():
     num_date = num_date+1
     print(date)
 
-    query = {'timezeros': [str(date)],'targets': targs}
+    query = {'timezeros': [str(date)],'targets': targs, 'units':loc}
     print(query)
 
 
@@ -81,7 +101,7 @@ def retrieve_data():
       rows = job.download_data()
       print(f"- got {len(rows)} forecast rows as a dataframe.")
       data = util.dataframe_from_rows(rows)
-      data.to_parquet(date+".parquet")
+      data.to_parquet("data/"+date+".parquet")
 
     except:
       print("Something went wrong for ",date)
@@ -105,14 +125,6 @@ retrieve_data()
 models = [m.abbreviation for m in project.models]
 with open('data/unique_lists/models.pkl', 'wb') as f:
     pickle.dump(models, f)
-f.close()
-
-# Locations dictionary {name: unit}
-locations = pd.read_csv("https://raw.githubusercontent.com/reichlab/zoltpy/master/zoltpy/locations.csv")
-locations = dict(locations.dropna()[['location_name', 'location']].to_dict('split')['data'])
-locations_inv = {v: k for k, v in locations.items()}
-with open('data/unique_lists/locations.pkl', 'wb') as f:
-    pickle.dump(locations, f)
 f.close()
 
 
