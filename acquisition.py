@@ -16,7 +16,9 @@ import zoltpy
 
 import pandas as pd
 import pyarrow.parquet as pq
+import bz2
 import pickle
+import _pickle as cPickle
 import time
 from zoltpy.connection import QueryType
 
@@ -112,7 +114,7 @@ def retrieve_data():
 ### Acquisition
 ## Data
 project = get_project()
-retrieve_data()
+#retrieve_data()
 
 ## Unique lists
 
@@ -168,10 +170,10 @@ for date in timezeros:
                                  row[4].split('ahead ',1)[1], #TARGET
                                  row[10]} # QUANTILE (None for point estimates) 
 
-with open('data/unique_lists/corr_dict.pkl', 'wb') as f:
-    pickle.dump(corr_dict, f)
-f.close()
-            
+
+import bz2
+with bz2.BZ2File('data/unique_lists/corr_dict.pkl', 'w') as f:
+	pickle.dump(corr_dict, f)
             
 
 

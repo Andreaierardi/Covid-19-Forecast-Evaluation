@@ -8,28 +8,22 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template import loader
 from django.http import HttpResponse
 from django import template
-import pandas
+from django.http import JsonResponse
+
+
+import pandas 
 import numpy as np
 import json
 import re
-from django.http import JsonResponse
-
-import pycode.acquisition as acquisition
 import datetime
 import time
-
-
 import os
 
-from zoltpy import util
-import zoltpy
+import pycode.acquisition as acquisition
+import getters as gets
 
 
-host = os.environ.get('Z_HOST')
-username = os.environ.get('Z_USERNAME')
-password = os.environ.get('Z_PASSWORD')
-conn = util.authenticate()
-print('\n* API CONNECTED')
+
 
 
 #project_name = 'COVID-19 Forecasts'
@@ -46,9 +40,14 @@ print('\n* API CONNECTED')
 
 values = list()
 labels = list()
-states = acquisition.Fstates
-models = acquisition.Fmodels
-dates = acquisition.Fdates
+states = list(gets.locations)[1:len(gets.locations)]
+models = gets.models
+dates = []
+for d in gets.timezeros:
+    dates.append(d.strftime("%Y-%m-%d"))
+
+targs = gets.targets
+
 
 FC = acquisition.FC
 FD = acquisition.FD
@@ -200,62 +199,53 @@ def getforecastplot(request, state, team,type,date):
     print(type)
     print(date)
 
-    models = acquisition.Fmodels
+#    states = gets.locations
+#    dates = acquisition.Fdates
+#    targs = gets.targets
 
-    tmpC = filter_FC = FC[FC.location_name == state]
-    filter_FC = filter_FC[filter_FC.model == team]
+#    models = gets.models
 
-    tmpD = filter_FD = FD[FD.location_name == state]
-    filter_FD = filter_FD[filter_FD.model == team]
+#    tmpC = filter_FC = FC[FC.location_name == state]
+#    filter_FC = filter_FC[filter_FC.model == team]
+
+#    tmpD = filter_FD = FD[FD.location_name == state]
+#    filter_FD = filter_FD[filter_FD.model == team]
 
 
-    radio_filter, radio_activate = radio_filtering(FC, FD)
+#    radio_filter, radio_activate = radio_filtering(FC, FD)
 
-    models = update_models(tmpC, tmpD, type)
+#    models = update_models(tmpC, tmpD, type)
 
-    name= state +"-"+ team +"-"+  namedict[type] +"-"+  date
+    name= state +"-"+ team +"-"+  type +"-"+  date
 
 
 
     if  request.method == "GET":
-
+        print(name)
         if(type!=None):
             if(state!="-1" and team!="-1"):
                 if(date!="-1"):
-                        data = acquisition.getRS(dict_case[type],state)
-                        data2 = acquisition.getFS(type, team, state, date)
-                        if(data2 is None):
-                            err = "No models found for the selected state"
-                            return JsonResponse({"errors": err, "models": models})
+                        data = gets.getFS(type=type, model="LANL-GrowthRate", state=state, timezero=date)
+                        print(data)
+
                         if(data is None):
                             err = "NotFound"
                             return JsonResponse({"errors": err, "models": models})
 
                         color= '#ba2116'
-                        color2= '#2f7ed8'
 
                         names1 = team
                         names2= state
-                        index = data2.index.strftime("%Y-%m-%d").tolist()
+                        index = data.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
-                        values = data2.values[:,0].tolist()
-                        quantiles = data2.values[:,1:]
-                        check_quantiles =np.isnan(np.sum(quantiles))
-                        if(check_quantiles):
-                            quantiles = [-1]
 
-                        else:
-                            quantiles = quantiles.tolist()
-
-                        values2 =  data.values.tolist()
-                        index2 = data.index.strftime("%Y-%m-%d").tolist()
-
+                        values = pandas.to_numeric(data.point,downcast='integer').tolist()
+                        for i in range(len(values)):
+                            values[i] = int(values[i])
+                        print(values)
                         index = convert_dateTotime(index)
-                        index2 = convert_dateTotime(index2)
                         series = list(zip(index,values))
-                        series2 = list(zip(index2,values2))
-
-                        context = { "radio_activate":radio_activate,"radio_filter": radio_filter, "names1": names1, "names2":names2,"name": name,"errors":err,"series":series, "series2":series2, "color2":color2,"quantiles":quantiles,  "color": color,"models":models, "states": states, "dates":dates}
+                        context = {  "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
