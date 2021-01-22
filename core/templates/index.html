@@ -103,27 +103,27 @@
                   <div class="col-sm-4">
                     <div class="form-check">
                       <label class="form-check-label">
-                        <input type="radio" checked onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type1" class="form-check-input" name="membershipRadios"  value="ic"> Incident Cases </label>
+                        <input type="radio" checked onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type1" class="form-check-input" name="membershipRadios"  value="inc case"> Incident Cases </label>
                       </div>
                     </div>
 
                     <div class="col-sm-5">
                       <div class="form-check">
                         <label class="form-check-label">
-                          <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="id">Incident  Deaths </label>
+                          <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="inc death">Incident  Deaths </label>
                         </div>
                       </div>
 
                       <div class="col-sm-4">
                         <div class="form-check">
                           <label class="form-check-label">
-                            <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())'  class="form-check-input"  id= "select_type3" name="membershipRadios" value="cc"> Cumulative Cases</label>
+                            <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())'  class="form-check-input"  id= "select_type3" name="membershipRadios" value="cum case"> Cumulative Cases</label>
                           </div>
                         </div>
                         <div class="col-sm-5">
                           <div class="form-check">
                             <label class="form-check-label">
-                              <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="cd">  Cumulative Deaths </label>
+                              <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="cum death">  Cumulative Deaths </label>
                             </div>
                           </div>
 
@@ -309,8 +309,8 @@
           var type_value = type.value;
           var date_value = date.value;
 
-
-
+          console.log("URL:")
+          console.log("get/ajax/forecast_plot/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value)
           // make POST ajax call
           $.ajax({
             type: 'GET',
@@ -319,15 +319,16 @@
             data: "",
             success: function (response) {
 
+              console.log("ENTER RESPONSE")
               _err = response["errors"]
-
+              console.log("ACK: "+_err)
               if(_err=="no")
               {
 
 
 
 
-                if(response["quantiles"][0] == -1)
+                /*if(response["quantiles"][0] == -1)
                 {
                   _check_quantiles = false
 
@@ -337,10 +338,10 @@
                   }, 3000)
                   _check_quantiles = true
 
-                }
+                }*/
 
-                update_radio(response)
-                update_selectors(response)
+                //update_radio(response)
+                //update_selectors(response)
 
 
 
@@ -349,12 +350,12 @@
                 //   _labels = response["index"]
 
             //    _values2 = response["values2"]
-                _color2 = response["color2"]
+                //_color2 = response["color2"]
                 //   _labels2 = response["index2"]
 
                 _name = response["name"]
                 _names1 = response["names1"]
-                _names2 = response["names2"]
+                //_names2 = response["names2"]
                 _models = response["models"]
 
                 /*    console.log("REAL")
@@ -370,13 +371,14 @@
                 */
 
                  _series = response["series"]
-                 _series2 = response ["series2"]
+                 _val = response["values"]
+                // _series2 = response ["series2"]
 
                   //  series = get_series(_labels,_values)
                 //    series2 = get_series(_labels2,_values2)
 
                  console.log(_series)
-                 console.log(_series2)
+                 //console.log(_series2)
                    // console.log(series)
                   //  console.log(series2)
 
@@ -414,12 +416,12 @@
 
                   series: [
 
-                  {
+                  /*{
                     name: _names2,
                     data: _series2,
                     color: _color2,
 
-                  },
+                  },*/
                   {
                     name: _names1,
                     data: _series,
@@ -443,9 +445,9 @@
                   $("#error_alert").fadeOut(800);
                 }, 3000)
 
-                update_selectors(response)
+                //update_selectors(response)
 
-                send_forecast_bench_form()
+                //send_forecast_bench_form()
 
 
               }

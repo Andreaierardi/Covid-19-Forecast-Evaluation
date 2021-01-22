@@ -11,7 +11,7 @@ from django import template
 from django.http import JsonResponse
 
 
-import pandas
+import pandas 
 import numpy as np
 import json
 import re
@@ -42,7 +42,10 @@ values = list()
 labels = list()
 states = list(gets.locations)[1:len(gets.locations)]
 models = gets.models
-dates = acquisition.Fdates
+dates = []
+for d in gets.timezeros:
+    dates.append(d.strftime("%Y-%m-%d"))
+
 targs = gets.targets
 
 
@@ -222,7 +225,9 @@ def getforecastplot(request, state, team,type,date):
         if(type!=None):
             if(state!="-1" and team!="-1"):
                 if(date!="-1"):
-                        data = gets.getFS(date,type,team,state)
+                        data = gets.getFS(type=type, model="LANL-GrowthRate", state=state, timezero=date)
+                        print(data)
+
                         if(data is None):
                             err = "NotFound"
                             return JsonResponse({"errors": err, "models": models})
@@ -233,12 +238,14 @@ def getforecastplot(request, state, team,type,date):
                         names2= state
                         index = data.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
-                        values = data.point.tolist()
 
+                        values = pandas.to_numeric(data.point,downcast='integer').tolist()
+                        for i in range(len(values)):
+                            values[i] = int(values[i])
+                        print(values)
                         index = convert_dateTotime(index)
                         series = list(zip(index,values))
-                        print(data)
-                        context = { "radio_activate":radio_activate,"radio_filter": radio_filter, "names1": names1, "name": name,"errors":err,"series":series, "quantiles":quantiles,  "color": color,"models":models, "states": states, "dates":dates}
+                        context = {  "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
