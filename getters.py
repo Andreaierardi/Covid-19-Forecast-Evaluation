@@ -1,6 +1,7 @@
 import pandas as pd
 import pyarrow.parquet as pq
 import datetime as dt
+import pickle
 
 f = open('data/unique_lists/locations.pkl', 'rb')
 locations = pickle.load(f)
