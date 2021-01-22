@@ -40,7 +40,7 @@ import getters as gets
 
 values = list()
 labels = list()
-states = gets.locations
+states = list(gets.locations)[1:len(gets.locations)]
 models = gets.models
 dates = acquisition.Fdates
 targs = gets.targets
@@ -213,12 +213,12 @@ def getforecastplot(request, state, team,type,date):
 
 #    models = update_models(tmpC, tmpD, type)
 
-    name= state +"-"+ team +"-"+  namedict[type] +"-"+  date
+    name= state +"-"+ team +"-"+  type +"-"+  date
 
 
 
     if  request.method == "GET":
-
+        print(name)
         if(type!=None):
             if(state!="-1" and team!="-1"):
                 if(date!="-1"):
@@ -237,7 +237,7 @@ def getforecastplot(request, state, team,type,date):
 
                         index = convert_dateTotime(index)
                         series = list(zip(index,values))
-
+                        print(data)
                         context = { "radio_activate":radio_activate,"radio_filter": radio_filter, "names1": names1, "name": name,"errors":err,"series":series, "quantiles":quantiles,  "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
