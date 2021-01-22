@@ -2,8 +2,27 @@ import pandas as pd
 import pyarrow.parquet as pq
 import datetime as dt
 
-locations = pd.read_csv("data/unique_lists/locations.csv")
-locations = dict(locations.dropna()[['location_name', 'location']].to_dict('split')['data'])
+f = open('data/unique_lists/locations.pkl', 'rb')
+locations = pickle.load(f)
+f.close()
+locations_inv = {v: k for k, v in locations.items()}
+
+f = open('data/unique_lists/targets.pkl', 'rb')
+targets = pickle.load(f)
+f.close()
+
+f = open('data/unique_lists/timezeros.pkl', 'rb')
+timezeros = pickle.load(f)
+f.close()
+
+f = open('data/unique_lists/models.pkl', 'rb')
+models = pickle.load(f)
+f.close()
+
+f = open('data/unique_lists/corr_dict.pkl', 'rb')
+corr_dict = pickle.load(f)
+f.close()
+
 quantiles = (0.99, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0.01, 0.975, 0.025)
 
 models = list(pd.read_csv("data/unique_lists/models.csv")['models'])
@@ -63,3 +82,64 @@ def getFS(timezero, type="all", model="all", state="all"):
 
 # Example: getFS(type="inc case", model="all", state="all", timezero="2020-04-06")
 # Example: getFS(type="cum death", model="LANL-GrowthRate", state="Texas", timezero="2020-04-06")
+
+
+
+def Fexists(model, location, timezero='any', target='any', quantile='any'):
+    if (model, location) not in corr_dict.keys():
+        return False
+    
+    flagTZ, flagTA, flagQU = False, False, False
+    
+    if timezero is not 'any':
+        for tup in list(corr_dict[(model, location)]):
+            try:
+                if timezero == tup[0]:
+                    flagTZ = True
+                    break
+            except:
+                continue
+    else:
+        flagTZ = True
+    
+    if flagTZ == False:
+        return False
+        
+    if target is not 'any':
+        for tup in list(corr_dict[(model, location)]):
+            try:
+                if target == tup[1]:
+                    flagTA = True
+                    break
+            except:
+                continue
+    else:
+        flagTA = True
+        
+    if flagTA == False:
+        return False
+        
+    if quantile is not 'any':
+        for tup in list(corr_dict[(model, location)]):
+            try:
+                if quantile == tup[2]:
+                    flagQU = True
+                    break
+            except:
+                continue
+    else:
+        flagQU = True
+    
+    if flagQU == False:
+        return False
+        
+    return True
+        
+
+# Examples of usage of Fexists:
+# Fexists(model='UT-Mobility', location='Connecticut')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc hospitalized')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', quantile = '0.1')
+# Fexists('UT-Mobility', 'Connecticut', quantile = '0.2')
+# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc death', quantile='0.95')

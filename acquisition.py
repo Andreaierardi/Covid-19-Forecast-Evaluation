@@ -167,66 +167,13 @@ for date in timezeros:
             corr_dict[modloc] = {row[1], # TIMEZERO
                                  row[4].split('ahead ',1)[1], #TARGET
                                  row[10]} # QUANTILE (None for point estimates) 
-            
-            
-def Fexists(model, location, timezero='any', target='any', quantile='any'):
-    if (model, location) not in corr_dict.keys():
-        return False
-    
-    flagTZ, flagTA, flagQU = False, False, False
-    
-    if timezero is not 'any':
-        for tup in list(corr_dict[(model, location)]):
-            try:
-                if timezero == tup[0]:
-                    flagTZ = True
-                    break
-            except:
-                continue
-    else:
-        flagTZ = True
-    
-    if flagTZ == False:
-        return False
-        
-    if target is not 'any':
-        for tup in list(corr_dict[(model, location)]):
-            try:
-                if target == tup[1]:
-                    flagTA = True
-                    break
-            except:
-                continue
-    else:
-        flagTA = True
-        
-    if flagTA == False:
-        return False
-        
-    if quantile is not 'any':
-        for tup in list(corr_dict[(model, location)]):
-            try:
-                if quantile == tup[2]:
-                    flagQU = True
-                    break
-            except:
-                continue
-    else:
-        flagQU = True
-    
-    if flagQU == False:
-        return False
-        
-    return True
-        
 
-# Examples of usage of Fexists:
-# Fexists(model='UT-Mobility', location='Connecticut')
-# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08')
-# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc hospitalized')
-# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', quantile = '0.1')
-# Fexists('UT-Mobility', 'Connecticut', quantile = '0.2')
-# Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc death', quantile='0.95')
+with open('data/unique_lists/corr_dict.pkl', 'wb') as f:
+    pickle.dump(corr_dict, f)
+f.close()
+            
+            
+
 
 
 
