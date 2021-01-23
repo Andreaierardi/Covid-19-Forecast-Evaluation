@@ -55,7 +55,7 @@ for i in gets.targets:
      string = x[-2]+" "+x[-1]
      if not string in all_targs:
              all_targs.append(string)
-
+all_targs.append("cum case")
 locations_inv = {v: k for k, v in gets.locations.items()}
 
 
@@ -105,20 +105,17 @@ Gets the radio buttons avaiable for the selected state to pass to the JS client
             - list of strings of radio buttons to activate
             - list of stirngs of radio buttons to deactivate
 """
-def radio_filtering(filter_FC, filter_FD):
+def radio_filtering(filter_FC):
     radio_filter = []
-    for i in ["cum death","inc death"]:
-        if not filter_FD[filter_FD.target.apply(str.endswith, args=(i, 0)) == True].model.unique().tolist():
-            radio_filter.append(namedict_inv[i])
-
+   
     for i in ["cum case","inc case"]:
         if not filter_FC[filter_FC.target.apply(str.endswith, args=(i, 0)) == True].model.unique().tolist():
-            radio_filter.append(namedict_inv[i])
+            radio_filter.append(i)
 
     radio_activate = []
     for i in ["cum case","inc case","cum death","inc death"]:
-        if namedict_inv[i] not in radio_filter:
-            radio_activate.append(namedict_inv[i])
+        if i not in radio_filter:
+            radio_activate.append(i)
     return (radio_filter, radio_activate)
 
 
@@ -208,7 +205,9 @@ def getforecastplot(request, state, team,type,date):
     print(team)
     print(type)
     print(date)
-
+    st = state
+    tm = team
+    ty= type
 #    states = gets.locations
 #    dates = acquisition.Fdates
 #    targs = gets.targets
@@ -226,51 +225,67 @@ def getforecastplot(request, state, team,type,date):
 
 #    models = update_models(tmpC, tmpD, type)
 
-    name= state +"-"+ team +"-"+  type +"-"+  date
+    models = gets.models
 
+    try:
+        sugg_date= gets.getFS(timezero=date)
+    except:
+            err = "No Data found for this date"
+            return JsonResponse({"errors": err, "models": models})
 
+    sugg_date= gets.getFS(timezero=date)
+    if sugg_date is None:
+         err = "No Data found for this date"
 
+         return JsonResponse({"errors": err, "models": models})
+    else:
+        models = list(sugg_date.model.unique())
+
+        dataset = sugg_date[sugg_date.unit == gets.locations[state]]
+
+        #print("dataset:", len(dataset))
+        check = dataset[dataset.model == team]
+        #print("check:", len(check))
+
+        if len(check)==0:
+            tm = dataset.model[0]
+            check = dataset[dataset.model == tm]
+            #print("new check", len(check))
+        print(models)
+
+        radio_filter, radio_activate = radio_filtering(check)
+
+        check2 = check[check.target.apply(str.endswith, args=(type, 0)) == True]
+       # print("checkc2:", len(check2))
+
+        if len(check2) == 0:
+            ty = radio_activate[0]
+            check2 =  check[check.target.apply(str.endswith, args=(ty, 0)) == True]
+       # print(radio_filter)
+       # print(radio_activate)
+       # print(check2)
     if  request.method == "GET":
-        print(name)
         if(type!=None):
             if(state!="-1" and team!="-1"):
                 if(date!="-1"):
                        
-                        new_loc = []
-                        new_model=[]
-                        new_targ = []
-                        suggestions = gets.getFS(timezero=date, state = state)
-                        suggestions2 = gets.getFS(timezero=date, state = state,model=team)
+                       
+                       # data = gets.getFS(timezero = date, type = ty, state = st, model = tm)
+                        print(ty,tm,st, date)
+                        
 
-                        targ_list = list(suggestions2.target.unique())
-
-                        for i in targ_list:
-                            x = i.split(" ")
-                            string = x[-2]+" "+x[-1]
-                            if not string in new_targ:
-                                    new_targ.append(string)
-
-                        new_model = list(suggestions.model.unique())
-                        new_targ = list()
-                        print(new_loc)
-                        data = gets.getFS(type=type, model=team, state=state, timezero=date)
-                        print(data)
-                        models = new_model
-
-                        radio_filtering = []
-                        radio_activate = new_targ
-
-                        for t in all_targs:
-                            if not t in new_targ:
-                                radio_filtering.append(t)
+                        data = check2.sort_index()
                         if(data is None):
                             err = "NotFound"
+                            print(err)
                             return JsonResponse({"errors": err, "models": models})
-
+                        #print(data)
                         color= '#ba2116'
+                        name= st +"-"+ tm +"-"+  ty +"-"+  date
+                        print(name) 
 
-                        names1 = team
-                        names2= state
+                        names1 = tm
+                        names2= st
                         index = data.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
 
@@ -281,7 +296,7 @@ def getforecastplot(request, state, team,type,date):
                         index = convert_dateTotime(index)
                         series = list(zip(index,values))
                        
-                        context = {  "radio_filter": radio_filtering, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
+                        context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
