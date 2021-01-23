@@ -19,7 +19,7 @@ import datetime
 import time
 import os
 
-import pycode.acquisition as acquisition
+#import pycode.acquisition as acquisition
 import getters as gets
 
 
@@ -48,9 +48,19 @@ for d in gets.timezeros:
 
 targs = gets.targets
 
+all_targs = []
 
-FC = acquisition.FC
-FD = acquisition.FD
+for i in gets.targets:
+     x = i.split(" ")
+     string = x[-2]+" "+x[-1]
+     if not string in all_targs:
+             all_targs.append(string)
+
+locations_inv = {v: k for k, v in gets.locations.items()}
+
+
+#FC = acquisition.FC
+#FD = acquisition.FD
 
 
 
@@ -225,9 +235,34 @@ def getforecastplot(request, state, team,type,date):
         if(type!=None):
             if(state!="-1" and team!="-1"):
                 if(date!="-1"):
-                        data = gets.getFS(type=type, model="LANL-GrowthRate", state=state, timezero=date)
-                        print(data)
+                       
+                        new_loc = []
+                        new_model=[]
+                        new_targ = []
+                        suggestions = gets.getFS(timezero=date, state = state)
+                        suggestions2 = gets.getFS(timezero=date, state = state,model=team)
 
+                        targ_list = list(suggestions2.target.unique())
+
+                        for i in targ_list:
+                            x = i.split(" ")
+                            string = x[-2]+" "+x[-1]
+                            if not string in new_targ:
+                                    new_targ.append(string)
+
+                        new_model = list(suggestions.model.unique())
+                        new_targ = list()
+                        print(new_loc)
+                        data = gets.getFS(type=type, model=team, state=state, timezero=date)
+                        print(data)
+                        models = new_model
+
+                        radio_filtering = []
+                        radio_activate = new_targ
+
+                        for t in all_targs:
+                            if not t in new_targ:
+                                radio_filtering.append(t)
                         if(data is None):
                             err = "NotFound"
                             return JsonResponse({"errors": err, "models": models})
@@ -245,7 +280,8 @@ def getforecastplot(request, state, team,type,date):
                         print(values)
                         index = convert_dateTotime(index)
                         series = list(zip(index,values))
-                        context = {  "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
+                       
+                        context = {  "radio_filter": radio_filtering, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
