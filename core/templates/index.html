@@ -139,7 +139,7 @@
                         <label>Forecast Date </label>
                         <div class="form-group">
 
-                          <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-4" name="getforebench">
+                          <select   id="select_date" onchange='$("#fore-bench-form").submit(send_date())' class="js-example-basic-single col-md-4" name="sendate">
                             <option selected value="{{ dates.0 }}" >{{ dates.0}}</option>
 
                             {% for date in dates|slice:'1:'  %}
@@ -288,10 +288,63 @@
         }
 
 
+
         send_forecast_bench_form()
 
 
 
+        function send_date() {
+          var date = document.getElementById("select_date");
+          var date_value = date.value;
+
+          $.ajax({
+            type: 'GET',
+            // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
+            url: "get/ajax/date_change/"+date_value,
+            data: "",
+            success: function (response) {
+
+              console.log("ENTER RESPONSE")
+              _err = response["errors"]
+              console.log("ACK: "+_err)
+              if(_err=="no")
+              {
+
+              }
+              else if(_err == "No date")
+              {
+                console.log("No date ")
+                $("#error_alert").fadeIn(400);
+                setTimeout(function(){
+                  $("#error_alert").fadeOut(800);
+                }, 3000)
+              }
+              else {
+
+                $("#error_alert").fadeIn(400);
+                setTimeout(function(){
+                  $("#error_alert").fadeOut(800);
+                }, 3000)
+
+
+
+              }
+
+
+
+
+            },
+            error: function (response) {
+              // alert the error if any error occured
+
+
+
+
+
+
+            }
+          })
+        }
         function send_forecast_bench_form() {
           // preventing from page reload and default actions
 
@@ -437,6 +490,14 @@
                   }
                 } );
 
+              }
+              else if(_err == "No date")
+              {
+                console.log("No date ")
+                $("#error_alert").fadeIn(400);
+                setTimeout(function(){
+                  $("#error_alert").fadeOut(800);
+                }, 3000)
               }
               else {
 

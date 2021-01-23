@@ -11,7 +11,7 @@ from django import template
 from django.http import JsonResponse
 
 
-import pandas 
+import pandas as pd
 import numpy as np
 import json
 import re
@@ -46,6 +46,8 @@ dates = []
 for d in gets.timezeros:
     dates.append(d.strftime("%Y-%m-%d"))
 
+global dataframe
+dataframe = pd.DataFrame()
 targs = gets.targets
 
 all_targs = []
@@ -57,7 +59,6 @@ for i in gets.targets:
              all_targs.append(string)
 all_targs.append("cum case")
 locations_inv = {v: k for k, v in gets.locations.items()}
-
 
 #FC = acquisition.FC
 #FD = acquisition.FD
@@ -107,7 +108,7 @@ Gets the radio buttons avaiable for the selected state to pass to the JS client
 """
 def radio_filtering(filter_FC):
     radio_filter = []
-   
+
     for i in ["cum case","inc case"]:
         if not filter_FC[filter_FC.target.apply(str.endswith, args=(i, 0)) == True].model.unique().tolist():
             radio_filter.append(i)
@@ -199,6 +200,17 @@ django.http.JsonResponse:
     the response to the client in JSON format
 
 """
+
+def datechange(request, date):
+    sugg_date= gets.getFS(timezero=date)
+
+    if sugg_date is None:
+         err = "No date"
+         return JsonResponse({"errors": err, "models": models})
+    global dataframe
+    dataframe = sugg_date
+    err = "no"
+    return JsonResponse({"errors": err, "models": models})
 def getforecastplot(request, state, team,type,date):
     print("Parameter from Get request")
     print(state)
@@ -226,53 +238,40 @@ def getforecastplot(request, state, team,type,date):
 #    models = update_models(tmpC, tmpD, type)
 
     models = gets.models
+    models = list(dataframe.model.unique())
 
-    try:
-        sugg_date= gets.getFS(timezero=date)
-    except:
-            err = "No Data found for this date"
-            return JsonResponse({"errors": err, "models": models})
+    dataset = dataframe[dataframe.unit == gets.locations[state]]
 
-    sugg_date= gets.getFS(timezero=date)
-    if sugg_date is None:
-         err = "No Data found for this date"
+    #print("dataset:", len(dataset))
+    check = dataset[dataset.model == team]
+    #print("check:", len(check))
 
-         return JsonResponse({"errors": err, "models": models})
-    else:
-        models = list(sugg_date.model.unique())
+    if len(check)==0:
+        tm = dataset.model[0]
+        check = dataset[dataset.model == tm]
+        #print("new check", len(check))
+    print(models)
 
-        dataset = sugg_date[sugg_date.unit == gets.locations[state]]
+    radio_filter, radio_activate = radio_filtering(check)
 
-        #print("dataset:", len(dataset))
-        check = dataset[dataset.model == team]
-        #print("check:", len(check))
+    check2 = check[check.target.apply(str.endswith, args=(type, 0)) == True]
+   # print("checkc2:", len(check2))
 
-        if len(check)==0:
-            tm = dataset.model[0]
-            check = dataset[dataset.model == tm]
-            #print("new check", len(check))
-        print(models)
-
-        radio_filter, radio_activate = radio_filtering(check)
-
-        check2 = check[check.target.apply(str.endswith, args=(type, 0)) == True]
-       # print("checkc2:", len(check2))
-
-        if len(check2) == 0:
-            ty = radio_activate[0]
-            check2 =  check[check.target.apply(str.endswith, args=(ty, 0)) == True]
-       # print(radio_filter)
+    if len(check2) == 0:
+        ty = radio_activate[0]
+        check2 =  check[check.target.apply(str.endswith, args=(ty, 0)) == True]
+   # print(radio_filter)
        # print(radio_activate)
        # print(check2)
     if  request.method == "GET":
         if(type!=None):
             if(state!="-1" and team!="-1"):
                 if(date!="-1"):
-                       
-                       
+
+
                        # data = gets.getFS(timezero = date, type = ty, state = st, model = tm)
                         print(ty,tm,st, date)
-                        
+
 
                         data = check2.sort_index()
                         if(data is None):
@@ -282,20 +281,20 @@ def getforecastplot(request, state, team,type,date):
                         #print(data)
                         color= '#ba2116'
                         name= st +"-"+ tm +"-"+  ty +"-"+  date
-                        print(name) 
+                        print(name)
 
                         names1 = tm
                         names2= st
                         index = data.index.strftime("%Y-%m-%d").tolist()
                         err = "no"
 
-                        values = pandas.to_numeric(data.point,downcast='integer').tolist()
+                        values = pd.to_numeric(data.point,downcast='integer').tolist()
                         for i in range(len(values)):
                             values[i] = int(values[i])
                         print(values)
                         index = convert_dateTotime(index)
                         series = list(zip(index,values))
-                       
+
                         context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
