@@ -43,11 +43,16 @@ labels = list()
 states = list(gets.locations)[1:len(gets.locations)]
 models = gets.models
 dates = []
+
+
 for d in gets.timezeros:
     dates.append(d.strftime("%Y-%m-%d"))
 
-global dataframe
-dataframe = pd.DataFrame()
+
+global list_dataframe
+list_dataframe =[]
+list_dataframe.append(gets.getFS(timezero=dates[-3]))
+
 targs = gets.targets
 
 all_targs = []
@@ -201,16 +206,20 @@ django.http.JsonResponse:
 
 """
 
-def datechange(request, date):
+def datechange(request, state, team,type,date):
     sugg_date= gets.getFS(timezero=date)
 
     if sugg_date is None:
          err = "No date"
          return JsonResponse({"errors": err, "models": models})
-    global dataframe
-    dataframe = sugg_date
     err = "no"
-    return JsonResponse({"errors": err, "models": models})
+    list_dataframe.append(sugg_date)
+    print("Add NEW DATA\n\n\n ================= \n\n\nssswqefwfew")
+    return getforecastplot(request, dataframe, state, team,type, date)
+
+
+
+
 def getforecastplot(request, state, team,type,date):
     print("Parameter from Get request")
     print(state)
@@ -236,7 +245,9 @@ def getforecastplot(request, state, team,type,date):
 #    radio_filter, radio_activate = radio_filtering(FC, FD)
 
 #    models = update_models(tmpC, tmpD, type)
+    dataframe = list_dataframe[-1]
 
+    print(dataframe)
     models = gets.models
     models = list(dataframe.model.unique())
 
