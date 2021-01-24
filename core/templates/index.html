@@ -168,6 +168,17 @@
                   </button>
                 </div>
 
+                <div class="alert alert-dismissible alert alert-light show fade " id="error_nodate" style=" display:none;   position:absolute;
+                top:50%;
+                left:50%;
+                margin-top:-50px;
+                margin-left:-100px;
+                width: 20em" role="alert"  >
+                <strong>Note: </strong>   <br> No forecast date for the selected zerodate  <br> 
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
                 <div class="alert alert-dismissible alert alert-light show fade " style="display:none;  position:absolute;
                 top:50%;
                 left:50%;
@@ -194,9 +205,9 @@
 
       <script>
 
-        function update_selectors(response)
+        function update_selectors(response, selector_name, response_type)
         {
-          x = document.getElementById("select_bench")
+          x = document.getElementById(selector_name)
           last = x.options[x.selectedIndex].value
           //  last = x.options[0].value
           while (x.options.length > 0) {
@@ -204,7 +215,7 @@
             x.remove(x.options.length - 1);
           }
 
-          new_options =  response["models"]
+          new_options =  response[response_type]
 
           console.log("LAst")
           console.log(last)
@@ -289,7 +300,7 @@
 
 
 
-        send_forecast_bench_form()
+        send_date()
 
 
 
@@ -312,7 +323,7 @@
           $.ajax({
             type: 'GET',
             // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
-            url: "get/ajax/forecast_plot/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value,
+            url: "get/ajax/date_change/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value,
             data: "",
             success: function (response) {
 
@@ -321,15 +332,24 @@
               console.log("ACK: "+_err)
               if(_err=="no")
               {
-                  //send_forecast_bench_form()
+                  send_forecast_bench_form()
               }
               else if(_err == "No date")
               {
                 console.log("No date ")
-                $("#error_alert").fadeIn(400);
+                $("#error_nodate").fadeIn(400);
                 setTimeout(function(){
-                  $("#error_alert").fadeOut(800);
+                  $("#error_nodate").fadeOut(800);
                 }, 3000)
+
+                if ( typeof myChart !== 'undefined')
+                {
+                  if(myChart.series[0])
+                  {
+                    myChart.series[0].remove(true)
+                  }
+                }
+                
               }
               else {
 
@@ -406,7 +426,11 @@
                 }*/
 
                 update_radio(response)
-                update_selectors(response)
+                
+                update_selectors(response,"select_bench","models")
+                update_selectors(response,"select_forecast","states")
+
+
 
 
 
@@ -518,7 +542,9 @@
                   $("#error_alert").fadeOut(800);
                 }, 3000)
 
-                update_selectors(response)
+                update_selectors(response,"select_bench","models")
+                update_selectors(response,"select_forecast","states")
+                
                 update_radio(response)
 
                 send_forecast_bench_form()

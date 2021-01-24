@@ -51,7 +51,8 @@ for d in gets.timezeros:
 
 global list_dataframe
 list_dataframe =[]
-list_dataframe.append(gets.getFS(timezero=dates[-3]))
+
+#date_change(request, state, team,type,date):
 
 targs = gets.targets
 
@@ -206,17 +207,40 @@ django.http.JsonResponse:
 
 """
 
-def datechange(request, state, team,type,date):
-    sugg_date= gets.getFS(timezero=date)
+def date_change(request, state, team,type,date):
+    global list_dataframe
+
+    try:
+     sugg_date= gets.getFS(timezero=date)
+     
+    except:
+         err = "No date"
+         models=[]
+         states=[]
+         list_dataframe =[]
+         active = []
+         name = ""
+         return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
 
     if sugg_date is None:
          err = "No date"
-         return JsonResponse({"errors": err, "models": models})
-    err = "no"
-    list_dataframe.append(sugg_date)
-    print("Add NEW DATA\n\n\n ================= \n\n\nssswqefwfew")
-    return getforecastplot(request, dataframe, state, team,type, date)
 
+         models=[]
+         states=[]
+         list_dataframe =[]
+         active = []
+         name = ""
+         return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
+
+     
+    else:
+        err = "no"
+        print("\n\n\n=======================\n Add NEW DATA\n\n\n =================== \n\n\n\n")
+
+        list_dataframe = [sugg_date]
+        
+        print(sugg_date)
+        return getforecastplot(request, state, team,type, date)
 
 
 
@@ -245,13 +269,18 @@ def getforecastplot(request, state, team,type,date):
 #    radio_filter, radio_activate = radio_filtering(FC, FD)
 
 #    models = update_models(tmpC, tmpD, type)
-    dataframe = list_dataframe[-1]
+    dataframe = list_dataframe[0]
 
-    print(dataframe)
+    print("LEN dataframe list:" , len(list_dataframe))
+    #print(dataframe)
     models = gets.models
     models = list(dataframe.model.unique())
 
+    states = [locations_inv[i] for i in list(dataframe.unit.unique())]
     dataset = dataframe[dataframe.unit == gets.locations[state]]
+    if len(dataset)==0:
+            st = locations_inv[dataframe.unit[0]]
+            dataset =  dataframe[dataframe.unit == gets.locations[st]]
 
     #print("dataset:", len(dataset))
     check = dataset[dataset.model == team]
@@ -306,7 +335,7 @@ def getforecastplot(request, state, team,type,date):
                         index = convert_dateTotime(index)
                         series = list(zip(index,values))
 
-                        context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
+                        context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
                         return JsonResponse(context)
 
 
@@ -357,3 +386,7 @@ def pages(request):
 
         html_template = loader.get_template( 'page-500.html' )
         return HttpResponse(html_template.render(context, request))
+
+
+
+
