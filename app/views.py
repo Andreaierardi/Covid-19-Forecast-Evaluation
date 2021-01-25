@@ -275,83 +275,84 @@ def getforecastplot(request, state, team,type,date):
 #    radio_filter, radio_activate = radio_filtering(FC, FD)
 
 #    models = update_models(tmpC, tmpD, type)
-    dataframe = list_dataframe[0]
+    if(len(list_dataframe)!= 0):
+        dataframe = list_dataframe[0]
 
-    print("LEN dataframe list:" , len(list_dataframe))
-    #print(dataframe)
-    models = gets.models
-    models = list(dataframe.model.unique())
+        print("LEN dataframe list:" , len(list_dataframe))
+        #print(dataframe)
+        models = gets.models
+        models = list(dataframe.model.unique())
 
-    states = [locations_inv[i] for i in list(dataframe.unit.unique())]
-    dataset = dataframe[dataframe.unit == gets.locations[state]]
-    if len(dataset)==0:
-            st = locations_inv[dataframe.unit[0]]
-            dataset =  dataframe[dataframe.unit == gets.locations[st]]
+        states = [locations_inv[i] for i in list(dataframe.unit.unique())]
+        dataset = dataframe[dataframe.unit == gets.locations[state]]
+        if len(dataset)==0:
+                st = locations_inv[dataframe.unit[0]]
+                dataset =  dataframe[dataframe.unit == gets.locations[st]]
 
-    #print("dataset:", len(dataset))
-    check = dataset[dataset.model == team]
-    #print("check:", len(check))
+        #print("dataset:", len(dataset))
+        check = dataset[dataset.model == team]
+        #print("check:", len(check))
 
-    if len(check)==0:
-        tm = dataset.model[0]
-        check = dataset[dataset.model == tm]
-        #print("new check", len(check))
-    print(models)
+        if len(check)==0:
+            tm = dataset.model[0]
+            check = dataset[dataset.model == tm]
+            #print("new check", len(check))
+        print(models)
 
-    radio_filter, radio_activate = radio_filtering(check)
+        radio_filter, radio_activate = radio_filtering(check)
 
-    check2 = check[check.target.apply(str.endswith, args=(type, 0)) == True]
-   # print("checkc2:", len(check2))
+        check2 = check[check.target.apply(str.endswith, args=(type, 0)) == True]
+       # print("checkc2:", len(check2))
 
-    if len(check2) == 0:
-        ty = radio_activate[0]
-        check2 =  check[check.target.apply(str.endswith, args=(ty, 0)) == True]
-   # print(radio_filter)
-       # print(radio_activate)
-       # print(check2)
-    if  request.method == "GET":
-        if(type!=None):
-            if(state!="-1" and team!="-1"):
-                if(date!="-1"):
-
-
-                       # data = gets.getFS(timezero = date, type = ty, state = st, model = tm)
-                        print(ty,tm,st, date)
+        if len(check2) == 0:
+            ty = radio_activate[0]
+            check2 =  check[check.target.apply(str.endswith, args=(ty, 0)) == True]
+       # print(radio_filter)
+           # print(radio_activate)
+           # print(check2)
+        if  request.method == "GET":
+            if(type!=None):
+                if(state!="-1" and team!="-1"):
+                    if(date!="-1"):
 
 
-                        data = check2.sort_index()
-                        if(data is None):
-                            err = "NotFound"
-                            print(err)
-                            return JsonResponse({"errors": err, "models": models})
-                        #print(data)
-                        color= '#ba2116'
-                        name= st +"-"+ tm +"-"+  ty +"-"+  date
-                        print(name)
-
-                        names1 = tm
-                        names2= st
-                        index = data.index.strftime("%Y-%m-%d").tolist()
-                        err = "no"
-
-                        values = pd.to_numeric(data.point,downcast='integer').tolist()
-                        for i in range(len(values)):
-                            values[i] = int(values[i])
-                        print(values)
-                        index = convert_dateTotime(index)
-                        series = list(zip(index,values))
-
-                        context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
-                        return JsonResponse(context)
+                           # data = gets.getFS(timezero = date, type = ty, state = st, model = tm)
+                            print(ty,tm,st, date)
 
 
+                            data = check2.sort_index()
+                            if(data is None):
+                                err = "NotFound"
+                                print(err)
+                                return JsonResponse({"errors": err, "models": models})
+                            #print(data)
+                            color= '#ba2116'
+                            name= st +"-"+ tm +"-"+  ty +"-"+  date
+                            print(name)
 
+                            names1 = tm
+                            names2= st
+                            index = data.index.strftime("%Y-%m-%d").tolist()
+                            err = "no"
+
+                            values = pd.to_numeric(data.point,downcast='integer').tolist()
+                            for i in range(len(values)):
+                                values[i] = int(values[i])
+                            print(values)
+                            index = convert_dateTotime(index)
+                            series = list(zip(index,values))
+
+                            context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
+                            return JsonResponse(context)
+
+
+
+                    else:
+                        err = "Select a Forecast date"
+                        return JsonResponse({"errors": err})
                 else:
-                    err = "Select a Forecast date"
+                    err = "Select a Location"
                     return JsonResponse({"errors": err})
-            else:
-                err = "Select a Location"
-                return JsonResponse({"errors": err})
 
 
 
