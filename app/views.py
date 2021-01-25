@@ -356,9 +356,6 @@ def getforecastplot(request, state, team,type,date):
 
     else:
          err = "Delay"
-
-         models=[]
-         states=[]
          list_dataframe =[]
          active = []
          name = ""
