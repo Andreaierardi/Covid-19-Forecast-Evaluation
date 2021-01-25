@@ -249,6 +249,8 @@ def date_change(request, state, team,type,date):
 
 
 def getforecastplot(request, state, team,type,date):
+    global list_dataframe
+
     print("Parameter from Get request")
     print(state)
     print(team)
