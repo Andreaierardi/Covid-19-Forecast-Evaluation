@@ -234,7 +234,6 @@ def date_change(request, state, team,type,date):
          list_dataframe =[]
          active = []
          name = ""
-         print("\n\n\n\n===== QUI =========== \n\n\n\n\n")
          return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
 
 
