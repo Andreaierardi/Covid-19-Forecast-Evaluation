@@ -354,6 +354,16 @@ def getforecastplot(request, state, team,type,date):
                     err = "Select a Location"
                     return JsonResponse({"errors": err})
 
+    else:
+         err = "Delay"
+
+         models=[]
+         states=[]
+         list_dataframe =[]
+         active = []
+         name = ""
+         return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
+
 
 
 
