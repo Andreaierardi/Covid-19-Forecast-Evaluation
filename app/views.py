@@ -275,7 +275,8 @@ def getforecastplot(request, state, team,type,date):
 #    radio_filter, radio_activate = radio_filtering(FC, FD)
 
 #    models = update_models(tmpC, tmpD, type)
-    dataframe = list_dataframe[0]
+    if(len(list_dataframe)!=0):
+        dataframe = list_dataframe[0]
 
     print("LEN dataframe list:" , len(list_dataframe))
     #print(dataframe)
