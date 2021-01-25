@@ -61,7 +61,7 @@
 
 
 
-                <div class="form-group">
+                <div class="form-group" id ="forecast">
                   <select   id="select_forecast" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
 
                     <option  value="{{ states.0 }}" selected> {{ states.0 }}</option>
@@ -75,9 +75,9 @@
 
 
 
-              <div class="col-md-6">
+              <div class="col-md-6" >
                 <label>Forecast Team - Model</label>
-                <div class="form-group">
+                <div class="form-group" id="team">
 
                   <select   id="select_bench" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="getforebench">
                     <option  value="{{models.0}}" selected> {{models.0}} </option>
@@ -92,12 +92,12 @@
 
 
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-6" >
 
 
 
                 <label class="col-sm-3 col-form-label">Target</label>
-                <div class="form-group row">
+                <div class="form-group row" id="targets">
 
 
                   <div class="col-sm-4">
@@ -135,7 +135,7 @@
 
 
 
-                      <div class="col-md-6">
+                      <div class="col-md-6" id = "dates">
                         <label>Forecast Date </label>
                         <div class="form-group">
 
@@ -174,7 +174,7 @@
                 margin-top:-50px;
                 margin-left:-100px;
                 width: 20em" role="alert"  >
-                <strong>Note: </strong>   <br> No forecast date for the selected zerodate  <br> 
+                <strong>Note: </strong>   <br> No forecast date for the selected zerodate  <br>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -304,7 +304,31 @@
 
 
 
+        function activate(elem) {
+          var x = document.getElementById(elem);
+          x.disabled = false
+
+        }
+
+        function disable(elem) {
+          var x = document.getElementById(elem);
+          x.disabled = true
+
+
+        }
+
+        function hide(elem) {
+          var x = document.getElementById(elem);
+          x.style.display = "none";
+        }
+
+        function show(elem) {
+          var x = document.getElementById(elem);
+          x.style.display = "block";
+        }
+
         function send_date() {
+
           var date = document.getElementById("select_date");
           var date_value = date.value;
 
@@ -332,6 +356,12 @@
               console.log("ACK: "+_err)
               if(_err=="no")
               {
+
+                  update_radio(response)
+
+                  update_selectors(response,"select_bench","models")
+                  update_selectors(response,"select_forecast","states")
+
                   send_forecast_bench_form()
               }
               else if(_err == "No date")
@@ -342,14 +372,15 @@
                   $("#error_nodate").fadeOut(800);
                 }, 3000)
 
-                if ( typeof myChart !== 'undefined')
-                {
-                  if(myChart.series[0])
-                  {
-                    myChart.series[0].remove(true)
-                  }
-                }
-                
+                hide("container2")
+                disable("select_bench")
+                disable("select_forecast")
+                disable("select_type1")
+                disable("select_type2")
+                disable("select_type3")
+                disable("select_type4")
+
+
               }
               else {
 
@@ -410,9 +441,13 @@
               if(_err=="no")
               {
 
-
-
-
+                show("container2")
+                activate("select_bench")
+                activate("select_forecast")
+                activate("select_type1")
+                activate("select_type2")
+                activate("select_type3")
+                activate("select_type4")
                 /*if(response["quantiles"][0] == -1)
                 {
                   _check_quantiles = false
@@ -426,7 +461,7 @@
                 }*/
 
                 update_radio(response)
-                
+
                 update_selectors(response,"select_bench","models")
                 update_selectors(response,"select_forecast","states")
 
@@ -529,6 +564,13 @@
               }
               else if(_err == "No date")
               {
+                hide("container2")
+                disable("select_bench")
+                disable("select_forecast")
+                disable("select_type1")
+                disable("select_type2")
+                disable("select_type3")
+                disable("select_type4")
                 console.log("No date ")
                 $("#error_alert").fadeIn(400);
                 setTimeout(function(){
@@ -544,7 +586,7 @@
 
                 update_selectors(response,"select_bench","models")
                 update_selectors(response,"select_forecast","states")
-                
+
                 update_radio(response)
 
                 send_forecast_bench_form()

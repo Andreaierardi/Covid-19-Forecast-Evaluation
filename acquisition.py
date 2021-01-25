@@ -24,14 +24,17 @@ from zoltpy.connection import QueryType
 
 
 # Locations dictionary {name: unit}
-locations = pd.read_csv("https://raw.githubusercontent.com/reichlab/zoltpy/master/zoltpy/locations.csv")
-locations = dict(locations.dropna()[['location_name', 'location']].to_dict('split')['data'])
-locations_inv = {v: k for k, v in locations.items()}
-with open('data/unique_lists/locations.pkl', 'wb') as f:
-    pickle.dump(locations, f)
-f.close()
+def update_locations():
+    locations = pd.read_csv("https://raw.githubusercontent.com/reichlab/zoltpy/master/zoltpy/locations.csv")
+    locations = dict(locations.dropna()[['location_name', 'location']].to_dict('split')['data'])
+    locations_inv = {v: k for k, v in locations.items()}
+    with open('data/unique_lists/locations.pkl', 'wb') as f:
+        pickle.dump(locations, f)
+    f.close()
+    return locations
 
 
+#update_locations()
 
 
 def get_project():
@@ -76,8 +79,14 @@ def get_targets():
       targs.append(target.name)
   return targs
 
-def retrieve_data():
-  dates = get_dates()
+
+def retrieve_data(new_dates = None):
+  if new_dates == None:
+      dates = get_dates()
+  else:
+      dates = new_dates
+  locations = update_locations()
+
   targs = get_targets()
   loc =   list(locations.values())[1:len(locations.values())]
   missing = []
@@ -87,7 +96,7 @@ def retrieve_data():
 
 
   for item in dates:
-    
+
     date = str(item)
     print("\n\n ===== NEW DATE:",num_date," ===== \n")
     num_date = num_date+1
@@ -109,8 +118,8 @@ def retrieve_data():
       print("Something went wrong for ",date)
       missing.append(date)
 
-      continue 
-  
+      continue
+
 ### Acquisition
 ## Data
 project = get_project()
@@ -124,61 +133,56 @@ project = get_project()
 # f.close()
 
 # Models list
-models = [m.abbreviation for m in project.models]
-with open('data/unique_lists/models.pkl', 'wb') as f:
-    pickle.dump(models, f)
-f.close()
+def update_models():
+    models = [m.abbreviation for m in project.models]
+    with open('data/unique_lists/models.pkl', 'wb') as f:
+        pickle.dump(models, f)
+    f.close()
 
 
-# Timezeros list 
-timezeros = get_dates()
-with open('data/unique_lists/timezeros.pkl', 'wb') as f:
-    pickle.dump(timezeros, f)
-f.close()
+def update_timezeros():
+    # Timezeros list
+    timezeros = get_dates()
+    with open('data/unique_lists/timezeros.pkl', 'wb') as f:
+        pickle.dump(timezeros, f)
+    f.close()
 
-# Targets list
-targets = get_targets()
-with open('data/unique_lists/targets.pkl', 'wb') as f:
-    pickle.dump(targets, f)
-f.close()
+def update_targets():
+    # Targets list
+    targets = get_targets()
+    with open('data/unique_lists/targets.pkl', 'wb') as f:
+        pickle.dump(targets, f)
+    f.close()
 
 
 #### CORRESPONDENCE dictionary ####
+def update_corrdict():
+    corr_dict = {}
 
-corr_dict = {}
-
-for date in timezeros:
-    try:
-        currd = pd.read_parquet("data/"+str(date)+".parquet")
-    except:
-        print('File not found')
-        continue
-    
-    print(str(date))
-    
-    for row in currd.values:
+    for date in timezeros:
         try:
-            modloc = (row[0], locations_inv[row[3]]) # MODEL AND LOCATION NAME
+            currd = pd.read_parquet("data/"+str(date)+".parquet")
         except:
+            print('File not found')
             continue
-        if modloc in corr_dict.keys():
-            corr_dict[modloc].add((row[1], # TIMEZERO
-                                   row[4].split('ahead ',1)[1], #TARGET
-                                   row[10])) # QUANTILE (None for point estimates)
-        else:
-            corr_dict[modloc] = {row[1], # TIMEZERO
-                                 row[4].split('ahead ',1)[1], #TARGET
-                                 row[10]} # QUANTILE (None for point estimates) 
+
+        print(str(date))
+
+        for row in currd.values:
+            try:
+                modloc = (row[0], locations_inv[row[3]]) # MODEL AND LOCATION NAME
+            except:
+                continue
+            if modloc in corr_dict.keys():
+                corr_dict[modloc].add((row[1], # TIMEZERO
+                                       row[4].split('ahead ',1)[1], #TARGET
+                                       row[10])) # QUANTILE (None for point estimates)
+            else:
+                corr_dict[modloc] = {row[1], # TIMEZERO
+                                     row[4].split('ahead ',1)[1], #TARGET
+                                     row[10]} # QUANTILE (None for point estimates)
 
 
-import bz2
-with bz2.BZ2File('data/unique_lists/corr_dict.pkl', 'w') as f:
-	pickle.dump(corr_dict, f)
-            
-
-
-
-
-
-
-
+    import bz2
+    with bz2.BZ2File('data/unique_lists/corr_dict.pkl', 'w') as f:
+    	pickle.dump(corr_dict, f)

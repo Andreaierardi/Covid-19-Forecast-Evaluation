@@ -26,7 +26,7 @@ def decompress_pickle(file):
  data = bz2.BZ2File(file, 'rb')
  data = cPickle.load(data)
  return data
- 
+
 corr_dict = decompress_pickle('data/unique_lists/corr_dict.pkl')
 
 quantiles = (0.99, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0.01, 0.975, 0.025)
@@ -66,12 +66,12 @@ def getFS(timezero, type="all", model="all", state="all"):
     c1 = data['target'].apply(str.endswith, args=(type, 0)) if type != "all" else pd.Series([True]*n)
     c2 = data['model'] == model if model != "all" else pd.Series([True]*n)
     c3 = data['unit'] == locations[state] if state != "all" else pd.Series([True]*n)
-    
+
     data = data[c1 & c2 & c3]
 
     if (data.empty):
         return None
-    
+
     # renaming duplicated columns
     data.rename(columns={"quantile": "q"}, inplace=True)
     # reshaping q column
@@ -94,9 +94,9 @@ def getFS(timezero, type="all", model="all", state="all"):
 def Fexists(model, location, timezero='any', target='any', quantile='any'):
     if (model, location) not in corr_dict.keys():
         return False
-    
+
     flagTZ, flagTA, flagQU = False, False, False
-    
+
     if timezero is not 'any':
         for tup in list(corr_dict[(model, location)]):
             try:
@@ -107,10 +107,10 @@ def Fexists(model, location, timezero='any', target='any', quantile='any'):
                 continue
     else:
         flagTZ = True
-    
+
     if flagTZ == False:
         return False
-        
+
     if target is not 'any':
         for tup in list(corr_dict[(model, location)]):
             try:
@@ -121,10 +121,10 @@ def Fexists(model, location, timezero='any', target='any', quantile='any'):
                 continue
     else:
         flagTA = True
-        
+
     if flagTA == False:
         return False
-        
+
     if quantile is not 'any':
         for tup in list(corr_dict[(model, location)]):
             try:
@@ -135,12 +135,12 @@ def Fexists(model, location, timezero='any', target='any', quantile='any'):
                 continue
     else:
         flagQU = True
-    
+
     if flagQU == False:
         return False
-        
+
     return True
-        
+
 
 # Examples of usage of Fexists:
 # Fexists(model='UT-Mobility', location='Connecticut')

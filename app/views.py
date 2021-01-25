@@ -21,7 +21,7 @@ import os
 
 #import pycode.acquisition as acquisition
 import getters as gets
-
+import acquisition as acq
 
 
 
@@ -48,9 +48,24 @@ dates = []
 for d in gets.timezeros:
     dates.append(d.strftime("%Y-%m-%d"))
 
+try:
+    data = gets.getFS(timezero= dates[0])
+except:
+    limit = dates[0]
+    print("LIMIT: ",limit)
+    parquet_list = sorted(os.listdir("data"))
+    parquet_list = parquet_list[0:len(parquet_list)-1]
+    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
+    last_parquet = parquet_list[len(parquet_list)-1].split(".parquet")[0]
+    print("LAST PARQUET:" ,last_parquet)
+    index = dates.index(last_parquet)
 
+    new_dates = dates[0:index]
+    print("NEW DATES:\n",new_dates)
+    acq.retrieve_data(new_dates)
+    data = gets.getFS(timezero= dates[0])
 global list_dataframe
-list_dataframe =[]
+list_dataframe =[data]
 
 #date_change(request, state, team,type,date):
 
@@ -210,18 +225,7 @@ django.http.JsonResponse:
 def date_change(request, state, team,type,date):
     global list_dataframe
 
-    try:
-     sugg_date= gets.getFS(timezero=date)
-     
-    except:
-         err = "No date"
-         models=[]
-         states=[]
-         list_dataframe =[]
-         active = []
-         name = ""
-         return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
-
+    sugg_date= gets.getFS(timezero=date)
     if sugg_date is None:
          err = "No date"
 
@@ -230,15 +234,16 @@ def date_change(request, state, team,type,date):
          list_dataframe =[]
          active = []
          name = ""
+         print("\n\n\n\n===== QUI =========== \n\n\n\n\n")
          return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
 
-     
+
     else:
         err = "no"
         print("\n\n\n=======================\n Add NEW DATA\n\n\n =================== \n\n\n\n")
 
         list_dataframe = [sugg_date]
-        
+
         print(sugg_date)
         return getforecastplot(request, state, team,type, date)
 
@@ -386,7 +391,3 @@ def pages(request):
 
         html_template = loader.get_template( 'page-500.html' )
         return HttpResponse(html_template.render(context, request))
-
-
-
-
