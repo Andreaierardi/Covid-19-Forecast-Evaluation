@@ -92,12 +92,12 @@
 
 
             <div class="row">
-              <div class="col-md-6" >
+              <div class="col-md-6" id= targets>
 
 
 
                 <label class="col-sm-3 col-form-label">Target</label>
-                <div class="form-group row" id="targets">
+                <div class="form-group row" >
 
 
                   <div class="col-sm-4">
@@ -259,7 +259,6 @@
           {
             x.options[0].selected = true
           }
-          sortSelect(x)
         }
 
         function update_radio (response)
@@ -292,8 +291,10 @@
             {
               if(radio_list[i].value == _radio_activate[j])
               {
+
                 radio_list[i].disabled = false
                 console.log("attivo",radio_list[i].value )
+                radio_list[i].checked  = true
 
               }
 
@@ -344,76 +345,8 @@
           x.style.display = "block";
         }
 
-        function send_date() {
-
-          var date = document.getElementById("select_date");
-          var date_value = date.value;
-
-          var fore = document.getElementById("select_forecast");
-          var bench = document.getElementById("select_bench");
-          var type = document.forms['fore-bench-form'].elements['membershipRadios']
-          var date = document.getElementById("select_date");
-
-          var fore_value = fore.value;
-          var bench_value = bench.value;
-          var type_value = type.value;
-          var date_value = date.value;
-
-          console.log("URL:")
-          console.log("get/ajax/date_change/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value)
-          $.ajax({
-            type: 'GET',
-            // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
-            url: "get/ajax/date_change/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value,
-            data: "",
-            success: function (response) {
-
-              console.log("ENTER RESPONSE")
-              _err = response["errors"]
-              console.log("ACK: "+_err)
-              if(_err=="no")
-              {
-
-                send_forecast_bench_form()
-              }
-              else if(_err == "No date")
-              {
-                console.log("No date ")
-                $("#error_nodate").fadeIn(400);
-                setTimeout(function(){
-                  $("#error_nodate").fadeOut(800);
-                }, 3000)
-
-
-
-              }
-              else {
-
-                $("#error_alert").fadeIn(400);
-                setTimeout(function(){
-                  $("#error_alert").fadeOut(800);
-                }, 3000)
-
-
-
-              }
-
-
-
-
-            },
-            error: function (response) {
-              // alert the error if any error occured
-
-
-
-
-
-
-            }
-          })
-        }
-
+        hide("dates")
+        hide("targets")
         function update_suggestions()
         {
 
@@ -439,10 +372,13 @@
              if(_err=="no")
              {
 
+
                update_radio(response)
 
                update_selectors(response,"select_date","dates")
 
+               show("targets")
+               show("dates")
 
                send_forecast_bench_form()
              }

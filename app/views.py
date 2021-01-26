@@ -200,27 +200,7 @@ django.http.JsonResponse:
 
 """
 
-def date_change(request, state, team,type,date):
 
-    sugg_date= gets.getFS(timezero=date)
-    if sugg_date is None:
-         err = "No date"
-
-         models=[]
-         states=[]
-         list_dataframe =[]
-         active = []
-         name = ""
-         return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
-
-
-    else:
-        err = "no"
-        print("\n\n\n=======================\n Add NEW DATA\n\n\n =================== \n\n\n\n")
-
-
-        print(sugg_date)
-        return getforecastplot(request, state, team,type, date)
 
 
 def get_suggestions(request, state, team):
@@ -240,7 +220,7 @@ def get_suggestions(request, state, team):
                 if s[1] not in targs:
                     targs.append(s[1])
 
-        dates = sorted(dates)
+        dates = sorted(dates, reverse = True)
         radio_activate = targs
 
         radio_filter = []
