@@ -21,10 +21,10 @@ import os
 
 #import pycode.acquisition as acquisition
 import getters as gets
-import acquisition as acq
-
-
-
+#import acquisition as acq
+from getters import Fexists
+from getters import getFS
+from getters import corr_dict
 
 #project_name = 'COVID-19 Forecasts'
 #model_abbr = 'BPagano-RtDriven'
@@ -40,17 +40,20 @@ import acquisition as acq
 
 values = list()
 labels = list()
-states = list(gets.locations)[1:len(gets.locations)]
-models = gets.models
+states = list(gets.locations)
+models = sorted(gets.models)
 dates = []
 
 
 for d in gets.timezeros:
-    dates.append(d.strftime("%Y-%m-%d"))
+   dates.append(d.strftime("%Y-%m-%d"))
 
 try:
     data = gets.getFS(timezero= dates[0])
+
 except:
+    import acquisition as acq
+
     limit = dates[0]
     print("LIMIT: ",limit)
     parquet_list = sorted(os.listdir("data"))
@@ -64,10 +67,7 @@ except:
     print("NEW DATES:\n",new_dates)
     acq.retrieve_data(new_dates)
     data = gets.getFS(timezero= dates[0])
-global list_dataframe
-list_dataframe =[data]
 
-#date_change(request, state, team,type,date):
 
 targs = gets.targets
 
@@ -84,28 +84,6 @@ locations_inv = {v: k for k, v in gets.locations.items()}
 #FC = acquisition.FC
 #FD = acquisition.FD
 
-
-
-# Useful dictionaries for the abbrevations
-namedict = {
-  "cc": "cum case",
-  "cd": "cum death",
-  "ic": "inc case",
-  "id": "inc death"
-}
-
-namedict_inv = {
-  "cum case":"cc",
-  "cum death": "cd",
-  "inc case": "ic",
-  "inc death": "id"
-}
-dict_case = {
-  "cc": "C",
-  "cd": "D",
-  "ic": "C",
-  "id": "D"
-}
 
 
 #============= UTILITY FUNCTIONS ====================
@@ -223,7 +201,6 @@ django.http.JsonResponse:
 """
 
 def date_change(request, state, team,type,date):
-    global list_dataframe
 
     sugg_date= gets.getFS(timezero=date)
     if sugg_date is None:
@@ -241,24 +218,107 @@ def date_change(request, state, team,type,date):
         err = "no"
         print("\n\n\n=======================\n Add NEW DATA\n\n\n =================== \n\n\n\n")
 
-        list_dataframe = [sugg_date]
 
         print(sugg_date)
         return getforecastplot(request, state, team,type, date)
 
 
+def get_suggestions(request, state, team):
+    if(Fexists(model = team, location = state)):
+
+        models = sorted(gets.models)
+        states = list(gets.locations)
+        targs = []
+
+        dates = []
+        sugg = corr_dict[(team,state)]
+        for s in sugg:
+            if(s is not None) and (type(s) is tuple):
+                print("FOUND:",s[0],s[1])
+                if s[0] not in dates:
+                    dates.append(s[0])
+                if s[1] not in targs:
+                    targs.append(s[1])
+
+        dates = sorted(dates)
+        radio_activate = targs
+
+        radio_filter = []
+        for i in all_targs:
+            if i not in radio_activate:
+                radio_filter.append(i)
+        err = "no"
+
+        print("\n\n=========\n\n")
+        print(radio_activate)
+        print(radio_filter)
+        print(dates)
+        context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
+        return JsonResponse(context)
+    else:
+        err = "Not Exists"
+        print(err)
+        return JsonResponse({"errors": err})
 
 def getforecastplot(request, state, team,type,date):
-    global list_dataframe
+
 
     print("Parameter from Get request")
     print(state)
     print(team)
     print(type)
     print(date)
-    st = state
-    tm = team
-    ty= type
+
+    if(Fexists(model = team, location = state)):
+
+        if(Fexists(model = team, location = state, target = type, timezero = date )):
+                data = gets.getFS(type=type, model=team, state=state, timezero=date)
+
+                if(data is None):
+                    err = "NotFound"
+                    print(err)
+                    return JsonResponse({"errors": err})
+                #print(data)
+                color= '#ba2116'
+                name= state +"-"+ team +"-"+  type +"-"+  date
+                print(name)
+
+                names1 = team
+                names2= state
+                index = data.index.strftime("%Y-%m-%d").tolist()
+                err = "no"
+
+                values = pd.to_numeric(data.point,downcast='integer').tolist()
+                for i in range(len(values)):
+                    values[i] = int(values[i])
+                print(values)
+                index = convert_dateTotime(index)
+                series = list(zip(index,values))
+
+                context = {   "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
+                return JsonResponse(context)
+        else:
+                    err = "No date"
+
+                    models=[]
+                    states=[]
+                    list_dataframe =[]
+                    active = []
+                    name = ""
+                    return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
+
+
+    else:
+            err = "No date"
+
+            models=[]
+            states=[]
+            list_dataframe =[]
+            active = []
+            name = ""
+            return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
+
+
 #    states = gets.locations
 #    dates = acquisition.Fdates
 #    targs = gets.targets
@@ -275,84 +335,6 @@ def getforecastplot(request, state, team,type,date):
 #    radio_filter, radio_activate = radio_filtering(FC, FD)
 
 #    models = update_models(tmpC, tmpD, type)
-    if(len(list_dataframe)!=0):
-        dataframe = list_dataframe[0]
-
-    print("LEN dataframe list:" , len(list_dataframe))
-    #print(dataframe)
-    models = gets.models
-    models = list(dataframe.model.unique())
-
-    states = [locations_inv[i] for i in list(dataframe.unit.unique())]
-    dataset = dataframe[dataframe.unit == gets.locations[state]]
-    if len(dataset)==0:
-            st = locations_inv[dataframe.unit[0]]
-            dataset =  dataframe[dataframe.unit == gets.locations[st]]
-
-    #print("dataset:", len(dataset))
-    check = dataset[dataset.model == team]
-    #print("check:", len(check))
-
-    if len(check)==0:
-        tm = dataset.model[0]
-        check = dataset[dataset.model == tm]
-        #print("new check", len(check))
-    print(models)
-
-    radio_filter, radio_activate = radio_filtering(check)
-
-    check2 = check[check.target.apply(str.endswith, args=(type, 0)) == True]
-   # print("checkc2:", len(check2))
-
-    if len(check2) == 0:
-        ty = radio_activate[0]
-        check2 =  check[check.target.apply(str.endswith, args=(ty, 0)) == True]
-   # print(radio_filter)
-       # print(radio_activate)
-       # print(check2)
-    if  request.method == "GET":
-        if(type!=None):
-            if(state!="-1" and team!="-1"):
-                if(date!="-1"):
-
-
-                       # data = gets.getFS(timezero = date, type = ty, state = st, model = tm)
-                        print(ty,tm,st, date)
-
-
-                        data = check2.sort_index()
-                        if(data is None):
-                            err = "NotFound"
-                            print(err)
-                            return JsonResponse({"errors": err, "models": models})
-                        #print(data)
-                        color= '#ba2116'
-                        name= st +"-"+ tm +"-"+  ty +"-"+  date
-                        print(name)
-
-                        names1 = tm
-                        names2= st
-                        index = data.index.strftime("%Y-%m-%d").tolist()
-                        err = "no"
-
-                        values = pd.to_numeric(data.point,downcast='integer').tolist()
-                        for i in range(len(values)):
-                            values[i] = int(values[i])
-                        print(values)
-                        index = convert_dateTotime(index)
-                        series = list(zip(index,values))
-
-                        context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color,"models":models, "states": states, "dates":dates}
-                        return JsonResponse(context)
-
-
-
-                else:
-                    err = "Select a Forecast date"
-                    return JsonResponse({"errors": err})
-            else:
-                err = "Select a Location"
-                return JsonResponse({"errors": err})
 
 
 

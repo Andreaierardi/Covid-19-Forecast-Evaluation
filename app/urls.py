@@ -16,6 +16,8 @@ urlpatterns = [
     path('', views.index, name='home'),
 
     path('get/ajax/forecast_plot/<str:state>/<str:team>/<str:type>/<str:date>', views.getforecastplot, name='getforecastplot'),
-    path('get/ajax/date_change/<str:state>/<str:team>/<str:type>/<str:date>', views.date_change, name='date_changes')
+    path('get/ajax/date_change/<str:state>/<str:team>/<str:type>/<str:date>', views.date_change, name='date_changes'),
+    path('get/ajax/update_suggestions/<str:state>/<str:team>', views.get_suggestions, name='get_suggestions')
+
 
 ]
