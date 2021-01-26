@@ -61,9 +61,9 @@ except:
     print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
     last_parquet = parquet_list[len(parquet_list)-1].split(".parquet")[0]
     print("LAST PARQUET:" ,last_parquet)
-    index = dates.index(last_parquet)
+    ind = dates.index(last_parquet)
 
-    new_dates = dates[0:index]
+    new_dates = dates[0:ind]
     print("NEW DATES:\n",new_dates)
     acq.retrieve_data(new_dates)
     data = gets.getFS(timezero= dates[0])
