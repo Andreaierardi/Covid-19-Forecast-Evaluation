@@ -48,25 +48,25 @@ dates = []
 for d in gets.timezeros:
    dates.append(d.strftime("%Y-%m-%d"))
 
-try:
-    data = gets.getFS(timezero= dates[0])
+#try:
+#    data = gets.getFS(timezero= dates[0])
 
-except:
-    import acquisition as acq
+#except:
+#    import acquisition as acq
 
-    limit = dates[0]
-    print("LIMIT: ",limit)
-    parquet_list = sorted(os.listdir("data"))
-    parquet_list = parquet_list[0:len(parquet_list)-1]
-    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
-    last_parquet = parquet_list[len(parquet_list)-1].split(".parquet")[0]
-    print("LAST PARQUET:" ,last_parquet)
-    ind = dates.index(last_parquet)
+#    limit = dates[0]
+#    print("LIMIT: ",limit)
+#    parquet_list = sorted(os.listdir("data"))
+#    parquet_list = parquet_list[0:len(parquet_list)-1]
+#    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
+#    last_parquet = parquet_list[len(parquet_list)-1].split(".parquet")[0]
+#    print("LAST PARQUET:" ,last_parquet)
+#    ind = dates.index(last_parquet)
 
-    new_dates = dates[0:ind]
-    print("NEW DATES:\n",new_dates)
-    acq.retrieve_data(new_dates)
-    data = gets.getFS(timezero= dates[0])
+#    new_dates = dates[0:ind]
+#    print("NEW DATES:\n",new_dates)
+#    acq.retrieve_data(new_dates)
+#    data = gets.getFS(timezero= dates[0])
 
 
 targs = gets.targets
