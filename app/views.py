@@ -36,7 +36,21 @@ states = list(gets.locations)
 models = sorted(gets.models)
 dates = []
 
-
+quantiles = ["0.99-0.01",
+"0.975-0.025",
+"0.95-0.05",
+"0.9-0.1",
+"0.85-0.15",
+"0.8-0.2",
+"0.75-0.25",
+"0.7-0.3",
+"0.65-0.35",
+"0.6-0.4",
+"0.55-0.45",
+"0.5-0.5"
+]
+#list(gets.quantiles)
+print(quantiles)
 for d in gets.timezeros:
    dates.append(d.strftime("%Y-%m-%d"))
 
@@ -163,17 +177,20 @@ def get_suggestions(request, state, team):
         models = sorted(gets.models)
         states = list(gets.locations)
         targs = []
-
         dates = []
+        quant = []
+
         sugg = corr_dict[(team,state)]
         for s in sugg:
             if(s is not None) and (type(s) is tuple):
-                print("FOUND:",s[0],s[1])
+                print("FOUND:",s[0],s[1],s[2])
                 if s[0] not in dates:
                     dates.append(s[0])
                 if s[1] not in targs:
                     targs.append(s[1])
-
+                if s[2] not in quant and s[2] is not None:
+                    quant.append(s[2])
+        print(quant)
         dates = sorted(dates, reverse = True)
         radio_activate = targs
 
@@ -181,20 +198,28 @@ def get_suggestions(request, state, team):
         for i in all_targs:
             if i not in radio_activate:
                 radio_filter.append(i)
-        err = "no"
 
+        quantiles = []
+        for i in quant[len(quant)//2:len(quant)]:
+                for j in quant[0:len(quant)//2+1]:
+                    if float(i)+float(j) == 1:
+                        quantiles.append(str(i)+"-"+str(j))
+        quantiles = sorted(quantiles, reverse = True)
+
+        err = "no"
         print("\n\n=========\n\n")
         print(radio_activate)
         print(radio_filter)
         print(dates)
-        context = {  "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
+        print(quantiles)
+        context = { "quantiles":quantiles, "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
         return JsonResponse(context)
     else:
         err = "Not Exists"
         print(err)
         return JsonResponse({"errors": err})
 
-def getforecastplot(request, state, team,type,date):
+def getforecastplot(request, state, team,type,date,quantile):
 
 
     print("Parameter from Get request")
@@ -202,7 +227,7 @@ def getforecastplot(request, state, team,type,date):
     print(team)
     print(type)
     print(date)
-
+    print(quantiles)
     if(Fexists(model = team, location = state)):
 
         if(Fexists(model = team, location = state, target = type, timezero = date )):
@@ -217,6 +242,13 @@ def getforecastplot(request, state, team,type,date):
                 name= state +"-"+ team +"-"+  type +"-"+  date
                 print(name)
 
+                print(quantile)
+                quant1 , quant2 = quantile.split("-")
+                print(quant1," and ", quant2)
+                qs = data[("quantile"),(quant1)]
+                qs2 = data[("quantile"),(quant2)]
+
+
                 names1 = team
                 names2= state
                 index = data.index.strftime("%Y-%m-%d").tolist()
@@ -225,11 +257,18 @@ def getforecastplot(request, state, team,type,date):
                 values = pd.to_numeric(data.point,downcast='integer').tolist()
                 for i in range(len(values)):
                     values[i] = int(values[i])
+
+                for i in range(len(qs)):
+                     qs[i] = int(float(qs[i]))
+                     qs2[i] = int(float(qs2[i]))
                 print(values)
                 index = convert_dateTotime(index)
                 series = list(zip(index,values))
+                seriesqs = list(zip(index,qs,qs2))
+                print(series)
+                print(seriesqs)
 
-                context = {   "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
+                context = {"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
                 return JsonResponse(context)
         else:
                     err = "No date"
@@ -263,7 +302,7 @@ def index(request):
 
 
 
-    context = { "states": states, "models":models, "dates":dates}
+    context = { "states": states, "models":models, "quantiles":quantiles,"dates":dates}
 
     return render(request, 'index.html',context)
 

@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="/static/assets/vendors/flag-icon-css/css/flag-icon.min.css">
 <link rel="stylesheet" href="/static/assets/vendors/owl-carousel-2/owl.carousel.min.css">
 <link rel="stylesheet" href="/static/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 {% endblock plugin_stylesheets %}
@@ -147,7 +147,54 @@
                             {% endfor %}
                           </select>
                         </div>
-                      </div>
+
+                      <div class="col-md-12" id = "quantiles">
+                        <label>Quantiles  </label>
+                        <div class="form-group">
+
+  <!--
+                       <label for="customRange1" class="form-label">Alpha value</label>
+
+                           <div class="row">
+
+                            <div class="col-sm-6">
+                          <input type="range" list="tickmarks" class="form-range" id="customRange1" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' oninput="document.getElementById('range_out').value = this.value">
+                          <datalist id="tickmarks">
+                            <option value="0"></option>
+                            <option value="10"></option>
+                            <option value="20"></option>
+                            <option value="30"></option>
+                            <option value="40"></option>
+                            <option value="50"></option>
+                            <option value="60"></option>
+                            <option value="70"></option>
+                            <option value="80"></option>
+                            <option value="90"></option>
+                            <option value="100">
+                            </option>
+                        </datalist>
+                        </div>
+                        <div class="col-sm-6">
+                          <output id="range_out"></output>
+                        </div>
+                      </div> -->
+
+
+                      <select   id="select_quantiles" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-4" name="sendquantiles">
+                        <option selected value="{{ quantiles.0 }}" >{{ quantiles.0}}</option>
+
+                        {% for quant in quantiles|slice:'1:'  %}
+                        <option  value="{{ quant }}" > {{ quant }}</option>
+                        {% endfor %}
+                      </select>
+
+
+                       </div>
+                    </div>
+
+                  </div>
+
+
                     </div>
 
 
@@ -204,23 +251,7 @@
 
 
       <script>
-        function sortSelect(selElem) {
-            var tmpAry = new Array();
-            for (var i=0;i<selElem.options.length;i++) {
-                tmpAry[i] = new Array();
-                tmpAry[i][0] = selElem.options[i].text;
-                tmpAry[i][1] = selElem.options[i].value;
-            }
-            tmpAry.sort(function(a, b){return a-b});    // Sort the numbers in the array in ascending order);
-            while (selElem.options.length > 0) {
-                selElem.options[0] = null;
-            }
-            for (var i=0;i<tmpAry.length;i++) {
-                var op = new Option(tmpAry[i][0], tmpAry[i][1]);
-                selElem.options[i] = op;
-            }
-            return;
-        }
+
 
         function update_selectors(response, selector_name, response_type)
         {
@@ -347,6 +378,9 @@
 
         hide("dates")
         hide("targets")
+        hide("quantiles")
+
+
         function update_suggestions()
         {
 
@@ -376,10 +410,12 @@
                update_radio(response)
 
                update_selectors(response,"select_date","dates")
+               update_selectors(response,"select_quantiles","quantiles")
 
+               //update range_selector(response, "")
                show("targets")
                show("dates")
-
+               show("quantiles")
                send_forecast_bench_form()
              }
 
@@ -421,19 +457,21 @@
           var bench = document.getElementById("select_bench");
           var type = document.forms['fore-bench-form'].elements['membershipRadios']
           var date = document.getElementById("select_date");
+          var quantiles = document.getElementById("select_quantiles");
 
           var fore_value = fore.value;
           var bench_value = bench.value;
           var type_value = type.value;
           var date_value = date.value;
+          var quantiles_value = quantiles.value;
 
           console.log("URL:")
-          console.log("get/ajax/forecast_plot/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value)
+          console.log("get/ajax/forecast_plot/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value+"/"+quantiles_value)
           // make POST ajax call
           $.ajax({
             type: 'GET',
             // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
-            url: "get/ajax/forecast_plot/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value,
+            url: "get/ajax/forecast_plot/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value+"/"+quantiles_value,
             data: "",
             success: function (response) {
 
@@ -456,9 +494,11 @@
 
                 }*/
 
-
+                  _quantiles = response["quantiles"]
+                  console.log("QUANT")
+                  console.log(_quantiles)
               //  _values = response["values"]
-                _color = response["color"]
+                 _color = response["color"]
                  _labels = response["index"]
 
             //    _values2 = response["values2"]
@@ -485,7 +525,10 @@
                  _series = response["series"]
                  _val = response["values"]
                 // _series2 = response ["series2"]
-
+                _namesq= response["names1"]
+                _seriesq = response["seriesqs"]
+                _colorq = response["color"]
+                console.log(_seriesq)
                   //  series = get_series(_labels,_values)
                 //    series2 = get_series(_labels2,_values2)
 
@@ -539,20 +582,20 @@
                     color: _color,
 					zIndex: 1
                   },
-				  
-				  {
-					name: _namesq,
-					data: _seriesq,
-					type: 'arearange',
-					lineWidth: 0,
-					color: _colorq,
-					fillOpacity: 0.3,
-					zIndex: 0,
-					marker: {
-						enabled: false
-				  }
-				  
-				  
+                  {
+        					name: _namesq,
+        					data: _seriesq,
+        					type: 'arearange',
+        					lineWidth: 0,
+        					color: _colorq,
+        					fillOpacity: 0.3,
+        					zIndex: 0,
+        					marker: {
+        						enabled: false
+        				  }
+                }
+
+
                   ],
                   plotOptions: {
                     line: {
@@ -627,4 +670,6 @@
 <script src="/static/assets/js/file-upload.js"></script>
 <script src="/static/assets/js/typeahead.js"></script>
 <script src="/static/assets/js/select2.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+
 {% endblock javascripts %}
