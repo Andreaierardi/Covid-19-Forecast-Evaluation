@@ -497,10 +497,8 @@
 
                 myChart = Highcharts.chart('container2', {
                   chart: {
-                    type: 'spline',
                     zoomType: 'x',
                     backgroundColor: '#191c24',
-
 
                   },
                   title: {
@@ -535,9 +533,11 @@
 
                   },*/
                   {
+					type: 'spline',
                     name: _names1,
                     data: _series,
-                    color: _color
+                    color: _color,
+					zIndex: 1
                   },
 				  
 				  {
