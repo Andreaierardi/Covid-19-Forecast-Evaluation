@@ -26,15 +26,7 @@ from getters import Fexists
 from getters import getFS
 from getters import corr_dict
 
-#project_name = 'COVID-19 Forecasts'
-#model_abbr = 'BPagano-RtDriven'
-#timezero_date = '2020-11-22'
 
-#project = [project for project in conn.projects if project.name == project_name][0]
-#json_io_dict = util.download_forecast(conn, project_name,model_abbr , timezero_date)
-#df2 = util.dataframe_from_json_io_dict(json_io_dict)
-
-#print(df2)
 
 #============= VARIABLE INITIALISATION  ====================
 
@@ -81,9 +73,6 @@ for i in gets.targets:
 all_targs.append("cum case")
 locations_inv = {v: k for k, v in gets.locations.items()}
 
-#FC = acquisition.FC
-#FD = acquisition.FD
-
 
 
 #============= UTILITY FUNCTIONS ====================
@@ -118,41 +107,6 @@ def radio_filtering(filter_FC):
             radio_activate.append(i)
     return (radio_filter, radio_activate)
 
-
-
-"""
-Gets the list of the model avaiable for the selected state and type of data to pass to the JS client
-
-    Parameters
-    ----------
-    tmpC : pandas.DataFrame
-        The dataframe for the cases filtered by State
-    tmpD : pansad.dataframe
-        The dataframe for the deaths filtered by State
-    type : str
-        The string of the type for the selected dataset
-
-    Returns
-    -------
-    list
-        a list of string containing the models avaiable for the type and state selected:
-
-"""
-
-def update_models(tmpC, tmpD, type):
-    if(type=="cc" ):
-        filter_state= tmpC[tmpC.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        model = filter_state.model.unique().tolist()
-    if (type=="ic"):
-        filter_state= tmpC[tmpC.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        model = filter_state.model.unique().tolist()
-    if(type=="cd"):
-        filter_state= tmpD[tmpD.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        model = filter_state.model.unique().tolist()
-    if(type=="id"):
-        filter_state= tmpD[tmpD.target.apply(str.endswith, args=(namedict[type], 0)) == True ]
-        model = filter_state.model.unique().tolist()
-    return model
 
 
 
@@ -282,7 +236,6 @@ def getforecastplot(request, state, team,type,date):
 
                     models=[]
                     states=[]
-                    list_dataframe =[]
                     active = []
                     name = ""
                     return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
@@ -298,23 +251,6 @@ def getforecastplot(request, state, team,type,date):
             name = ""
             return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
 
-
-#    states = gets.locations
-#    dates = acquisition.Fdates
-#    targs = gets.targets
-
-#    models = gets.models
-
-#    tmpC = filter_FC = FC[FC.location_name == state]
-#    filter_FC = filter_FC[filter_FC.model == team]
-
-#    tmpD = filter_FD = FD[FD.location_name == state]
-#    filter_FD = filter_FD[filter_FD.model == team]
-
-
-#    radio_filter, radio_activate = radio_filtering(FC, FD)
-
-#    models = update_models(tmpC, tmpD, type)
 
 
 

@@ -76,6 +76,10 @@ def get_targets():
       targs.append(target.name)
   return targs
 
+
+
+
+
 def retrieve_data(new_dates = None):
   if new_dates == None:
       dates = get_dates()
