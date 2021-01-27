@@ -232,12 +232,13 @@ def getforecastplot(request, state, team,type,date,quantile):
 
         if(Fexists(model = team, location = state, target = type, timezero = date )):
                 data = gets.getFS(type=type, model=team, state=state, timezero=date)
-
+                #IHME-curvefit ALABAMA
                 if(data is None):
                     err = "NotFound"
                     print(err)
                     return JsonResponse({"errors": err})
-                #print(data)
+                data = data.sort_index()
+
                 color= '#ba2116'
                 name= state +"-"+ team +"-"+  type +"-"+  date
                 print(name)
