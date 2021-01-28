@@ -96,7 +96,7 @@
 
 
 
-                <label class="col-sm-3 col-form-label">Target</label>
+                <label class="col-sm-4 col-form-label">Target</label>
                 <div class="form-group row" >
 
 
@@ -134,12 +134,15 @@
                       </div>
 
 
+                      <div class="col-md-6" id= targets>
 
-                      <div class="col-md-6" id = "dates">
+                        <div class="form-group row" >
+
+                      <div class="col-sm-4" id = "dates">
                         <label>Forecast Date </label>
                         <div class="form-group">
 
-                          <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-4" name="sendate">
+                          <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="sendate">
                             <option selected value="{{ dates.0 }}" >{{ dates.0}}</option>
 
                             {% for date in dates|slice:'1:'  %}
@@ -147,8 +150,9 @@
                             {% endfor %}
                           </select>
                         </div>
+                      </div>
 
-                      <div class="col-md-12" id = "quantiles">
+                      <div class="col-sm-4" id = "quantiles">
                         <label>Quantiles  </label>
                         <div class="form-group">
 
@@ -180,7 +184,7 @@
                       </div> -->
 
 
-                      <select   id="select_quantiles" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-4" name="sendquantiles">
+                      <select   id="select_quantiles" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="sendquantiles">
                         <option selected value="{{ quantiles.0 }}" >{{ quantiles.0}}</option>
 
                         {% for quant in quantiles|slice:'1:'  %}
@@ -191,14 +195,16 @@
 
                        </div>
                     </div>
-
                   </div>
 
+                  </div>
+                </div>
+
+                </form>
 
                     </div>
 
 
-                  </form>
 
                   <div id="container2" style="width:100%; height:400px;"></div>
 
@@ -481,7 +487,6 @@
               if(_err=="no")
               {
 
-                update_selectors(response,"select_quantiles","quantiles")
 
                 /*if(response["quantiles"][0] == -1)
                 {
@@ -497,6 +502,7 @@
 
 
                   _quantiles = response["quantiles"]
+                  update_selectors(response,"select_quantiles","quantiles")
                   console.log("QUANT")
                   console.log(_quantiles)
               //  _values = response["values"]
