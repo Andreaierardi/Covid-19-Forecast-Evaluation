@@ -249,6 +249,8 @@ def getforecastplot(request, state, team,type,date,quantile):
 
                 names1 = team
                 names2= state
+                namesq =  "Confidence Intervals:"+quantile
+                colorq = "#ffcc66"
                 index = data.index.strftime("%Y-%m-%d").tolist()
                 err = "no"
 
@@ -261,25 +263,36 @@ def getforecastplot(request, state, team,type,date,quantile):
                 series = list(zip(index,values))
                 print(series)
                 quantiles = []
-                for qut in data[('quantile')]:
-                    quantiles.append(qut)
-                #Auquan-SEIR , Alabama, 2020-08-24, cum death
-                check1 = Fexists(model = team, location = state, target = type, timezero = date, quantile = quant1 )
-                check2 = Fexists(model = team, location = state, target = type, timezero = date, quantile = quant2 )
-                if check1 and check2 :
+
+                quant = list(data[('quantile')])
+                quant_list = []
+                for i in quant[len(quant)//2:len(quant)]:
+                            for j in quant[0:len(quant)//2+1]:
+                                print("===_", i,j)
+                                if float(i)+float(j) == 1:
+                                    if(float(i)> float(j)):
+                                        quantiles.append(str(i)+"-"+str(j))
+                                    else:
+                                        quantiles.append(str(j)+"-"+str(i))
+                                    quant_list.append(str(i))
+                                    quant_list.append(str(j))
+
+                quantiles = sorted(quantiles, reverse =True)
+                print("======\n\n",quantiles)
+                print("\n\n\n\n\n\n---\n\n\n\n")
+                if quant1 in quant_list:
                     qs = data[("quantile"),(quant1)]
                     qs2 = data[("quantile"),(quant2)]
                     for i in range(len(qs)):
                         qs[i] = int(float(qs[i]))
                         qs2[i] = int(float(qs2[i]))
-                    seriesqs = list(zip(index,qs,qs2))
-                    print(seriesqs)
+                        seriesqs = list(zip(index,qs,qs2))
+                        print(seriesqs)
                 else:
                     seriesqs = []
 
 
-
-                context = {"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
+                context = {"namesq":namesq, "colorq":colorq,"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
                 return JsonResponse(context)
         else:
                     err = "No date"

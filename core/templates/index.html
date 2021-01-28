@@ -481,6 +481,7 @@
               if(_err=="no")
               {
 
+                update_selectors(response,"select_quantiles","quantiles")
 
                 /*if(response["quantiles"][0] == -1)
                 {
@@ -493,6 +494,7 @@
                   _check_quantiles = true
 
                 }*/
+
 
                   _quantiles = response["quantiles"]
                   console.log("QUANT")
@@ -525,9 +527,9 @@
                  _series = response["series"]
                  _val = response["values"]
                 // _series2 = response ["series2"]
-                _namesq= response["names1"]
+                _namesq= response["namesq"]
                 _seriesq = response["seriesqs"]
-                _colorq = response["color"]
+                _colorq = response["colorq"]
                 console.log(_seriesq)
                   //  series = get_series(_labels,_values)
                 //    series2 = get_series(_labels2,_values2)
@@ -540,7 +542,7 @@
 
                 myChart = Highcharts.chart('container2', {
                   chart: {
-                    zoomType: 'x',
+                    zoomType: 'xy',
                     backgroundColor: '#191c24',
 
                   },
