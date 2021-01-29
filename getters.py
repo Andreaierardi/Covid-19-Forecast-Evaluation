@@ -9,6 +9,9 @@ f = open('data/unique_lists/locations.pkl', 'rb')
 locations = pickle.load(f)
 f.close()
 locations_inv = {v: k for k, v in locations.items()}
+f = open('data/unique_lists/locations_abbr.pkl', 'rb')
+locations_abbr = pickle.load(f)
+f.close()
 
 f = open('data/unique_lists/targets.pkl', 'rb')
 targets = pickle.load(f)
