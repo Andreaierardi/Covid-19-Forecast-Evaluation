@@ -25,9 +25,9 @@ from zoltpy.connection import QueryType
 
 # Locations dictionary {name: unit}
 locations = pd.read_csv("https://raw.githubusercontent.com/reichlab/zoltpy/master/zoltpy/locations.csv")
+locations_abbr = dict(locations.dropna()[['location_name', 'abbreviation']].to_dict('split')['data'])
 locations = dict(locations.dropna()[['location_name', 'location']].to_dict('split')['data'])
 locations_inv = {v: k for k, v in locations.items()}
-locations_abbr = dict(locations.dropna()[['abbreviation', 'location_name']].to_dict('split')['data'])
 with open('data/unique_lists/locations.pkl', 'wb') as f:
     pickle.dump(locations, f)
 f.close()
