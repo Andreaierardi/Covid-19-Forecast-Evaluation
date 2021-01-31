@@ -4,6 +4,7 @@ import datetime as dt
 import bz2
 import pickle
 import _pickle as cPickle
+import operator as op
 
 f = open('data/unique_lists/locations.pkl', 'rb')
 locations = pickle.load(f)
