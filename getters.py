@@ -4,7 +4,6 @@ import datetime as dt
 import bz2
 import pickle
 import _pickle as cPickle
-import operator as op
 
 f = open('data/unique_lists/locations.pkl', 'rb')
 locations = pickle.load(f)
@@ -153,3 +152,65 @@ def Fexists(model, location, timezero='any', target='any', quantile='any'):
 # Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', quantile = '0.1')
 # Fexists('UT-Mobility', 'Connecticut', quantile = '0.2')
 # Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc death', quantile='0.95')
+
+
+def getRS(timezero, type, state, window):
+    """Gets the real cases, deaths or hospitalized series by state
+
+    Parameters
+    ----------
+    timezero : str or datetime
+        The start date for weekly aggregation. If a string, provide the format '%Y-%m-%d'.
+    type : str
+        'cum case' for cumulative cases.
+        'cum death' for cumulative deaths.
+        'inc case' for incidental cases.
+        'inc death' for incidental deaths.
+        'curr hospitalized' for currently hospitalized.
+        'all' for all types
+    state : str
+        The desired state for COVID statistics (full name). Choose 'all' for returning every state.
+    window : int
+        The length of the time window of data to be retrieved in weeks.
+
+    Returns
+    -------
+    pandas.Series : the series of real cases, deaths or hospitalized of the specified state. 
+                    For cumulative or current type, data is taken every week for a total of <window> weeks.
+                    For incidental type, data is aggregated every week starting from timezero+1 for a total of <window> weeks.
+    """
+    
+    data = pd.read_parquet("data/real_data.parquet")
+    if(isinstance(timezero, str)):
+        try:
+            timezero = dt.datetime.strptime(str(timezero), "%Y-%m-%d")
+        except Exception as e:
+            print(e)
+            return None
+
+    
+    # state filter
+    data = data[data['state'] == locations_abbr[state]]
+    
+    # date filter
+    data['date'] = pd.to_datetime(data['date'])
+    data.set_index('date', inplace=True)
+    
+    try:
+        if('cum' in type or 'curr' in type):
+            datelist = [timezero + dt.timedelta(7)*(1+i) for i in range(window)]
+            out = data.loc[datelist,type]
+        else:
+            datelist = [timezero + dt.timedelta(1+i) for i in range(7*window)]
+            out = data.loc[datelist,type]
+            # aggregate by week, starting on timezero+1
+            out = out.groupby(lambda x: timezero + dt.timedelta(((x-timezero).days-1) // 7 + 1)*7).sum()       
+    except Exception as e:
+        print(e)
+        return None
+
+    return out
+
+
+# Example: out = getRS('2020-05-20', type='inc case', state='Alabama', window=4)
+    

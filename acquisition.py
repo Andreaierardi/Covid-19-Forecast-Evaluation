@@ -186,3 +186,32 @@ for date in timezeros:
 import bz2
 with bz2.BZ2File('data/unique_lists/corr_dict.pkl', 'w') as f:
 	pickle.dump(corr_dict, f)
+    
+       
+# REAL DATA GETTER from https://covidtracking.com
+real_data = pd.read_csv("https://covidtracking.com/data/download/all-states-history.csv")
+real_data_US = pd.read_csv("https://covidtracking.com/data/download/national-history.csv")
+real_data = real_data.loc[:,['date', 'state', 
+                             'positive', 'death','hospitalizedCurrently',
+                             'positiveIncrease', 'deathIncrease']]
+real_data_US = real_data_US.loc[:,['date', 
+                                   'positive', 'death','hospitalizedCurrently',
+                                   'positiveIncrease', 'deathIncrease']]
+real_data.rename(columns={'positive': 'cum case',
+                          'death': 'cum death',
+                          'hospitalizedCurrently': 'curr hospitalized',
+                          'positiveIncrease': 'inc case',
+                          'deathIncrease': 'inc death'}, inplace=True)
+real_data_US.rename(columns={'positive': 'cum case',
+                             'death': 'cum death',
+                             'hospitalizedCurrently': 'curr hospitalized',
+                             'positiveIncrease': 'inc case',
+                             'deathIncrease': 'inc death'}, inplace=True)
+real_data_US.insert(loc=1, column='state', value='US')
+real_data = real_data.append(real_data_US).reset_index(drop=True)
+
+# ---------- Writing --------------
+real_data.to_parquet('data/real_data.parquet') 
+
+
+
