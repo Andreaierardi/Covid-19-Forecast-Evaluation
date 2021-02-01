@@ -539,6 +539,7 @@
                 _namesq= response["namesq"]
                 _seriesq = response["seriesqs"]
                 _colorq = response["colorq"]
+                _type_serie = response["type_serie"]
                 console.log(_seriesq)
                   //  series = get_series(_labels,_values)
                 //    series2 = get_series(_labels2,_values2)
@@ -585,14 +586,16 @@
 
 
                   {
-					type: 'spline',
+
+					          type: _type_serie,
                     name: _names1,
                     data: _series,
                     color: _color,
-					          zIndex: 1
+					          zIndex: 1,
+
                   },
                   {
-                    type: 'spline',
+                    type:_type_serie,
                     name: _real_name,
                     data: _real_series,
                     color: _real_color,
@@ -618,9 +621,24 @@
                   plotOptions: {
                     line: {
                       dataLabels: {
-                        enabled: true
+                        enabled: true,
+                        inside: true,
+                       style: {
+                           fontSize: '16px'
+                       }
+                      }
+                    },
+                    column:{
+                      dataLabels: {
+                        enabled: true,
+                        inside: true,
+                       style: {
+                           fontSize: '10px'
+                       }
                       }
                     }
+
+
                   }
                 } );
 
@@ -689,5 +707,7 @@
 <script src="/static/assets/js/typeahead.js"></script>
 <script src="/static/assets/js/select2.js"></script>
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
-
+<script src="https://code.highcharts.com/modules/histogram-bellcurve.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 {% endblock javascripts %}
