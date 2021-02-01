@@ -518,6 +518,9 @@
                 //_names2 = response["names2"]
                 _models = response["models"]
 
+                _real_name =  response["real_name"]
+                _real_color = response["real_color"]
+                _real_series = response["real_series"]
                 /*    console.log("REAL")
 
                 console.log(_labels)
@@ -541,6 +544,9 @@
                 //    series2 = get_series(_labels2,_values2)
 
                  console.log(_series)
+
+                 console.log("\n\n\n === REAL === \n\n\n")
+                 console.log(_real_series)
                  //console.log(_series2)
                    // console.log(series)
                   //  console.log(series2)
@@ -577,19 +583,23 @@
 
                   series: [
 
-                  /*{
-                    name: _names2,
-                    data: _series2,
-                    color: _color2,
 
-                  },*/
                   {
 					type: 'spline',
                     name: _names1,
                     data: _series,
                     color: _color,
-					zIndex: 1
+					          zIndex: 1
                   },
+                  {
+                    type: 'spline',
+                    name: _real_name,
+                    data: _real_series,
+                    color: _real_color,
+                    zIndex: 1
+
+                  },
+
                   {
         					name: _namesq,
         					data: _seriesq,

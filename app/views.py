@@ -25,7 +25,7 @@ import getters as gets
 from getters import Fexists
 from getters import getFS
 from getters import corr_dict
-
+from getters import getRS
 
 
 #============= VARIABLE INITIALISATION  ====================
@@ -36,19 +36,31 @@ states = list(gets.locations)
 models = sorted(gets.models)
 dates = []
 
-quantiles = ["0.99-0.01",
-"0.975-0.025",
-"0.95-0.05",
-"0.9-0.1",
-"0.85-0.15",
-"0.8-0.2",
-"0.75-0.25",
-"0.7-0.3",
-"0.65-0.35",
-"0.6-0.4",
-"0.55-0.45",
-"0.5-0.5"
-]
+quant = gets.quantiles
+quantiles = []
+for i in quant[len(quant)//2:len(quant)]:
+            for j in quant[0:len(quant)//2+1]:
+                print("===_", i,j)
+                if float(i)+float(j) == 1:
+                    if(float(i)> float(j)):
+                        quantiles.append(str(i)+"-"+str(j))
+                    else:
+                        quantiles.append(str(j)+"-"+str(i))
+quantiles = sorted(quantiles, reverse = True)
+print(quantiles)
+#quantiles = ["0.99-0.01",
+#"0.975-0.025",
+#"0.95-0.05",
+#"0.9-0.1",
+#"0.85-0.15",
+#"0.8-0.2",
+#"0.75-0.25",
+#"0.7-0.3",
+#"0.65-0.35",
+#"0.6-0.4",
+#"0.55-0.45",
+#"0.5-0.5"
+#]
 #list(gets.quantiles)
 print(quantiles)
 for d in gets.timezeros:
@@ -231,16 +243,28 @@ def getforecastplot(request, state, team,type,date,quantile):
     if(Fexists(model = team, location = state)):
 
         if(Fexists(model = team, location = state, target = type, timezero = date )):
-                data = gets.getFS(type=type, model=team, state=state, timezero=date)
+                data = getFS(type=type, model=team, state=state, timezero=date)
                 #IHME-curvefit ALABAMA
                 if(data is None):
                     err = "NotFound"
                     print(err)
                     return JsonResponse({"errors": err})
+
+                real_data = getRS(timezero= date, type = type , state= state, window= len(data))
+                if (real_data is None):
+                        err = "Real data NotFound"
+                        print(err)
+                        return JsonResponse({"errors": err})
                 data = data.sort_index()
+                real_data = real_data.sort_index()
 
                 color= '#ba2116'
+                real_color = '#2f7ed8'
+                colorq = "#ffcc66"
+
+
                 name= state +"-"+ team +"-"+  type +"-"+  date
+                real_name = "Real cases"
                 print(name)
                 print(quantile)
                 quant1 , quant2 = quantile.split("-")
@@ -250,7 +274,6 @@ def getforecastplot(request, state, team,type,date,quantile):
                 names1 = team
                 names2= state
                 namesq =  "Confidence Intervals:"+quantile
-                colorq = "#ffcc66"
                 index = data.index.strftime("%Y-%m-%d").tolist()
                 err = "no"
 
@@ -259,9 +282,19 @@ def getforecastplot(request, state, team,type,date,quantile):
                     values[i] = int(values[i])
 
                 print(values)
+
+
+                real_values = list(real_data.values)
+                for i in range(len(real_values)):
+                    real_values[i] = int(real_values[i])
+
+                print(real_values)
                 index = convert_dateTotime(index)
                 series = list(zip(index,values))
                 print(series)
+
+
+                real_series = list(zip(index, real_values))
                 quantiles = []
 
                 quant = list(data[('quantile')])
@@ -292,7 +325,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                     seriesqs = []
 
 
-                context = {"namesq":namesq, "colorq":colorq,"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
+                context = {"real_color": real_color,"real_name":real_name,"real_series":real_series,"namesq":namesq, "colorq":colorq,"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
                 return JsonResponse(context)
         else:
                     err = "No date"
