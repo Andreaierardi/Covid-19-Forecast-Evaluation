@@ -540,6 +540,7 @@
                 _seriesq = response["seriesqs"]
                 _colorq = response["colorq"]
                 _type_serie = response["type_serie"]
+                _type_error = response["type_error"]
                 console.log(_seriesq)
                   //  series = get_series(_labels,_values)
                 //    series2 = get_series(_labels2,_values2)
@@ -584,6 +585,23 @@
 
                   series: [
 
+                  {
+                    name: _namesq,
+                    data: _seriesq,
+                    type: _type_error,
+                    color: _colorq,
+
+
+                  },
+
+                  {
+                    name: _namesq,
+                    data: _seriesq,
+                    type: _type_error,
+                    color: _colorq,
+
+
+                  },
 
                   {
 
@@ -603,18 +621,6 @@
 
                   },
 
-                  {
-        					name: _namesq,
-        					data: _seriesq,
-        					type: 'arearange',
-        					lineWidth: 0,
-        					color: _colorq,
-        					fillOpacity: 0.3,
-        					zIndex: 0,
-        					marker: {
-        						enabled: false
-        				  }
-                }
 
 
                   ],
@@ -628,7 +634,7 @@
                           symbolStrokeWidth: 2,
                           x: -40,
                           y: -10,
-                          
+
                           theme: {
                                    'stroke-width': 2,
                                    fill:'#191c24',
@@ -665,10 +671,27 @@
                            fontSize: '10px'
                        }
                       }
+                    },
+
+                    arearange:{
+                      fillOpacity: 0.3,
+                      zIndex: 0,
+                      marker: {
+                        enabled: false
+                      }
+                    },
+
+
+                    errorbar:
+                    {
+                      // Prevents error bar from adding extra padding on the xAxis:
+                        pointRange: 0,
+                      
+                    }
                     }
 
 
-                  }
+
                 } );
 
               }

@@ -326,10 +326,12 @@ def getforecastplot(request, state, team,type,date,quantile):
 
                 if type.startswith("inc"):
                     type_serie = "column"
+                    type_error = "errorbar"
                     #or histogram
                 else:
                     type_serie = "spline"
-                context = {"type_serie":type_serie, "real_color": real_color,"real_name":real_name,"real_series":real_series,"namesq":namesq, "colorq":colorq,"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
+                    type_error = "arearange"
+                context = {"type_error":type_error,"type_serie":type_serie, "real_color": real_color,"real_name":real_name,"real_series":real_series,"namesq":namesq, "colorq":colorq,"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
                 return JsonResponse(context)
         else:
                     err = "No date"
