@@ -77,7 +77,7 @@ except:
     parquet_list = sorted(os.listdir("data"))
     parquet_list = parquet_list[0:len(parquet_list)-1]
     print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
-    last_parquet = parquet_list[len(parquet_list)-1].split(".parquet")[0]
+    last_parquet = parquet_list[len(parquet_list)-2].split(".parquet")[0]
     print("LAST PARQUET:" ,last_parquet)
     ind = dates.index(last_parquet)
 
