@@ -72,15 +72,16 @@ def get_dates():
     dates.append(item.timezero_date)
   return dates
 
-def get_targets(hosp=False):
+def get_targets(onlyhosp=False):
   targs =[]
   for target in project.targets:
     name = target.name
-    if "wk" in name:
-      targs.append(target.name)
-    if hosp:
+    if onlyhosp:
       if "hosp" in name:
         targs.append(target.name)
+    elif "wk" in name:
+      targs.append(target.name)
+      
   return targs
 
 
@@ -94,6 +95,7 @@ def retrieve_data(new_dates = None):
       dates = new_dates
 
   targs = get_targets()
+#  targs = get_targets(onlyhosp=True)
   loc =   list(locations.values())[1:len(locations.values())]
   missing = []
 
