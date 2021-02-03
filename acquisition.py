@@ -72,12 +72,15 @@ def get_dates():
     dates.append(item.timezero_date)
   return dates
 
-def get_targets():
+def get_targets(hosp=False):
   targs =[]
   for target in project.targets:
     name = target.name
     if "wk" in name:
       targs.append(target.name)
+    if hosp:
+      if "hosp" in name:
+        targs.append(target.name)
   return targs
 
 

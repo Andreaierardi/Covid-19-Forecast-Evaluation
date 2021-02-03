@@ -49,6 +49,7 @@ def getFS(timezero, type="all", model="all", state="all"):
         'cum death' for cumulative deaths.
         'inc case' for incidental cases.
         'inc death' for incidental deaths.
+        'hosp' for hospitalized.
         'all' for all types
     model : str
         The model of the forecast. Choose 'all' for returning every model.
