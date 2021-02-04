@@ -251,7 +251,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                     return JsonResponse({"errors": err})
 
                 data_len =len(data)
-                
+
                 today = datetime.datetime.now()
                 convert = datetime.datetime.strptime(date,"%Y-%m-%d")
                 while(convert+datetime.timedelta(7*data_len)) > today:
@@ -305,32 +305,35 @@ def getforecastplot(request, state, team,type,date,quantile):
                 real_series = list(zip(index, real_values))
                 quantiles = []
 
-                quant = list(data[('quantile')])
-                quant_list = []
-                for i in quant[len(quant)//2:len(quant)]:
-                            for j in quant[0:len(quant)//2+1]:
-                                print("===_", i,j)
-                                if float(i)+float(j) == 1:
-                                    if(float(i)> float(j)):
-                                        quantiles.append(str(i)+"-"+str(j))
-                                    else:
-                                        quantiles.append(str(j)+"-"+str(i))
-                                    quant_list.append(str(i))
-                                    quant_list.append(str(j))
+                try:
+                    quant = list(data[('quantile')])
+                    quant_list = []
+                    for i in quant[len(quant)//2:len(quant)]:
+                                for j in quant[0:len(quant)//2+1]:
+                                    print("===_", i,j)
+                                    if float(i)+float(j) == 1:
+                                        if(float(i)> float(j)):
+                                            quantiles.append(str(i)+"-"+str(j))
+                                        else:
+                                            quantiles.append(str(j)+"-"+str(i))
+                                        quant_list.append(str(i))
+                                        quant_list.append(str(j))
 
-                quantiles = sorted(quantiles, reverse =True)
-                print("======\n\n",quantiles)
-                print("\n\n\n\n\n\n---\n\n\n\n")
-                if quant1 in quant_list:
-                    qs = data[("quantile"),(quant1)]
-                    qs2 = data[("quantile"),(quant2)]
-                    for i in range(len(qs)):
-                        qs[i] = int(float(qs[i]))
-                        qs2[i] = int(float(qs2[i]))
-                        seriesqs = list(zip(index,qs,qs2))
-                        print(seriesqs)
-                else:
-                    seriesqs = []
+                    quantiles = sorted(quantiles, reverse =True)
+                    print("======\n\n",quantiles)
+                    print("\n\n\n\n\n\n---\n\n\n\n")
+                    if quant1 in quant_list:
+                        qs = data[("quantile"),(quant1)]
+                        qs2 = data[("quantile"),(quant2)]
+                        for i in range(len(qs)):
+                            qs[i] = int(float(qs[i]))
+                            qs2[i] = int(float(qs2[i]))
+                            seriesqs = list(zip(index,qs,qs2))
+                            print(seriesqs)
+                    else:
+                        seriesqs = []
+                except:
+                        seriesqs = []
 
                 if type.startswith("inc"):
                     type_serie = "column"
