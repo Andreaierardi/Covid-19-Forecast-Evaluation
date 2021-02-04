@@ -47,6 +47,7 @@ for i in quant[len(quant)//2:len(quant)]:
                     else:
                         quantiles.append(str(j)+"-"+str(i))
 quantiles = sorted(quantiles, reverse = True)
+all_quant = quantiles
 print(quantiles)
 #quantiles = ["0.99-0.01",
 #"0.975-0.025",
@@ -244,7 +245,6 @@ def getforecastplot(request, state, team,type,date,quantile):
 
         if(Fexists(model = team, location = state, target = type, timezero = date )):
                 data = getFS(type=type, model=team, state=state, timezero=date)
-                #IHME-curvefit ALABAMA
                 if(data is None):
                     err = "NotFound"
                     print(err)
@@ -274,6 +274,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                 name= state +"-"+ team +"-"+  type +"-"+  date
                 real_name = "Real cases"
                 print(name)
+                
                 print(quantile)
                 quant1 , quant2 = quantile.split("-")
                 print(quant1," and ", quant2)
@@ -334,6 +335,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                         seriesqs = []
                 except:
                         seriesqs = []
+                        quantiles = [-1]
 
                 if type.startswith("inc"):
                     type_serie = "column"

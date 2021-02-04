@@ -416,8 +416,18 @@
                update_radio(response)
 
                update_selectors(response,"select_date","dates")
-               update_selectors(response,"select_quantiles","quantiles")
 
+               console.log(response["quantiles"])
+               if(response["quantiles"] !== undefined || response["quantiles"] !== null) 
+                  {
+                   update_selectors(response,"select_quantiles","quantiles")
+                  }
+                else
+                {
+                  response["quantiles"] =["nodata"]
+                  update_selectors(response,"select_quantiles","quantiles")
+
+                 }
                //update range_selector(response, "")
                show("targets")
                show("dates")
@@ -488,7 +498,7 @@
               {
 
 
-                /*if(response["quantiles"][0] == -1)
+                if(response["quantiles"][0] == -1)
                 {
                   _check_quantiles = false
 
@@ -498,11 +508,22 @@
                   }, 3000)
                   _check_quantiles = true
 
-                }*/
+                }
 
+                  if(!response["quantiles"][0]  == -1)
+                  {
 
-                  _quantiles = response["quantiles"]
-                  update_selectors(response,"select_quantiles","quantiles")
+                    update_selectors(response,"select_quantiles","quantiles")
+                    _quantiles = response["quantiles"]
+
+                  }
+                  else
+                  {
+                    update_selectors(response,"select_quantiles","quantiles")
+
+                    _quantiles = []
+                  }
+
                   console.log("QUANT")
                   console.log(_quantiles)
               //  _values = response["values"]
@@ -594,14 +615,6 @@
 
                   },
 
-                  {
-                    name: _namesq,
-                    data: _seriesq,
-                    type: _type_error,
-                    color: _colorq,
-
-
-                  },
 
                   {
 
