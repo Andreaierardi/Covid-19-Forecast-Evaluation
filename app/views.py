@@ -250,7 +250,15 @@ def getforecastplot(request, state, team,type,date,quantile):
                     print(err)
                     return JsonResponse({"errors": err})
 
-                real_data = getRS(timezero= date, type = type , state= state, window= len(data))
+                data_len =len(data)
+                
+                today = datetime.datetime.now()
+                convert = datetime.datetime.strptime(date,"%Y-%m-%d")
+                while(convert+datetime.timedelta(7*data_len)) > today:
+                    data_len = data_len -1
+                    print(data_len)
+                real_data = getRS(timezero= date, type = type , state= state, window= data_len)
+
                 if (real_data is None):
                         err = "Real data NotFound"
                         print(err)
@@ -348,7 +356,6 @@ def getforecastplot(request, state, team,type,date,quantile):
 
             models=[]
             states=[]
-            list_dataframe =[]
             active = []
             name = ""
             return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
