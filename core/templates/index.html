@@ -215,7 +215,7 @@
                   margin-top:-50px;
                   margin-left:-100px;
                   width: 20em" role="alert"  >
-                  <strong>Note: </strong>   <br> No forecast release from the last selected team "{{ models.0}}"  <br> Team has been  <strong> automatically selected</strong>
+                  <strong>Note: </strong>   <br> No forecast release for the last selected team  <br>  try to <strong>change </strong> the forecast <strong>date</strong> or the <strong>target</strong>
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -294,7 +294,18 @@
 
           if(check_last)
           {
-            x.options[0].selected = true
+            if (x.options[0] == null){
+              var opt = document.createElement('option');
+
+              opt.text = "No quantiles"
+              opt.value = "-1"
+              x.add(opt,null)
+              x.options[0].selected = true
+            }
+            else
+            {
+              x.options[0].selected = true
+            }
           }
         }
 
@@ -417,17 +428,9 @@
 
                update_selectors(response,"select_date","dates")
 
+               update_selectors(response,"select_quantiles","quantiles")
                console.log(response["quantiles"])
-               if(response["quantiles"] !== undefined || response["quantiles"] !== null) 
-                  {
-                   update_selectors(response,"select_quantiles","quantiles")
-                  }
-                else
-                {
-                  response["quantiles"] =["nodata"]
-                  update_selectors(response,"select_quantiles","quantiles")
 
-                 }
                //update range_selector(response, "")
                show("targets")
                show("dates")
@@ -507,23 +510,13 @@
                     $("#alert").fadeOut(800);
                   }, 3000)
                   _check_quantiles = true
-
+                  response["quantiles"] = []
                 }
 
-                  if(!response["quantiles"][0]  == -1)
-                  {
+                  update_selectors(response,"select_quantiles","quantiles")
 
-                    update_selectors(response,"select_quantiles","quantiles")
-                    _quantiles = response["quantiles"]
 
-                  }
-                  else
-                  {
-                    update_selectors(response,"select_quantiles","quantiles")
-
-                    _quantiles = []
-                  }
-
+                  _quantiles = response["quantiles"]
                   console.log("QUANT")
                   console.log(_quantiles)
               //  _values = response["values"]
@@ -659,7 +652,6 @@
                                     },
                                     select: {
                                         stroke: 'black',
-                                        symbolStroke: 'black',
                                         fill: 'silver'
                                     }
                                 }
@@ -699,7 +691,7 @@
                     {
                       // Prevents error bar from adding extra padding on the xAxis:
                         pointRange: 0,
-                      
+
                     }
                     }
 

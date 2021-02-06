@@ -1,0 +1,219 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Authors {% endblock %}
+
+<!-- Specific Plugin CSS goes HERE -->
+{% block plugin_stylesheets %}{% endblock plugin_stylesheets %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="content-wrapper">
+  <div class="page-header">
+    <h3 class="page-title"> Documentation </h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Documentation</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Doc </li>
+      </ol>
+    </nav>
+  </div>
+  <div class="row">
+
+
+    <div class="col-md-4 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Top aligned media</h4>
+          <div class="media">
+            <i class="mdi mdi-earth icon-md text-info d-flex align-self-start mr-3"></i>
+            <div class="media-body">
+              <p class="card-text">Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Center aligned media</h4>
+          <div class="media">
+            <i class="mdi mdi-earth icon-md text-info d-flex align-self-center mr-3"></i>
+            <div class="media-body">
+              <p class="card-text">Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Bottom aligned media</h4>
+          <div class="media">
+            <i class="mdi mdi-earth icon-md text-info d-flex align-self-end mr-3"></i>
+            <div class="media-body">
+              <p class="card-text">Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Highlighted Text</h4>
+          <p class="card-description"> Wrap the text in <code>&lt;mark&gt;</code> to highlight text </p>
+          <p> It is a long <mark class="bg-warning text-white">established</mark> fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">List Unordered</h4>
+          <ul>
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Integer molestie lorem at massa</li>
+            <li>Facilisis in pretium nisl aliquet</li>
+            <li>Nulla volutpat aliquam velit</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Bold text</h4>
+          <p class="card-description"> Use class<code>.font-weight-bold</code>
+          </p>
+          <p> It is a long <span class="font-weight-bold">established fact</span> that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">List Ordered</h4>
+          <ol>
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Integer molestie lorem at massa</li>
+            <li>Facilisis in pretium nisl aliquet</li>
+            <li>Nulla volutpat aliquam velit></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title text-primary">Underline</h4>
+          <p class="card-description"> Wrap in <code>&lt;u&gt;</code> tag for underline </p>
+          <p>
+            <u>lorem ipsum dolor sit amet, consectetur mod tempor incididunt ut labore et dolore magna aliqua.</u>
+          </p>
+        </div>
+        <div class="card-body">
+          <h4 class="card-title text-danger">Lowercase</h4>
+          <p class="card-description"> Use class <code>.text-lowercase</code>
+          </p>
+          <p class="text-lowercase"> lorem ipsum dolor sit amet, consectetur mod tempor incididunt ut labore et dolore magna aliqua. </p>
+        </div>
+        <div class="card-body">
+          <h4 class="card-title text-warning">Uppercase</h4>
+          <p class="card-description"> Use class <code>.text-uppercase</code>
+          </p>
+          <p class="text-uppercase"> lorem ipsum dolor sit amet, consectetur mod tempor incididunt ut labore et dolore magna aliqua. </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Mute</h4>
+          <p class="card-description"> Use class <code>.text-muted</code>
+          </p>
+          <p class="text-muted"> lorem ipsum dolor sit amet, consectetur mod tempor incididunt ut labore et dolore magna aliqua. </p>
+        </div>
+        <div class="card-body">
+          <h4 class="card-title text-success">Strike</h4>
+          <p class="card-description"> Wrap content in <code>&lt;del&gt;</code> tag </p>
+          <p>
+            <del> lorem ipsum dolor sit amet, consectetur mod tempor incididunt ut labore et dolore magna aliqua. </del>
+          </p>
+        </div>
+        <div class="card-body">
+          <h4 class="card-title text-info">Capitalized</h4>
+          <p class="card-description"> Use class <code>.text-capitalize</code>
+          </p>
+          <p class="text-capitalize"> lorem ipsum dolor sit amet, consectetur mod tempor incididunt ut labore et dolore magna aliqua. </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">List with icon</h4>
+          <p class="card-description">Add class <code>.list-ticked</code> to <code>&lt;ul&gt;</code></p>
+          <ul class="list-ticked">
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Integer molestie lorem at massa</li>
+            <li>Facilisis in pretium nisl aliquet</li>
+            <li>Nulla volutpat aliquam velit></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">List with icon</h4>
+          <p class="card-description">Add class <code>.list-arrow</code> to <code>&lt;ul&gt;</code></p>
+          <ul class="list-arrow">
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Integer molestie lorem at massa</li>
+            <li>Facilisis in pretium nisl aliquet</li>
+            <li>Nulla volutpat aliquam velit></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">List with icon</h4>
+          <p class="card-description">Add class <code>.list-star</code> to <code>&lt;ul&gt;</code></p>
+          <ul class="list-star">
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Integer molestie lorem at massa</li>
+            <li>Facilisis in pretium nisl aliquet</li>
+            <li>Nulla volutpat aliquam velit></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+</div>
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific Plugin JS goes HERE  -->
+{% block plugin_javascripts %}{% endblock plugin_javascripts %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

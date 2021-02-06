@@ -274,7 +274,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                 name= state +"-"+ team +"-"+  type +"-"+  date
                 real_name = "Real cases"
                 print(name)
-                
+
                 print(quantile)
                 quant1 , quant2 = quantile.split("-")
                 print(quant1," and ", quant2)
@@ -306,7 +306,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                 real_series = list(zip(index, real_values))
                 quantiles = []
 
-                try:
+                if len(list(data.values[0])) > 5:
                     quant = list(data[('quantile')])
                     quant_list = []
                     for i in quant[len(quant)//2:len(quant)]:
@@ -321,9 +321,34 @@ def getforecastplot(request, state, team,type,date,quantile):
                                         quant_list.append(str(j))
 
                     quantiles = sorted(quantiles, reverse =True)
-                    print("======\n\n",quantiles)
+                    print("PREE ======\n\n",quantiles)
                     print("\n\n\n\n\n\n---\n\n\n\n")
-                    if quant1 in quant_list:
+                    print("quant1:",quant1)
+                    print("quant_list:",quant_list)
+                    if (quant1 is not None) and (not quant1 == ""):
+                        if quant1 in quant_list:
+                            qs = data[("quantile"),(quant1)]
+                            qs2 = data[("quantile"),(quant2)]
+                            for i in range(len(qs)):
+                                qs[i] = int(float(qs[i]))
+                                qs2[i] = int(float(qs2[i]))
+                                seriesqs = list(zip(index,qs,qs2))
+                                print(seriesqs)
+                        else:
+                            print("QUANT does not exist - auto selection")
+                            quant1 = quant_list[0]
+                            quant2 = quant_list[1]
+                            qs = data[("quantile"),(quant1)]
+                            qs2 = data[("quantile"),(quant2)]
+                            for i in range(len(qs)):
+                                qs[i] = int(float(qs[i]))
+                                qs2[i] = int(float(qs2[i]))
+                                seriesqs = list(zip(index,qs,qs2))
+                                print(seriesqs)
+                    else:
+                        print("QUANT NONE")
+                        quant1 = quant_list[0]
+                        quant2 = quant_list[1]
                         qs = data[("quantile"),(quant1)]
                         qs2 = data[("quantile"),(quant2)]
                         for i in range(len(qs)):
@@ -331,12 +356,12 @@ def getforecastplot(request, state, team,type,date,quantile):
                             qs2[i] = int(float(qs2[i]))
                             seriesqs = list(zip(index,qs,qs2))
                             print(seriesqs)
-                    else:
-                        seriesqs = []
-                except:
+                else:
                         seriesqs = []
                         quantiles = [-1]
 
+                print("======\n\n",quantiles)
+                print("\n\n\n\n\n\n---\n\n\n\n")
                 if type.startswith("inc"):
                     type_serie = "column"
                     type_error = "errorbar"

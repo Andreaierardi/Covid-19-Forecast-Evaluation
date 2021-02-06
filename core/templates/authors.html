@@ -1,0 +1,121 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Authors {% endblock %}
+
+<!-- Specific Plugin CSS goes HERE -->
+{% block plugin_stylesheets %}{% endblock plugin_stylesheets %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<div class="content-wrapper">
+  <div class="page-header">
+    <h3 class="page-title"> Authors </h3>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Authors</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Authors list</li>
+      </ol>
+    </nav>
+  </div>
+  <div class="row">
+
+
+
+
+<div class="col-lg-12 grid-margin stretch-card">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Striped Table</h4>
+      <p class="card-description"> Add class <code>.table-striped</code>
+      </p>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th> User </th>
+              <th> First name </th>
+              <th> Progress </th>
+
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="py-1">
+                <img src="/static/assets/images/faces-clipart/pic-1.png" alt="image" />
+              </td>
+              <td> Herman Beck </td>
+
+              <td> May 15, 2015 </td>
+            </tr>
+            <tr>
+              <td class="py-1">
+                <img src="/static/assets/images/faces-clipart/pic-2.png" alt="image" />
+              </td>
+              <td> Messsy Adam </td>
+
+              <td> July 1, 2015 </td>
+            </tr>
+            <tr>
+              <td class="py-1">
+                <img src="/static/assets/images/faces-clipart/pic-3.png" alt="image" />
+              </td>
+              <td> John Richards </td>
+
+              <td> Apr 12, 2015 </td>
+            </tr>
+            <tr>
+              <td class="py-1">
+                <img src="/static/assets/images/faces-clipart/pic-4.png" alt="image" />
+              </td>
+              <td> Peter Meggik </td>
+
+              <td> May 15, 2015 </td>
+            </tr>
+            <tr>
+              <td class="py-1">
+                <img src="/static/assets/images/faces-clipart/pic-1.png" alt="image" />
+              </td>
+              <td> Edward </td>
+
+              <td> May 03, 2015 </td>
+            </tr>
+            <tr>
+              <td class="py-1">
+                <img src="/static/assets/images/faces-clipart/pic-2.png" alt="image" />
+              </td>
+              <td> John Doe </td>
+
+              <td> April 05, 2015 </td>
+            </tr>
+            <tr>
+              <td class="py-1">
+                <img src="/static/assets/images/faces-clipart/pic-3.png" alt="image" />
+              </td>
+              <td> Henry Tom </td>
+
+              <td> June 16, 2015 </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+</div>
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific Plugin JS goes HERE  -->
+{% block plugin_javascripts %}{% endblock plugin_javascripts %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}
