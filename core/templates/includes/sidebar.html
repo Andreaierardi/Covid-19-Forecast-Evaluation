@@ -24,6 +24,16 @@
               <span class="menu-title">Dashboard</span>
             </a>
           </li>
+          <li class="nav-item menu-items {% if 'data' in segment %} active {% endif %}">
+            <a class="nav-link" href="/data.html">
+              <span class="menu-icon">
+                <i class="mdi mdi mdi-chart-bar"></i>
+              </span>
+              <span class="menu-title">Data</span>
+            </a>
+          </li>
+
+
           <li class="nav-item menu-items {% if 'authors' in segment %} active {% endif %}">
             <a class="nav-link" href="/authors.html">
               <span class="menu-icon">
@@ -36,12 +46,12 @@
           <li class="nav-item menu-items {% if 'doc' in segment %} active {% endif %}">
             <a class="nav-link" href="/doc.html">
               <span class="menu-icon">
-                <i class="mdi mdi mdi-account-multiple"></i>
+                <i class="mdi mdi-information-variant"></i>
               </span>
               <span class="menu-title">Documentation</span>
             </a>
           </li>
-          <!--  {% include 'includes/part_sidebar.html' %}   -->
+         {% include 'includes/part_sidebar.html' %} 
 
 
         </ul>

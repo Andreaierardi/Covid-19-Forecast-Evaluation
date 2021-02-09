@@ -1,0 +1,234 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Data {% endblock %} 
+
+<!-- Specific Plugin CSS goes HERE -->
+{% block plugin_stylesheets %}
+<link rel="stylesheet" href="/static/assets/vendors/jvectormap/jquery-jvectormap.css">
+<link rel="stylesheet" href="/static/assets/vendors/flag-icon-css/css/flag-icon.min.css">
+<link rel="stylesheet" href="/static/assets/vendors/owl-carousel-2/owl.carousel.min.css">
+<link rel="stylesheet" href="/static/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock plugin_stylesheets %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="content-wrapper">
+    <div class="page-header">
+      <h3 class="page-title"> Data </h3>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">Tables</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Data tables</li>
+        </ol>
+      </nav>
+    </div>
+
+
+
+    <div class="row">
+      <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Data Tables</h4>
+            </p>
+
+            <form id="fore-bench-form"   class="forms-sample">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label>Location </label>
+    
+    
+    
+                    <div class="form-group" id ="forecast">
+                      <select   id="select_forecast" onchange='$("#fore-bench-form").submit(update_suggestions())' class="js-example-basic-single col-md-6" name="getforebench">
+    
+                        <option  value="{{ states.0 }}" selected> {{ states.0 }}</option>
+                        {% for st in states|slice:"1:" %}
+                        <option value="{{ st }}" > {{ st }}</option>
+                        {% endfor %}
+    
+                      </select>
+                    </div>
+                  </div>
+    
+    
+    
+                  <div class="col-md-6" >
+                    <label>Forecast Team - Model</label>
+                    <div class="form-group" id="team">
+    
+                      <select   id="select_bench" onchange='$("#fore-bench-form").submit(update_suggestions())' class="js-example-basic-single col-md-6" name="getforebench">
+                        <option  value="{{models.0}}" selected> {{models.0}} </option>
+    
+                        {% for model in models|slice:'1:' %}
+                        <option value="{{ model }}" > {{ model }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+    
+    
+                <div class="row">
+                  <div class="col-md-6" id= targets>
+    
+    
+    
+                    <label class="col-sm-4 col-form-label">Target</label>
+                    <div class="form-group row" >
+    
+    
+                      <div class="col-sm-4">
+                        <div class="form-check">
+                          <label class="form-check-label">
+                            <input type="radio" checked onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type1" class="form-check-input" name="membershipRadios"  value="inc case"> Incident Cases </label>
+                          </div>
+                        </div>
+    
+                        <div class="col-sm-5">
+                          <div class="form-check">
+                            <label class="form-check-label">
+                              <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="inc death">Incident  Deaths </label>
+                            </div>
+                          </div>
+    
+                          <div class="col-sm-4">
+                            <div class="form-check">
+                              <label class="form-check-label">
+                                <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())'  class="form-check-input"  id= "select_type3" name="membershipRadios" value="cum case"> Cumulative Cases</label>
+                              </div>
+                            </div>
+                            <div class="col-sm-5">
+                              <div class="form-check">
+                                <label class="form-check-label">
+                                  <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="cum death">  Cumulative Deaths </label>
+                                </div>
+                              </div>
+    
+    
+    
+                            </div>
+    
+                          </div>
+    
+    
+                          <div class="col-md-6" id= targets>
+    
+                            <div class="form-group row" >
+    
+                          <div class="col-sm-4" id = "dates">
+                            <label>Forecast Date </label>
+                            <div class="form-group">
+    
+                              <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="sendate">
+                                <option selected value="{{ dates.0 }}" >{{ dates.0}}</option>
+    
+                                {% for date in dates|slice:'1:'  %}
+                                <option  value="{{ date }}" > {{ date }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+    
+                      </div>
+    
+                      </div>
+                    </div>
+
+
+                    <div class="col-md-6">
+                        <h4 class="card-title">Download</h4>
+                    <button type="button" class="btn btn-success btn-icon-text">
+                        <i class="mdi mdi mdi-download btn-icon-prepend"></i> Dowload dataset </button>
+    
+                  </div>
+
+                    </form>
+                    
+
+
+
+                <br>
+                <br>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Profile</th>
+                    <th>VatNo.</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Jacob</td>
+                    <td>53275531</td>
+                    <td>12 May 2017</td>
+                    <td><label class="badge badge-danger">Pending</label></td>
+                  </tr>
+                  <tr>
+                    <td>Messsy</td>
+                    <td>53275532</td>
+                    <td>15 May 2017</td>
+                    <td><label class="badge badge-warning">In progress</label></td>
+                  </tr>
+                  <tr>
+                    <td>John</td>
+                    <td>53275533</td>
+                    <td>14 May 2017</td>
+                    <td><label class="badge badge-info">Fixed</label></td>
+                  </tr>
+                  <tr>
+                    <td>Peter</td>
+                    <td>53275534</td>
+                    <td>16 May 2017</td>
+                    <td><label class="badge badge-success">Completed</label></td>
+                  </tr>
+                  <tr>
+                    <td>Dave</td>
+                    <td>53275535</td>
+                    <td>20 May 2017</td>
+                    <td><label class="badge badge-warning">In progress</label></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Plugin JS goes HERE  -->
+{% block plugin_javascripts %}
+<script src="/static/assets/vendors/chart.js/Chart.min.js"></script>
+<script src="/static/assets/vendors/progressbar.js/progressbar.min.js"></script>
+<script src="/static/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
+<script src="/static/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+<script src="/static/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+
+<script src="/static/assets/vendors/select2/select2.min.js"></script>
+<script src="/static/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
+{% endblock plugin_javascripts %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src="/static/assets/js/chart.js"></script>
+
+<script src="/static/assets/js/dashboard.js"></script>
+<script src="/static/assets/js/file-upload.js"></script>
+<script src="/static/assets/js/typeahead.js"></script>
+<script src="/static/assets/js/select2.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/histogram-bellcurve.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+{% endblock javascripts %}
