@@ -392,8 +392,15 @@ def getforecastplot(request, state, team,type,date,quantile):
 
 
 
+def getforecastdata(request, state, team,type,date):
 
 
+    print("Parameter from Get request")
+    print(state)
+    print(team)
+    print(type)
+    print(date)
+    
 #@login_required(login_url="/login/")
 def index(request):
 
@@ -406,6 +413,16 @@ def index(request):
 
     return render(request, 'index.html',context)
 
+def data(request):
+
+    context = {}
+    context['segment'] = 'data'
+
+
+
+    context = { "states": states, "models":models, "quantiles":quantiles,"dates":dates}
+
+    return render(request, 'data.html',context)
 
 
 #@login_required(login_url="/login/")
@@ -417,6 +434,12 @@ def pages(request):
 
         load_template      = request.path.split('/')[-1]
         context['segment'] = load_template
+        context = {}
+        context['segment'] = 'data'
+
+
+
+        context = { "states": states, "models":models, "quantiles":quantiles,"dates":dates}
 
         html_template = loader.get_template( load_template )
         return HttpResponse(html_template.render(context, request))

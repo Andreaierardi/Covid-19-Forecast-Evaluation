@@ -205,6 +205,278 @@
 
     </div>
 
+      <script>
+
+        function update_selectors(response, selector_name, response_type)
+        {
+          x = document.getElementById(selector_name)
+          last = x.options[x.selectedIndex].value
+          //  last = x.options[0].value
+          while (x.options.length > 0) {
+
+            x.remove(x.options.length - 1);
+          }
+
+          new_options =  response[response_type]
+
+          console.log("Last SELECTOR for-  ",selector_name,"   - :")
+          console.log(last)
+
+          check_last = true
+          for (i = 0; i < new_options.length; i++) {
+
+
+            var opt = document.createElement('option');
+
+            opt.text = new_options[i]
+            opt.value = new_options[i]
+            if(new_options[i]== last)
+            {
+              console.log("ENTRA")
+              opt.selected = true
+              console.log("NEW is", opt.value)
+              check_last = false
+            }
+            x.add(opt, null);
+          }
+
+          if(check_last)
+          {
+            if (x.options[0] == null){
+              var opt = document.createElement('option');
+
+              opt.text = "No quantiles"
+              opt.value = "-1"
+              x.add(opt,null)
+              x.options[0].selected = true
+            }
+            else
+            {
+              x.options[0].selected = true
+            }
+          }
+        }
+
+        function update_radio (response)
+        {
+          _radio_filter = response["radio_filter"]
+          radio_list = document.forms['fore-bench-form'].elements['membershipRadios']
+
+          for (i = 0; i < radio_list.length; i++)
+          {
+            for(j = 0 ; j < _radio_filter.length; j++)
+            {
+              if(radio_list[i].value == _radio_filter[j])
+              {
+                radio_list[i].disabled = true
+                console.log("disattivo",radio_list[i].value )
+
+              }
+
+
+            }
+
+          }
+
+          _radio_activate = response["radio_activate"]
+          radio_list = document.forms['fore-bench-form'].elements['membershipRadios']
+
+          for (i = 0; i < radio_list.length; i++)
+          {
+            for(j = 0 ; j < _radio_activate.length; j++)
+            {
+              if(radio_list[i].value == _radio_activate[j])
+              {
+
+                radio_list[i].disabled = false
+                console.log("attivo",radio_list[i].value )
+                radio_list[i].checked  = true
+
+              }
+
+
+            }
+
+          }
+        }
+
+ function update_suggestions()
+        {
+
+         var fore = document.getElementById("select_forecast");
+         var bench = document.getElementById("select_bench");
+
+         var fore_value = fore.value;
+         var bench_value = bench.value;
+
+
+         console.log("URL:")
+         console.log("get/ajax/update_suggestions/"+fore_value+"/"+bench_value)
+         $.ajax({
+           type: 'GET',
+           // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
+           url: "get/ajax/update_suggestions/"+fore_value+"/"+bench_value,
+           data: "",
+           success: function (response) {
+
+             console.log("ENTER RESPONSE")
+             _err = response["errors"]
+             console.log("ACK: "+_err)
+             if(_err=="no")
+             {
+
+
+               update_radio(response)
+
+               update_selectors(response,"select_date","dates")
+
+               send_forecastdata_form()
+             }
+
+             else {
+
+               $("#error_alert").fadeIn(400);
+               setTimeout(function(){
+                 $("#error_alert").fadeOut(800);
+               }, 3000)
+
+
+
+             }
+
+
+
+
+           },
+           error: function (response) {
+             // alert the error if any error occured
+
+
+
+
+
+
+           }
+         })
+       }
+
+
+
+       
+        function send_forecastdata_form() {
+          // preventing from page reload and default actions
+
+          // serialize the data for sending the form data.
+          var serializedData = $(this).serialize();
+
+
+          var fore = document.getElementById("select_forecast");
+          var bench = document.getElementById("select_bench");
+          var type = document.forms['fore-bench-form'].elements['membershipRadios']
+          var date = document.getElementById("select_date");
+
+          var fore_value = fore.value;
+          var bench_value = bench.value;
+          var type_value = type.value;
+          var date_value = date.value;
+
+          console.log("URL:")
+          console.log("get/ajax/forecast_data/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value+"/")
+          // make POST ajax call
+          $.ajax({
+            type: 'GET',
+            // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
+            url: "get/ajax/forecast_data/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value+"/",
+            data: "",
+            success: function (response) {
+
+              console.log("ENTER RESPONSE")
+              _err = response["errors"]
+              console.log("ACK: "+_err)
+              if(_err=="no")
+              {
+
+
+                _name = response["name"]
+                _names1 = response["names1"]
+                //_names2 = response["names2"]
+                _models = response["models"]
+
+                _real_name =  response["real_name"]
+                _real_color = response["real_color"]
+                _real_series = response["real_series"]
+                /*    console.log("REAL")
+
+                console.log(_labels)
+                console.log(_values)
+
+                console.log("FORECAST")
+                console.log(_labels2)
+                console.log(_values2)
+
+                console.log(_models)
+                */
+
+                 _series = response["series"]
+                 _val = response["values"]
+                // _series2 = response ["series2"]
+                _namesq= response["namesq"]
+                _seriesq = response["seriesqs"]
+                _colorq = response["colorq"]
+                _type_serie = response["type_serie"]
+                _type_error = response["type_error"]
+                console.log(_seriesq)
+                  //  series = get_series(_labels,_values)
+                //    series2 = get_series(_labels2,_values2)
+
+                 console.log(_series)
+
+                 console.log("\n\n\n === REAL === \n\n\n")
+                 console.log(_real_series)
+                 //console.log(_series2)
+                   // console.log(series)
+                  //  console.log(series2)
+
+
+
+              }
+              else if(_err == "No date")
+              {
+
+                $("#error_alert").fadeIn(400);
+                setTimeout(function(){
+                  $("#error_alert").fadeOut(800);
+                }, 3000)
+              }
+              else {
+
+                $("#error_alert").fadeIn(400);
+                setTimeout(function(){
+                  $("#error_alert").fadeOut(800);
+                }, 3000)
+
+
+              }
+
+
+
+
+            },
+            error: function (response) {
+              // alert the error if any error occured
+
+
+
+
+
+
+            }
+          })
+        }
+
+
+      </script>
+
 {% endblock content %}
 
 <!-- Specific Plugin JS goes HERE  -->
