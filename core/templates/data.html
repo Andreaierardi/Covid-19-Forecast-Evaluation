@@ -451,6 +451,7 @@ function addAllColumnHeaders(myList, selector) {
               }
               else if(_err == "No date")
               {
+                remove_table('#excelDataTable')
 
                 $("#error_alert").fadeIn(400);
                 setTimeout(function(){
@@ -458,6 +459,7 @@ function addAllColumnHeaders(myList, selector) {
                 }, 3000)
               }
               else {
+               remove_table('#excelDataTable')
 
                 $("#error_alert").fadeIn(400);
                 setTimeout(function(){
