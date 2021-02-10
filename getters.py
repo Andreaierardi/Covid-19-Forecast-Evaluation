@@ -96,6 +96,8 @@ def getFS(timezero, type="all", model="all", state="all"):
 
 
 def Fexists(model, location, timezero='all', target='all', quantile='all'):
+    if model == "all" or location== "all":
+        return True
     if (model, location) not in corr_dict.keys():
         return False
 

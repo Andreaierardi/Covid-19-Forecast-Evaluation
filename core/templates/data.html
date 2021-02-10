@@ -149,22 +149,32 @@
                       </div>
                     </div>
 
+                    <div class="form-group row" >
 
                     <div class="col-md-6">
                         <h4 class="card-title">Download</h4>
-                    <button type="button" onclick="download_data()" class="btn btn-success btn-icon-text">
+                    <button type="button" onclick="download_data()" id="download_button" class="btn btn-success btn-icon-text">
                         <i class="mdi mdi mdi-download btn-icon-prepend"></i> Dowload dataset </button>
 
                   </div>
+                  <div class = "col-md-6">
+                  <h4 class="card-title">Show table</h4>
+                  <button type="button" onclick="toggle('excelDataTable','icon_but')" id="showtable" class="btn btn-primary btn-icon-text">
+                      <i id="icon_but" class="mdi mdi-arrow-down-drop-circle"></i> Show tables </button>
+                </div>
+              </div>
 
                     </form>
 
+               
+
+                    <div id="wpbody-content" style="margin: 2em 2em 2em 2em;">
+                        <h4 class="card-title text-danger" id="alert_notfound"> </h4>
+                  
+                      <div class="clear"></div>
+                  </div>
 
 
-
-                <br>
-                <br>
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
             <div class="table-responsive">
 
                 <table class="table" id="excelDataTable">
@@ -180,13 +190,58 @@
       <script>
 
 
+toggle("excelDataTable","icon_but")
 
-         function ConvertToCSV(objArray) {
+function toggle(el, iel) {
+  var x = document.getElementById(el);
+  var i = document.getElementById(iel);
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    i.className = "mdi mdi-arrow-down-drop-circle"
+  } else {
+    x.style.display = "none";
+    i.className = "mdi mdi-arrow-up-drop-circle-outline"
+  }
+}
+
+function hide(elem) {
+          var x = document.getElementById(elem);
+          x.style.display = "none";
+        }
+
+        function show(elem) {
+          var x = document.getElementById(elem);
+          x.style.display = "block";
+        }
+
+function activate(elem) {
+          var x = document.getElementById(elem);
+          x.disabled = false
+
+        }
+
+        function disable(elem) {
+          var x = document.getElementById(elem);
+          x.disabled = true
+
+
+        }
+         function ConvertToCSV(objArray, col) {
             var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            
             var str = '';
+            console.log(col)
+            var line ='';
 
+            for (i =0; i<col.length; i++)
+            {
+                if (line!='') line += ','
+                  
+                line += col[i][0]+col[i][1]
+            }
+           str+= line+'\r\n'
+           line = ''
             for (var i = 0; i < array.length; i++) {
-                var line = '';
                 for (var index in array[i]) {
                     if (line != '') line += ','
 
@@ -195,12 +250,13 @@
 
                 str += line + '\r\n';
             }
-
+            console.log(str)
             return str;
         }
         function download_data()
         {
-          data = ConvertToCSV(_data)
+          console.log(_data, _columns)
+          data = ConvertToCSV(_data, _columns)
           console.log(data)
           filename = "export.csv"
           csvFile = new Blob([data], {type: "text/csv"});
@@ -341,6 +397,8 @@
              if(_err=="no")
              {
 
+              activate("download_button")
+              document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = '';
 
                update_radio(response)
 
@@ -350,11 +408,9 @@
              }
 
              else {
-
-               $("#error_alert").fadeIn(400);
-               setTimeout(function(){
-                 $("#error_alert").fadeOut(800);
-               }, 3000)
+              remove_table('#excelDataTable')
+              document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = 'Data not found ';
+              disable("download_button")
 
 
 
@@ -449,32 +505,21 @@ function addAllColumnHeaders(myList, selector) {
               console.log("ACK: "+_err)
               if(_err=="no")
               {
-
+              document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = '';
+              activate("download_button")
 
                 _name = response["name"]
                _data = response["data"]
+               _columns = response["columns"]
                remove_table('#excelDataTable')
                buildHtmlTable('#excelDataTable', myList =_data)
 
 
               }
-              else if(_err == "No date")
-              {
-                remove_table('#excelDataTable')
-
-                $("#error_alert").fadeIn(400);
-                setTimeout(function(){
-                  $("#error_alert").fadeOut(800);
-                }, 3000)
-              }
               else {
-               remove_table('#excelDataTable')
-
-                $("#error_alert").fadeIn(400);
-                setTimeout(function(){
-                  $("#error_alert").fadeOut(800);
-                }, 3000)
-
+                remove_table('#excelDataTable')
+              document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = 'Data not found ';
+              disable("download_button")
 
               }
 
@@ -506,6 +551,7 @@ function addAllColumnHeaders(myList, selector) {
 <script src="/static/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
 <script src="/static/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 <script src="/static/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
 <script src="/static/assets/vendors/select2/select2.min.js"></script>
 <script src="/static/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>

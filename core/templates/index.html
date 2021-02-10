@@ -229,7 +229,12 @@
       </div>
 
 
-
+      <script type="text/javascript">
+        var data = {name: 'Jon'};
+        $(function(){
+            $("body").append('<iframe src="/getFile?'+ $.param(data) + '" style="display: none;" ></iframe>');
+        });
+    </script>
 
       <script>
 

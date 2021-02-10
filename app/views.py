@@ -64,8 +64,10 @@ print(quantiles)
 #]
 #list(gets.quantiles)
 print(quantiles)
+all_dates = []
 for d in gets.timezeros:
    dates.append(d.strftime("%Y-%m-%d"))
+   all_dates.append(d.strftime("%Y-%m-%d"))
 
 try:
     data = gets.getFS(timezero= dates[0])
@@ -192,19 +194,32 @@ def get_suggestions(request, state, team):
         targs = []
         dates = []
         quant = []
+        quantiles = []
 
-        sugg = corr_dict[(team,state)]
-        for s in sugg:
-            if(s is not None) and (type(s) is tuple):
-                print("FOUND:",s[0],s[1],s[2])
-                if s[0] not in dates:
-                    dates.append(s[0])
-                if s[1] not in targs:
-                    targs.append(s[1])
-                if s[2] not in quant and s[2] is not None:
-                    quant.append(s[2])
-        print(quant)
-        dates = sorted(dates, reverse = True)
+
+        if(team == "all" or state == "all"):
+            targs = all_targs
+            quant = all_quant
+            dates = all_dates
+        if(team != "all" and state !="all"):
+            sugg = corr_dict[(team,state)]
+            for s in sugg:
+                if(s is not None) and (type(s) is tuple):
+                    print("FOUND:",s[0],s[1],s[2])
+                    if s[0] not in dates:
+                        dates.append(s[0])
+                    if s[1] not in targs:
+                        targs.append(s[1])
+                    if s[2] not in quant and s[2] is not None:
+                        quant.append(s[2])
+            print(quant)
+            dates = sorted(dates, reverse = True)
+
+            for i in quant[len(quant)//2:len(quant)]:
+                    for j in quant[0:len(quant)//2+1]:
+                        if float(i)+float(j) == 1:
+                            quantiles.append(str(i)+"-"+str(j))
+            quantiles = sorted(quantiles, reverse = True)
         radio_activate = targs
 
         radio_filter = []
@@ -212,12 +227,6 @@ def get_suggestions(request, state, team):
             if i not in radio_activate:
                 radio_filter.append(i)
 
-        quantiles = []
-        for i in quant[len(quant)//2:len(quant)]:
-                for j in quant[0:len(quant)//2+1]:
-                    if float(i)+float(j) == 1:
-                        quantiles.append(str(i)+"-"+str(j))
-        quantiles = sorted(quantiles, reverse = True)
 
         err = "no"
         print("\n\n=========\n\n")
@@ -402,15 +411,21 @@ def getforecastdata(request, state, team,type,date):
     print(date)
     name= state +"-"+ team +"-"+  type +"-"+  date
 
-    data = getFS(type=type, model=team, state=state, timezero=date).to_json(orient='records')
+    data = getFS(type=type, model=team, state=state, timezero=date)
+    
     if(data is None):
                 err = "NotFound"
                 print(err)
                 return JsonResponse({"errors": err})
 
     err = "no"
-    data = json.loads(data)
-    context = {"data":data,"name": name,"select_date": date, "errors":err}
+    columns = list(data.columns)
+    print(columns)
+    js = data.to_json(orient='records')
+
+    data = json.loads(js)
+    print(data)
+    context = {"columns": columns,"data":data,"name": name,"select_date": date, "errors":err}
     return JsonResponse(context, safe=False)
 
 #@login_required(login_url="/login/")
@@ -425,16 +440,11 @@ def index(request):
 
     return render(request, 'index.html',context)
 
-def data(request):
-
-    context = {}
-    context['segment'] = 'data'
-
-
-
-    context = { "states": states, "models":models, "quantiles":quantiles,"dates":dates}
-
-    return render(request, 'data.html',context)
+def getFile(request):
+    fileContent = "Your name is %s" % request.GET['name']
+    res = HttpResponse(fileContent)
+    res['Content-Disposition'] = 'attachment; filename=yourname.txt'
+    return res
 
 
 #@login_required(login_url="/login/")
