@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Data {% endblock %} 
+{% block title %} Data {% endblock %}
 
 <!-- Specific Plugin CSS goes HERE -->
 {% block plugin_stylesheets %}
@@ -41,62 +41,66 @@
                 <div class="row">
                   <div class="col-md-6">
                     <label>Location </label>
-    
-    
-    
+
+
+
                     <div class="form-group" id ="forecast">
                       <select   id="select_forecast" onchange='$("#fore-bench-form").submit(update_suggestions())' class="js-example-basic-single col-md-6" name="getforebench">
-    
+                        <option value="all" >All</option>
+
                         <option  value="{{ states.0 }}" selected> {{ states.0 }}</option>
                         {% for st in states|slice:"1:" %}
                         <option value="{{ st }}" > {{ st }}</option>
                         {% endfor %}
-    
+
                       </select>
                     </div>
                   </div>
-    
-    
-    
+
+
+
                   <div class="col-md-6" >
                     <label>Forecast Team - Model</label>
                     <div class="form-group" id="team">
-    
+
                       <select   id="select_bench" onchange='$("#fore-bench-form").submit(update_suggestions())' class="js-example-basic-single col-md-6" name="getforebench">
+                        <option value="all" >All</option>
+
                         <option  value="{{models.0}}" selected> {{models.0}} </option>
-    
+
                         {% for model in models|slice:'1:' %}
                         <option value="{{ model }}" > {{ model }}</option>
                         {% endfor %}
+
                       </select>
                     </div>
                   </div>
                 </div>
-    
-    
+
+
                 <div class="row">
                   <div class="col-md-6" id= targets>
-    
-    
-    
+
+
+
                     <label class="col-sm-4 col-form-label">Target</label>
                     <div class="form-group row" >
-    
-    
+
+
                       <div class="col-sm-4">
                         <div class="form-check">
                           <label class="form-check-label">
                             <input type="radio" checked onchange='$("#fore-bench-form").submit(send_forecastdata_form())' id= "select_type1" class="form-check-input" name="membershipRadios"  value="inc case"> Incident Cases </label>
                           </div>
                         </div>
-    
+
                         <div class="col-sm-5">
                           <div class="form-check">
                             <label class="form-check-label">
                               <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecastdata_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="inc death">Incident  Deaths </label>
                             </div>
                           </div>
-    
+
                           <div class="col-sm-4">
                             <div class="form-check">
                               <label class="form-check-label">
@@ -109,34 +113,39 @@
                                   <input type="radio" onchange='$("#fore-bench-form").submit(send_forecastdata_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="cum death">  Cumulative Deaths </label>
                                 </div>
                               </div>
-    
-    
-    
+                              <div class="col-sm-5">
+                                <div class="form-check">
+                                  <label class="form-check-label">
+                                    <input type="radio" onchange='$("#fore-bench-form").submit(send_forecastdata_form())' id= "select_type5" class="form-check-input" name="membershipRadios"  value="all"> Any </label>
+                                  </div>
+                                </div>
+
+
                             </div>
-    
+
                           </div>
-    
-    
+
+
                           <div class="col-md-6" id= targets>
-    
+
                             <div class="form-group row" >
-    
+
                           <div class="col-sm-12" id = "dates">
                             <label>Forecast Date </label>
                             <div class="form-group">
-    
+
                               <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecastdata_form())' class="js-example-basic-single col-md-6" name="sendate">
                                 <option selected value="{{ dates.0 }}" >{{ dates.0}}</option>
-    
+
                                 {% for date in dates|slice:'1:'  %}
                                 <option  value="{{ date }}" > {{ date }}</option>
                                 {% endfor %}
                               </select>
                             </div>
                           </div>
-    
+
                       </div>
-    
+
                       </div>
                     </div>
 
@@ -145,11 +154,11 @@
                         <h4 class="card-title">Download</h4>
                     <button type="button" onclick="download_data()" class="btn btn-success btn-icon-text">
                         <i class="mdi mdi mdi-download btn-icon-prepend"></i> Dowload dataset </button>
-    
+
                   </div>
 
                     </form>
-                    
+
 
 
 
@@ -159,7 +168,7 @@
             <div class="table-responsive">
 
                 <table class="table" id="excelDataTable">
-               
+
               </table>
             </div>
           </div>
@@ -170,8 +179,8 @@
 
       <script>
 
-     
-              
+
+
          function ConvertToCSV(objArray) {
             var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
             var str = '';
@@ -367,10 +376,10 @@
          })
        }
 
-   function remove_table(selector) { 
-                  $(selector+ " tr").remove(); 
-                
-              } 
+   function remove_table(selector) {
+                  $(selector+ " tr").remove();
+
+              }
 
 function buildHtmlTable(selector,myList) {
   var columns = addAllColumnHeaders(myList, selector);
@@ -407,7 +416,7 @@ function addAllColumnHeaders(myList, selector) {
   return columnSet;
 }
 
-       
+
         function send_forecastdata_form() {
           // preventing from page reload and default actions
 

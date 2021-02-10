@@ -95,13 +95,13 @@ def getFS(timezero, type="all", model="all", state="all"):
 
 
 
-def Fexists(model, location, timezero='any', target='any', quantile='any'):
+def Fexists(model, location, timezero='all', target='all', quantile='all'):
     if (model, location) not in corr_dict.keys():
         return False
 
     flagTZ, flagTA, flagQU = False, False, False
 
-    if timezero is not 'any':
+    if timezero is not 'all':
         for tup in list(corr_dict[(model, location)]):
             try:
                 if timezero == tup[0]:
@@ -115,7 +115,7 @@ def Fexists(model, location, timezero='any', target='any', quantile='any'):
     if flagTZ == False:
         return False
 
-    if target is not 'any':
+    if target is not 'all':
         for tup in list(corr_dict[(model, location)]):
             try:
                 if target == tup[1]:
@@ -129,7 +129,7 @@ def Fexists(model, location, timezero='any', target='any', quantile='any'):
     if flagTA == False:
         return False
 
-    if quantile is not 'any':
+    if quantile is not 'all':
         for tup in list(corr_dict[(model, location)]):
             try:
                 if quantile == tup[2]:
@@ -176,11 +176,11 @@ def getRS(timezero, type, state, window):
 
     Returns
     -------
-    pandas.Series : the series of real cases, deaths or hospitalized of the specified state. 
+    pandas.Series : the series of real cases, deaths or hospitalized of the specified state.
                     For cumulative or current type, data is taken every week for a total of <window> weeks.
                     For incidental type, data is aggregated every week starting from timezero+1 for a total of <window> weeks.
     """
-    
+
     data = pd.read_parquet("data/real_data.parquet")
     if(isinstance(timezero, str)):
         try:
@@ -189,14 +189,14 @@ def getRS(timezero, type, state, window):
             print(e)
             return None
 
-    
+
     # state filter
     data = data[data['state'] == locations_abbr[state]]
-    
+
     # date filter
     data['date'] = pd.to_datetime(data['date'])
     data.set_index('date', inplace=True)
-    
+
     try:
         if('cum' in type or 'curr' in type):
             datelist = [timezero + dt.timedelta(7)*(1+i) for i in range(window)]
@@ -205,7 +205,7 @@ def getRS(timezero, type, state, window):
             datelist = [timezero + dt.timedelta(1+i) for i in range(7*window)]
             out = data.loc[datelist,type]
             # aggregate by week, starting on timezero+1
-            out = out.groupby(lambda x: timezero + dt.timedelta(((x-timezero).days-1) // 7 + 1)*7).sum()       
+            out = out.groupby(lambda x: timezero + dt.timedelta(((x-timezero).days-1) // 7 + 1)*7).sum()
     except Exception as e:
         print(e)
         return None
@@ -214,4 +214,3 @@ def getRS(timezero, type, state, window):
 
 
 # Example: out = getRS('2020-05-20', type='inc case', state='Alabama', window=4)
-    
