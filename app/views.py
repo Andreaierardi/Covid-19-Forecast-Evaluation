@@ -400,7 +400,19 @@ def getforecastdata(request, state, team,type,date):
     print(team)
     print(type)
     print(date)
-    
+    name= state +"-"+ team +"-"+  type +"-"+  date
+
+    data = getFS(type=type, model=team, state=state, timezero=date).to_json(orient='records')
+    if(data is None):
+                err = "NotFound"
+                print(err)
+                return JsonResponse({"errors": err})
+
+    err = "no"
+    data = json.loads(data)
+    context = {"data":data,"name": name,"select_date": date, "errors":err}
+    return JsonResponse(context, safe=False)
+
 #@login_required(login_url="/login/")
 def index(request):
 

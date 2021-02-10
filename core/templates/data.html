@@ -86,27 +86,27 @@
                       <div class="col-sm-4">
                         <div class="form-check">
                           <label class="form-check-label">
-                            <input type="radio" checked onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type1" class="form-check-input" name="membershipRadios"  value="inc case"> Incident Cases </label>
+                            <input type="radio" checked onchange='$("#fore-bench-form").submit(send_forecastdata_form())' id= "select_type1" class="form-check-input" name="membershipRadios"  value="inc case"> Incident Cases </label>
                           </div>
                         </div>
     
                         <div class="col-sm-5">
                           <div class="form-check">
                             <label class="form-check-label">
-                              <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="inc death">Incident  Deaths </label>
+                              <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecastdata_form())' id= "select_type2" class="form-check-input" name="membershipRadios"  value="inc death">Incident  Deaths </label>
                             </div>
                           </div>
     
                           <div class="col-sm-4">
                             <div class="form-check">
                               <label class="form-check-label">
-                                <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecast_bench_form())'  class="form-check-input"  id= "select_type3" name="membershipRadios" value="cum case"> Cumulative Cases</label>
+                                <input type="radio"  onchange='$("#fore-bench-form").submit(send_forecastdata_form())'  class="form-check-input"  id= "select_type3" name="membershipRadios" value="cum case"> Cumulative Cases</label>
                               </div>
                             </div>
                             <div class="col-sm-5">
                               <div class="form-check">
                                 <label class="form-check-label">
-                                  <input type="radio" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="cum death">  Cumulative Deaths </label>
+                                  <input type="radio" onchange='$("#fore-bench-form").submit(send_forecastdata_form())' id= "select_type4" class="form-check-input" name="membershipRadios"  value="cum death">  Cumulative Deaths </label>
                                 </div>
                               </div>
     
@@ -121,11 +121,11 @@
     
                             <div class="form-group row" >
     
-                          <div class="col-sm-4" id = "dates">
+                          <div class="col-sm-12" id = "dates">
                             <label>Forecast Date </label>
                             <div class="form-group">
     
-                              <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecast_bench_form())' class="js-example-basic-single col-md-6" name="sendate">
+                              <select   id="select_date" onchange='$("#fore-bench-form").submit(send_forecastdata_form())' class="js-example-basic-single col-md-6" name="sendate">
                                 <option selected value="{{ dates.0 }}" >{{ dates.0}}</option>
     
                                 {% for date in dates|slice:'1:'  %}
@@ -143,7 +143,7 @@
 
                     <div class="col-md-6">
                         <h4 class="card-title">Download</h4>
-                    <button type="button" class="btn btn-success btn-icon-text">
+                    <button type="button" onclick="download_data()" class="btn btn-success btn-icon-text">
                         <i class="mdi mdi mdi-download btn-icon-prepend"></i> Dowload dataset </button>
     
                   </div>
@@ -155,48 +155,11 @@
 
                 <br>
                 <br>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
             <div class="table-responsive">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Profile</th>
-                    <th>VatNo.</th>
-                    <th>Created</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Jacob</td>
-                    <td>53275531</td>
-                    <td>12 May 2017</td>
-                    <td><label class="badge badge-danger">Pending</label></td>
-                  </tr>
-                  <tr>
-                    <td>Messsy</td>
-                    <td>53275532</td>
-                    <td>15 May 2017</td>
-                    <td><label class="badge badge-warning">In progress</label></td>
-                  </tr>
-                  <tr>
-                    <td>John</td>
-                    <td>53275533</td>
-                    <td>14 May 2017</td>
-                    <td><label class="badge badge-info">Fixed</label></td>
-                  </tr>
-                  <tr>
-                    <td>Peter</td>
-                    <td>53275534</td>
-                    <td>16 May 2017</td>
-                    <td><label class="badge badge-success">Completed</label></td>
-                  </tr>
-                  <tr>
-                    <td>Dave</td>
-                    <td>53275535</td>
-                    <td>20 May 2017</td>
-                    <td><label class="badge badge-warning">In progress</label></td>
-                  </tr>
-                </tbody>
+
+                <table class="table" id="excelDataTable">
+               
               </table>
             </div>
           </div>
@@ -207,6 +170,50 @@
 
       <script>
 
+     
+              
+         function ConvertToCSV(objArray) {
+            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+            var str = '';
+
+            for (var i = 0; i < array.length; i++) {
+                var line = '';
+                for (var index in array[i]) {
+                    if (line != '') line += ','
+
+                    line += array[i][index];
+                }
+
+                str += line + '\r\n';
+            }
+
+            return str;
+        }
+        function download_data()
+        {
+          data = ConvertToCSV(_data)
+          console.log(data)
+          filename = "export.csv"
+          csvFile = new Blob([data], {type: "text/csv"});
+
+            // download link
+            downloadLink = document.createElement("a");
+
+            // file name
+            downloadLink.download = filename;
+
+            // create link to file
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+
+            // hide download link
+            downloadLink.style.display = "";
+
+            // add link to DOM
+            document.body.appendChild(downloadLink);
+
+            // click download link
+            downloadLink.click();
+        }
         function update_selectors(response, selector_name, response_type)
         {
           x = document.getElementById(selector_name)
@@ -360,7 +367,45 @@
          })
        }
 
+   function remove_table(selector) { 
+                  $(selector+ " tr").remove(); 
+                
+              } 
 
+function buildHtmlTable(selector,myList) {
+  var columns = addAllColumnHeaders(myList, selector);
+
+  for (var i = 0; i < myList.length; i++) {
+    var row$ = $('<tr/>');
+    for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+      var cellValue = myList[i][columns[colIndex]];
+      if (cellValue == null) cellValue = "";
+      row$.append($('<td/>').html(cellValue));
+    }
+    $(selector).append(row$);
+  }
+}
+
+// Adds a header row to the table and returns the set of columns.
+// Need to do union of keys from all records as some records may not contain
+// all records.
+function addAllColumnHeaders(myList, selector) {
+  var columnSet = [];
+  var headerTr$ = $('<tr/>');
+
+  for (var i = 0; i < myList.length; i++) {
+    var rowHash = myList[i];
+    for (var key in rowHash) {
+      if ($.inArray(key, columnSet) == -1) {
+        columnSet.push(key);
+        headerTr$.append($('<th/>').html(key));
+      }
+    }
+  }
+  $(selector).append(headerTr$);
+
+  return columnSet;
+}
 
        
         function send_forecastdata_form() {
@@ -398,45 +443,9 @@
 
 
                 _name = response["name"]
-                _names1 = response["names1"]
-                //_names2 = response["names2"]
-                _models = response["models"]
-
-                _real_name =  response["real_name"]
-                _real_color = response["real_color"]
-                _real_series = response["real_series"]
-                /*    console.log("REAL")
-
-                console.log(_labels)
-                console.log(_values)
-
-                console.log("FORECAST")
-                console.log(_labels2)
-                console.log(_values2)
-
-                console.log(_models)
-                */
-
-                 _series = response["series"]
-                 _val = response["values"]
-                // _series2 = response ["series2"]
-                _namesq= response["namesq"]
-                _seriesq = response["seriesqs"]
-                _colorq = response["colorq"]
-                _type_serie = response["type_serie"]
-                _type_error = response["type_error"]
-                console.log(_seriesq)
-                  //  series = get_series(_labels,_values)
-                //    series2 = get_series(_labels2,_values2)
-
-                 console.log(_series)
-
-                 console.log("\n\n\n === REAL === \n\n\n")
-                 console.log(_real_series)
-                 //console.log(_series2)
-                   // console.log(series)
-                  //  console.log(series2)
-
+               _data = response["data"]
+               remove_table('#excelDataTable')
+               buildHtmlTable('#excelDataTable', myList =_data)
 
 
               }
