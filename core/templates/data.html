@@ -151,13 +151,13 @@
 
                     <div class="form-group row" >
 
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="margin-bottom: 2em;">
                         <h4 class="card-title">Download</h4>
                     <button type="button" onclick="download_data()" id="download_button" class="btn btn-success btn-icon-text">
                         <i class="mdi mdi mdi-download btn-icon-prepend"></i> Dowload dataset </button>
 
                   </div>
-                  <div class = "col-md-6">
+                  <div  class = "col-md-6">
                   <h4 class="card-title">Show table</h4>
                   <button type="button" onclick="toggle('excelDataTable','icon_but')" id="showtable" class="btn btn-primary btn-icon-text">
                       <i id="icon_but" class="mdi mdi-arrow-down-drop-circle"></i> Show tables </button>
@@ -226,40 +226,23 @@ function activate(elem) {
 
 
         }
-         function ConvertToCSV(objArray, col) {
-            var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
-            
-            var str = '';
-            console.log(col)
-            var line ='';
+        function arrayToCSV(objArray) {
+     const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
+     let str = `${Object.keys(array[0]).map(value => `"${value}"`).join(",")}` + '\r\n';
 
-            for (i =0; i<col.length; i++)
-            {
-                if (line!='') line += ','
-                  
-                line += col[i][0]+col[i][1]
-            }
-           str+= line+'\r\n'
-           line = ''
-            for (var i = 0; i < array.length; i++) {
-                for (var index in array[i]) {
-                    if (line != '') line += ','
+     return array.reduce((str, next) => {
+         str += `${Object.values(next).map(value => `"${value}"`).join(",")}` + '\r\n';
+         return str;
+        }, str);
+ }
 
-                    line += array[i][index];
-                }
-
-                str += line + '\r\n';
-            }
-            console.log(str)
-            return str;
-        }
         function download_data()
         {
           console.log(_data, _columns)
-          data = ConvertToCSV(_data, _columns)
+          out = arrayToCSV(_data)
           console.log(data)
-          filename = "export.csv"
-          csvFile = new Blob([data], {type: "text/csv"});
+          filename = "c19exp_"+_name+".csv"
+          csvFile = new Blob([out], {type: "text/csv"});
 
             // download link
             downloadLink = document.createElement("a");
@@ -507,12 +490,19 @@ function addAllColumnHeaders(myList, selector) {
               {
               document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = '';
               activate("download_button")
-
+            
                 _name = response["name"]
                _data = response["data"]
+               if(_data.length > 100)
+               {
+                 data = _data.slice(1, 100);
+               }
+               else
+                  data = _data
                _columns = response["columns"]
+              
                remove_table('#excelDataTable')
-               buildHtmlTable('#excelDataTable', myList =_data)
+               buildHtmlTable('#excelDataTable', myList =data)
 
 
               }

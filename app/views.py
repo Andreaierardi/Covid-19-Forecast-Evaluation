@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django import template
 from django.http import JsonResponse
 
+from django.http import StreamingHttpResponse
 
 import pandas as pd
 import numpy as np
@@ -18,7 +19,7 @@ import re
 import datetime
 import time
 import os
-
+import csv
 #import pycode.acquisition as acquisition
 import getters as gets
 #import acquisition as acq
@@ -441,11 +442,24 @@ def index(request):
     return render(request, 'index.html',context)
 
 def getFile(request):
-    fileContent = "Your name is %s" % request.GET['name']
-    res = HttpResponse(fileContent)
-    res['Content-Disposition'] = 'attachment; filename=yourname.txt'
-    return res
+    
+    def stream():
+            buffer_ = io.StringIO()
+            writer = csv.writer(buffer_)
+            for row in rows:
+                writer.writerow(row)
+                buffer_.seek(0)
+                data = buffer_.read()
+                buffer_.seek(0)
+                buffer_.truncate()
+                yield data
 
+    response = StreamingHttpResponse(
+        stream(), content_type='text/csv'
+    )
+    disposition = "attachment; filename=file.csv"
+    response['Content-Disposition'] = disposition
+    return response
 
 #@login_required(login_url="/login/")
 def pages(request):
