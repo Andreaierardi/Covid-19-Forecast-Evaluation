@@ -70,6 +70,7 @@ for d in gets.timezeros:
    dates.append(d.strftime("%Y-%m-%d"))
    all_dates.append(d.strftime("%Y-%m-%d"))
 
+
 try:
     data = gets.getFS(timezero= dates[0])
 
