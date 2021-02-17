@@ -442,26 +442,6 @@ def index(request):
 
     return render(request, 'index.html',context)
 
-def getFile(request):
-    
-    def stream():
-            buffer_ = io.StringIO()
-            writer = csv.writer(buffer_)
-            for row in rows:
-                writer.writerow(row)
-                buffer_.seek(0)
-                data = buffer_.read()
-                buffer_.seek(0)
-                buffer_.truncate()
-                yield data
-
-    response = StreamingHttpResponse(
-        stream(), content_type='text/csv'
-    )
-    disposition = "attachment; filename=file.csv"
-    response['Content-Disposition'] = disposition
-    return response
-
 #@login_required(login_url="/login/")
 def pages(request):
     context = {}

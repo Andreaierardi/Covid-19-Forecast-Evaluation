@@ -18,8 +18,7 @@ urlpatterns = [
     path('get/ajax/forecast_plot/<str:state>/<str:team>/<str:type>/<str:date>/<str:quantile>', views.getforecastplot, name='getforecastplot'),
     path('get/ajax/forecast_data/<str:state>/<str:team>/<str:type>/<str:date>/', views.getforecastdata, name='getforecastdata'),
 
-    path('get/ajax/update_suggestions/<str:state>/<str:team>', views.get_suggestions, name='get_suggestions'),
-    path('get/ajax/getfile/', views.getFile, name='getFile')
+    path('get/ajax/update_suggestions/<str:state>/<str:team>', views.get_suggestions, name='get_suggestions')
 
 
 ]
