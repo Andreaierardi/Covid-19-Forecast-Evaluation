@@ -41,7 +41,7 @@ quant = gets.quantiles
 quantiles = []
 for i in quant[len(quant)//2:len(quant)]:
             for j in quant[0:len(quant)//2+1]:
-                print("===_", i,j)
+                #print("===_", i,j)
                 if float(i)+float(j) == 1:
                     if(float(i)> float(j)):
                         quantiles.append(str(i)+"-"+str(j))
@@ -49,22 +49,6 @@ for i in quant[len(quant)//2:len(quant)]:
                         quantiles.append(str(j)+"-"+str(i))
 quantiles = sorted(quantiles, reverse = True)
 all_quant = quantiles
-print(quantiles)
-#quantiles = ["0.99-0.01",
-#"0.975-0.025",
-#"0.95-0.05",
-#"0.9-0.1",
-#"0.85-0.15",
-#"0.8-0.2",
-#"0.75-0.25",
-#"0.7-0.3",
-#"0.65-0.35",
-#"0.6-0.4",
-#"0.55-0.45",
-#"0.5-0.5"
-#]
-#list(gets.quantiles)
-print(quantiles)
 all_dates = []
 for d in gets.timezeros:
    dates.append(d.strftime("%Y-%m-%d"))
@@ -207,14 +191,14 @@ def get_suggestions(request, state, team):
             sugg = corr_dict[(team,state)]
             for s in sugg:
                 if(s is not None) and (type(s) is tuple):
-                    print("FOUND:",s[0],s[1],s[2])
+                    #print("FOUND:",s[0],s[1],s[2])
                     if s[0] not in dates:
                         dates.append(s[0])
                     if s[1] not in targs:
                         targs.append(s[1])
                     if s[2] not in quant and s[2] is not None:
                         quant.append(s[2])
-            print(quant)
+            #print(quant)
             dates = sorted(dates, reverse = True)
 
             for i in quant[len(quant)//2:len(quant)]:
@@ -231,11 +215,11 @@ def get_suggestions(request, state, team):
 
 
         err = "no"
-        print("\n\n=========\n\n")
-        print(radio_activate)
-        print(radio_filter)
-        print(dates)
-        print(quantiles)
+      #  print("\n\n=========\n\n")
+      #  print(radio_activate)
+      #  print(radio_filter)
+      # print(dates)
+      #  print(quantiles)
         context = { "quantiles":quantiles, "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
         return JsonResponse(context)
     else:
@@ -267,7 +251,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                 convert = datetime.datetime.strptime(date,"%Y-%m-%d")
                 while(convert+datetime.timedelta(7*data_len)) > today:
                     data_len = data_len -1
-                    print(data_len)
+                    #print(data_len)
                 real_data = getRS(timezero= date, type = type , state= state, window= data_len)
 
                 if (real_data is None):
@@ -286,9 +270,9 @@ def getforecastplot(request, state, team,type,date,quantile):
                 real_name = "Real cases"
                 print(name)
 
-                print(quantile)
+                #print(quantile)
                 quant1 , quant2 = quantile.split("-")
-                print(quant1," and ", quant2)
+                #print(quant1," and ", quant2)
 
 
                 names1 = team
@@ -301,16 +285,18 @@ def getforecastplot(request, state, team,type,date,quantile):
                 for i in range(len(values)):
                     values[i] = int(values[i])
 
-                print(values)
+                #print(values)
 
 
                 real_values = list(real_data.values)
                 for i in range(len(real_values)):
                     real_values[i] = int(real_values[i])
 
-                print(real_values)
+                #print(real_values)
                 index = convert_dateTotime(index)
                 series = list(zip(index,values))
+
+                print("SERIES OBTAINED")
                 print(series)
 
 
@@ -322,7 +308,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                     quant_list = []
                     for i in quant[len(quant)//2:len(quant)]:
                                 for j in quant[0:len(quant)//2+1]:
-                                    print("===_", i,j)
+                                    #print("===_", i,j)
                                     if float(i)+float(j) == 1:
                                         if(float(i)> float(j)):
                                             quantiles.append(str(i)+"-"+str(j))
@@ -332,10 +318,10 @@ def getforecastplot(request, state, team,type,date,quantile):
                                         quant_list.append(str(j))
 
                     quantiles = sorted(quantiles, reverse =True)
-                    print("PREE ======\n\n",quantiles)
-                    print("\n\n\n\n\n\n---\n\n\n\n")
-                    print("quant1:",quant1)
-                    print("quant_list:",quant_list)
+                  #  print("PREE ======\n\n",quantiles)
+                   # print("\n\n\n\n\n\n---\n\n\n\n")
+                   # print("quant1:",quant1)
+                   # print("quant_list:",quant_list)
                     if (quant1 is not None) and (not quant1 == ""):
                         if quant1 in quant_list:
                             qs = data[("quantile"),(quant1)]
@@ -371,8 +357,8 @@ def getforecastplot(request, state, team,type,date,quantile):
                         seriesqs = []
                         quantiles = [-1]
 
-                print("======\n\n",quantiles)
-                print("\n\n\n\n\n\n---\n\n\n\n")
+                #print("======\n\n",quantiles)
+                #print("\n\n\n\n\n\n---\n\n\n\n")
                 if type.startswith("inc"):
                     type_serie = "column"
                     type_error = "errorbar"
@@ -422,11 +408,11 @@ def getforecastdata(request, state, team,type,date):
 
     err = "no"
     columns = list(data.columns)
-    print(columns)
+    #print(columns)
     js = data.to_json(orient='records')
 
     data = json.loads(js)
-    print(data)
+    #print(data)
     context = {"columns": columns,"data":data,"name": name,"select_date": date, "errors":err}
     return JsonResponse(context, safe=False)
 
