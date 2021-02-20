@@ -15,7 +15,6 @@ from zoltpy import util
 import zoltpy
 
 import pandas as pd
-import pyarrow.parquet as pq
 import bz2
 import pickle
 import _pickle as cPickle

@@ -1,5 +1,4 @@
 import pandas as pd
-import pyarrow.parquet as pq
 import datetime as dt
 import bz2
 import pickle
