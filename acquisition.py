@@ -95,7 +95,7 @@ def retrieve_data(new_dates = None):
 
   targs = get_targets()
 #  targs = get_targets(onlyhosp=True)
-  loc =   list(locations.values())[1:len(locations.values())]
+  loc =   list(locations.values())#[1:len(locations.values())]
   missing = []
 
   print("Number of dates:" ,len(project.timezeros))
