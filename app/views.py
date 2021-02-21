@@ -22,12 +22,6 @@ import os
 import csv
 #import pycode.acquisition as acquisition
 import getters as gets
-#import acquisition as acq
-from getters import Fexists
-from getters import getFS
-from getters import corr_dict
-from getters import getRS
-
 
 #============= VARIABLE INITIALISATION  ====================
 
@@ -173,7 +167,7 @@ django.http.JsonResponse:
 
 
 def get_suggestions(request, state, team):
-    if(Fexists(model = team, location = state)):
+    if(gets.Fexists(model = team, location = state)):
 
         models = sorted(gets.models)
         states = list(gets.locations)
@@ -188,7 +182,7 @@ def get_suggestions(request, state, team):
             quant = all_quant
             dates = all_dates
         if(team != "all" and state !="all"):
-            sugg = corr_dict[(team,state)]
+            sugg = gets.corr_dict[(team,state)]
             for s in sugg:
                 if(s is not None) and (type(s) is tuple):
                     #print("FOUND:",s[0],s[1],s[2])
@@ -236,10 +230,10 @@ def getforecastplot(request, state, team,type,date,quantile):
     print(type)
     print(date)
     print(quantile)
-    if(Fexists(model = team, location = state)):
+    if(gets.Fexists(model = team, location = state)):
 
-        if(Fexists(model = team, location = state, target = type, timezero = date )):
-                data = getFS(type=type, model=team, state=state, timezero=date)
+        if(gets.Fexists(model = team, location = state, target = type, timezero = date )):
+                data = gets.getFS(type=type, model=team, state=state, timezero=date)
                 if(data is None):
                     err = "NotFound"
                     print(err)
@@ -252,7 +246,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                 while(convert+datetime.timedelta(7*data_len)) > today:
                     data_len = data_len -1
                     #print(data_len)
-                real_data = getRS(timezero= date, type = type , state= state, window= data_len)
+                real_data = gets.getRS(timezero= date, type = type , state= state, window= data_len)
 
                 if (real_data is None):
                         err = "Real data NotFound"
@@ -399,7 +393,7 @@ def getforecastdata(request, state, team,type,date):
     print(date)
     name= state +"-"+ team +"-"+  type +"-"+  date
 
-    data = getFS(type=type, model=team, state=state, timezero=date)
+    data = gets.getFS(type=type, model=team, state=state, timezero=date)
     
     if(data is None):
                 err = "NotFound"
