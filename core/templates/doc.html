@@ -6,7 +6,14 @@
 {% block plugin_stylesheets %}{% endblock plugin_stylesheets %}
 
 <!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<style>
+  .font16
+  {
+    font-size: 16px;
+  }
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
 
@@ -25,18 +32,18 @@
   <div class="col-sm-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h2 class="card-title text-primary" style=" text-align: center">  Testing the predictive accuracy of COVID-19 forecasts</h2>
+        <h2 class="card-title text-primary" style=" text-align: center; text-transform: none">  Testing the predictive accuracy of COVID-19 forecasts</h2>
 
         <div class="media">
           <div class="media-body">
-            <p class="card-text">
+            <p class="card-text font16">
               We test the predictive accuracy of forecasts for the cumulative number of COVID-19 fatalities produced by several 
               modelling teams and collected by the United States 
               <a href="https://www.google.com/url?q=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fcovid-data%2Fforecasting-us.html&sa=D&sntz=1&usg=AFQjCNFxgk8qRTIBrUF3LvupkYR2G2FUxg">
                 Centers for Disease Control and Prevention (CDC)
               </a>
               </p>
-            <p class="card-text">
+            <p class="card-text font16 ">
 
               The tests rely on fixed-smoothing asymptotics that allow for accurate testing even in small samples, see 
               <a href="https://www.google.com/url?q=https%3A%2F%2Fonlinelibrary.wiley.com%2Fdoi%2Ffull%2F10.1002%2Fjae.2756&sa=D&sntz=1&usg=AFQjCNE8vAg8dQlwtrZTaY0Tt3BMPRPXJw">
@@ -44,7 +51,7 @@
               Coroneo and Iacone (2020).
               </a>
             </p>
-            <p class="card-text">
+            <p class="card-text font16">
 
               For more details see the working paper 
               <a href="https://www.google.com/url?q=https%3A%2F%2Fideas.repec.org%2Fp%2Fyor%2Fyorken%2F20-10.html&sa=D&sntz=1&usg=AFQjCNHqW0_UYL5G-vCDa4eWzttcsoQAAA">
@@ -65,10 +72,10 @@
   <div class="col-sm-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h2 class="card-title text-primary" style=" text-align: center"> Results </h2>
+        <h2 class="card-title text-primary" style=" text-align: center; text-transform: none"> Results </h2>
         <div class="media">
           <div class="media-body">
-            <p class="card-text">
+            <p class="card-text font16" >
               Forecast evaluation for the number of cumulative deaths in the US made  by  eight  forecasting  teams:
 
               <ul>
@@ -84,7 +91,7 @@
 
               We also report results for the Ensemble (En) forecast published by the CDC.
             </p>
-            <p class="card-text">
+            <p class="card-text font16">
 
               Results for the United States for predictions made from  May  18,  2020  to  August  24,  2020 are reported below.
             </p>
@@ -93,10 +100,10 @@
             <img src="/static/assets/images/results1.png"  style="width:50%; margin: 1em 1em 2em 1em"  >
           </div>
 
-
-            <p class="card-text">
+        
+            <p class="card-text font16" style="text-align:justify">
               The figure reports the test statistic for the test of equal predictive accuracy using the weighted covariance estimator (WCE) of the long run variance and fixed-b asymptotics. The benchmark is a second degree polynomial model fitted on a rolling window of 5 observations. A positive value of the test statistic indicates lower loss for the forecaster, i.e. better performance of the forecaster relative to the polynomial model. Different loss functions are reported with different markers: plus refers to a quadratic loss function, diamond to the absolute loss function, filled circle to the absolute percentage loss function and empty circle to the asymmetric loss function. The dotted, dashed and continuous red horizontal lines denote respectively the 20%, 10% and 5% significance levels. The forecast horizons h are 1, 2, 3 and 4 weeks ahead.
-            </p>
+           </p>
 
          
           </div>
@@ -110,8 +117,7 @@
   <div class="col-sm-12 grid-margin stretch-card">
     <div class="card">
       <div class="card-body">
-        <h2 class="card-title text-primary" style=" text-align: center">   Project by
-        </h2>
+        <h2 class="card-title text-primary" style=" text-align: center;text-transform: none">   Project by</h2>
         <ul>
           
      <li>    
