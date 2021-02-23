@@ -35,6 +35,8 @@ quantiles = (0.99, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 
 
 models = list(pd.read_csv("data/unique_lists/models.csv")['models'])
 
+real_data = pd.read_parquet("data/real_data.parquet")
+
 # Forecast Series getter
 def getFS(timezero, type="all", model="all", state="all"):
     """Gets the weekly forecasted series by model, state and forecast date

@@ -49,6 +49,20 @@ for d in gets.timezeros:
    all_dates.append(d.strftime("%Y-%m-%d"))
 
 
+today = datetime.datetime.today()
+last_monday = today + datetime.timedelta(days=-today.weekday(), weeks=1) -  datetime.timedelta(7)
+try: 
+    last_date = datetime.datetime.strptime(gets.real_data.date[0] ,"%Y-%m-%d")
+    print("LAST monday", last_monday.date())
+    print("LAST monday of real data", last_date.date())
+    if(last_date.date() < last_monday.date()):
+        import acquisition
+    else:
+        print("Real data is already up-to-date")
+except Exception as e:
+            print(e)
+            print("ERROR IN FINDING new real data")
+
 try:
     data = gets.getFS(timezero= dates[0])
 
