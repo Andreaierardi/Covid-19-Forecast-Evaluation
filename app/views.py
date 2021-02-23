@@ -217,7 +217,7 @@ def get_suggestions(request, state, team):
         context = { "quantiles":quantiles, "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
         return JsonResponse(context)
     else:
-        err = "Not Exists"
+        err = "No information found for the selected location and forecast team"
         print(err)
         return JsonResponse({"errors": err})
 
@@ -240,12 +240,6 @@ def getforecastplot(request, state, team,type,date,quantile):
                     return JsonResponse({"errors": err})
 
                 data_len =len(data)
-
-                today = datetime.datetime.now()
-                convert = datetime.datetime.strptime(date,"%Y-%m-%d")
-                while(convert+datetime.timedelta(7*data_len)) > today:
-                    data_len = data_len -1
-                    #print(data_len)
                 real_data = gets.getRS(timezero= date, type = type , state= state, window= data_len)
 
                 if (real_data is None):
@@ -260,7 +254,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                 colorq = "#ffcc66"
 
 
-                name= state +"-"+ team +"-"+  type +"-"+  date
+                name= state +" \n"+ team +" \n"+  type +" \n"+  date
                 real_name = "Real cases"
                 print(name)
 
@@ -373,7 +367,7 @@ def getforecastplot(request, state, team,type,date,quantile):
 
 
     else:
-            err = "No date"
+            err = "No zerodate found for selected location and foreast team"
 
             models=[]
             states=[]
@@ -396,7 +390,7 @@ def getforecastdata(request, state, team,type,date):
     data = gets.getFS(type=type, model=team, state=state, timezero=date)
     
     if(data is None):
-                err = "NotFound"
+                err = "No data avaiable"
                 print(err)
                 return JsonResponse({"errors": err})
 

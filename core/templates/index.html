@@ -183,7 +183,13 @@
 
                   <div id="container2" style="width:100%; height:400px;"></div>
 
-
+                  <div id="wpbody-content" style="margin: 2em 2em 2em 2em;">
+                        <h4 class="card-title text-danger" id="error-message"> </h4>
+                  
+                      <div class="clear">
+                      
+                  </div>
+                
                   <div class="alert alert-dismissible alert alert-light show fade " id="error_alert" style=" display:none;   position:absolute;
                   top:50%;
                   left:50%;
@@ -412,12 +418,14 @@
              }
 
              else {
+               document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = _err;
 
+               hide("container2")
                $("#error_alert").fadeIn(400);
                setTimeout(function(){
                  $("#error_alert").fadeOut(800);
                }, 3000)
-
+              show("error-message")
 
 
              }
@@ -473,6 +481,8 @@
               if(_err=="no")
               {
 
+                show("container2")
+                document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = "";
 
                 if(response["quantiles"][0] == -1)
                 {
@@ -675,14 +685,18 @@
               }
               else if(_err == "No date")
               {
+                document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = _err;
 
+                hide("container2")
                 $("#error_alert").fadeIn(400);
                 setTimeout(function(){
                   $("#error_alert").fadeOut(800);
                 }, 3000)
               }
               else {
+                                document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = _err;
 
+                hide("container2")
                 $("#error_alert").fadeIn(400);
                 setTimeout(function(){
                   $("#error_alert").fadeOut(800);

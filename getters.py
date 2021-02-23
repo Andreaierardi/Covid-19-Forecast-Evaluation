@@ -190,6 +190,11 @@ def getRS(timezero, type, state, window):
             print(e)
             return None
 
+    last_date = dt.datetime.strptime(data.date[0],"%Y-%m-%d")
+
+    while(timezero+dt.timedelta(7*window)) > last_date:
+             window = window -1
+                    #print(data_len)
 
     # state filter
     data = data[data['state'] == locations_abbr[state]]
