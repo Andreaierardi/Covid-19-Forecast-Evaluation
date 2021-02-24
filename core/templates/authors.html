@@ -6,7 +6,14 @@
 {% block plugin_stylesheets %}{% endblock plugin_stylesheets %}
 
 <!-- Specific CSS goes HERE -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<style>
+  .font16
+  {
+    font-size: 16px;
+  }
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
 
@@ -106,25 +113,47 @@
     </div>
 
 
+<div class="card-body">
+
+    <h4 class="card-title" style="text-transform:none">    Dashboard developed by: </h4>
+
+     <div class="media">
+          <div class="media-body">
+            <ul> 
+                          <li>           Andrea Ierardi                </li> 
+
+                          <li>           Fabio Caironi              </li> 
+                          <li>          Marzio De Corato                </li> 
+
+             
+              </p>
+            </ul> 
+
+          </div>
+        </div>
+
+  </div>
+
     <br>
 <br>
 
   <div class="card-body">
 
-    <h4 class="card-title">    Powered by: </h4>
+    <h4 class="card-title" style="text-transform:none">    Powered by: </h4>
 
-  <a href="https://www.unimi.it/it">
-    <img src="/static/assets/images/unimi.svg" width="100px" height="100px">
-  </a>
-  <a href="https://ceeds.unimi.it/">
-    <img src="/static/assets/images/deem.gif" width="100px" height="100px">
-  </a>
-  <a href="http://www.demm.unimi.it/ecm/home">
-    <img src="/static/assets/images/ceeds.png" width="150px" height="100px">
-  </a>
+    <a href="https://www.unimi.it/it">
+      <img src="/static/assets/images/unimi.svg" width="100px" height="100px">
+    </a>
+    <a href="https://ceeds.unimi.it/">
+      <img src="/static/assets/images/deem.gif" width="100px" height="100px">
+    </a>
+    <a href="http://www.demm.unimi.it/ecm/home">
+      <img src="/static/assets/images/ceeds.png" width="150px" height="100px">
+    </a>
 
  
-</div>
+  </div>
+  
   </div>
 </div>
 
