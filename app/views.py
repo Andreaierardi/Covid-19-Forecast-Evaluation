@@ -381,7 +381,7 @@ def getforecastplot(request, state, team,type,date,quantile):
 
 
     else:
-            err = "No zerodate found for selected location and foreast team"
+            err = "No forecast date found for selected location and forecast team"
 
             models=[]
             states=[]
