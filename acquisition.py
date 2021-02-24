@@ -80,7 +80,7 @@ def get_targets(onlyhosp=False):
         targs.append(target.name)
     elif "wk" in name:
       targs.append(target.name)
-      
+
   return targs
 
 
@@ -126,7 +126,11 @@ def retrieve_data(new_dates = None):
       missing.append(date)
 
       continue
-
+  print(missing)
+  f = open("logs/missing_data.txt", "w")
+  for m in missing:
+      f.write(str(m))
+  f.close()
 ### Acquisition
 ## Data
 project = get_project()
