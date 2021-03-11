@@ -179,6 +179,50 @@ def reshape_for_download(dataset):
 
 
 
+def get_download(state, path, timezero="all", type="all", model="all"):
+    """Gets the weekly forecasted series by model, state and forecast date
+
+    Parameters
+    ----------
+    state : str
+        The target state of the forecast (full name). This argument must be a single location.
+    path : str
+        Path where to write the xlsx file.
+    timezero : str or datetime
+        The date when the forecast was performed. If a string, provide the format '%Y-%m-%d'.
+        'all' for all timezeros.
+    type : str
+        'cum case' for cumulative cases.
+        'cum death' for cumulative deaths.
+        'inc case' for incidental cases.
+        'inc death' for incidental deaths.
+        'hosp' for hospitalized.
+        'all' for all types
+    model : str
+        The model of the forecast. Choose 'all' for returning every model.
+
+    Returns
+    -------
+    pandas.DataFrame
+        a data frame indexed by target date, including series:
+           - point series
+           - quantile series
+    """
+    
+    #curr_date
+    
+    
+    
+    
+    if timezero == "all":
+        return None
+    else:
+        data = getFS(timezero=timezero, type=type, model=model, state=state)
+        data = reshape_for_download(data)
+        data.to_excel(excel_writer=path, sheet_name=model.title(), index=False)
+
+
+
 
 
 def getRS(timezero, type, state, window):
