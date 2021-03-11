@@ -158,6 +158,29 @@ def Fexists(model, location, timezero='all', target='all', quantile='all'):
 # Fexists('UT-Mobility', 'Connecticut', timezero='2020-06-08', target='inc death', quantile='0.95')
 
 
+def reshape_for_download(dataset):
+    new = pd.DataFrame({
+        'model': dataset['model'],
+        'forecast_date': pd.to_datetime(dataset['timezero']).dt.strftime('%d/%m/%Y'),
+        'target': dataset['target'],
+        'target_week_end_date': dataset.index.strftime('%d/%m/%Y'),
+        'location': dataset['unit'].replace(locations_inv),
+        'point': dataset['point'],
+    })
+    
+    for q in quantiles:
+        qs = str(q)
+        if ('quantile', qs) in dataset.columns:
+            new[f'quantile_{qs}'] = dataset[('quantile', qs)]
+    
+    new.reset_index(drop=True, inplace=True)
+    
+    return new
+
+
+
+
+
 def getRS(timezero, type, state, window):
     """Gets the real cases, deaths or hospitalized series by state
 
