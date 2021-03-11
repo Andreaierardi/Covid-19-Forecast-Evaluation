@@ -211,6 +211,10 @@ def get_download(state, path, timezero="all", type="all", model="all"):
            - quantile series
     """
     
+    writer = pd.ExcelWriter(path, engine='xlsxwriter')
+    
+    i = 0
+    
     if timezero == "all" and model == "all" and type == "all" and type == "all":
         for curr_mod in models:
             print(f'writing {curr_mod}...')
@@ -220,9 +224,14 @@ def get_download(state, path, timezero="all", type="all", model="all"):
                 if Fexists(model=curr_mod, location=state, timezero=curr_date_s, target='all', quantile='all'):
                     data_new = getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
                     data_new = reshape_for_download(data_new)
-                    data.append(data_new)
-                    
-            data.to_excel(excel_writer=path, sheet_name=model, index=False)   
+                    data = data.append(data_new)
+
+            data.to_excel(excel_writer=writer, sheet_name=curr_mod, index=False) 
+            
+            # Retrieve only first models...:
+            #i = i+1
+            #if i >= 3:
+            #    break
             
     
     else:
@@ -230,7 +239,8 @@ def get_download(state, path, timezero="all", type="all", model="all"):
         #data = reshape_for_download(data)
         #data.to_excel(excel_writer=path, sheet_name=model, index=False)
         return None
-        
+    
+    writer.save()
     print('Done!')
 
 
