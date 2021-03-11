@@ -164,7 +164,7 @@ def reshape_for_download(dataset):
         'forecast_date': pd.to_datetime(dataset['timezero']).dt.strftime('%d/%m/%Y'),
         'target': dataset['target'],
         'target_week_end_date': dataset.index.strftime('%d/%m/%Y'),
-        'location': dataset['unit'].replace(locations_inv),
+        'location_name': dataset['unit'].replace(locations_inv),
         'point': dataset['point'],
     })
     
@@ -172,6 +172,8 @@ def reshape_for_download(dataset):
         qs = str(q)
         if ('quantile', qs) in dataset.columns:
             new[f'quantile_{qs}'] = dataset[('quantile', qs)]
+        else:
+            new[f'quantile_{qs}'] = None
     
     new.reset_index(drop=True, inplace=True)
     
@@ -209,18 +211,27 @@ def get_download(state, path, timezero="all", type="all", model="all"):
            - quantile series
     """
     
-    #curr_date
+    if timezero == "all" and model == "all" and type == "all" and type == "all":
+        for curr_mod in models:
+            print(f'writing {curr_mod}...')
+            data = pd.DataFrame()
+            for curr_date in timezeros:
+                curr_date_s = str(curr_date)
+                if Fexists(model=curr_mod, location=state, timezero=curr_date_s, target='all', quantile='all'):
+                    data_new = getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
+                    data_new = reshape_for_download(data_new)
+                    data.append(data_new)
+                    
+            data.to_excel(excel_writer=path, sheet_name=model, index=False)   
+            
     
-    
-    
-    
-    if timezero == "all":
-        return None
     else:
-        data = getFS(timezero=timezero, type=type, model=model, state=state)
-        data = reshape_for_download(data)
-        data.to_excel(excel_writer=path, sheet_name=model.title(), index=False)
-
+        #data = getFS(timezero=timezero, type=type, model=model, state=state)
+        #data = reshape_for_download(data)
+        #data.to_excel(excel_writer=path, sheet_name=model, index=False)
+        return None
+        
+    print('Done!')
 
 
 
