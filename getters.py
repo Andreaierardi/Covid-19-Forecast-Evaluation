@@ -225,8 +225,8 @@ def get_download(state, path, timezero="all", type="all", model="all"):
                     data_new = getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
                     data_new = reshape_for_download(data_new)
                     data = data.append(data_new)
-
-            data.to_excel(excel_writer=writer, sheet_name=curr_mod, index=False) 
+            if(len(data) != 0):
+                data.to_excel(excel_writer=writer, sheet_name=curr_mod, index=False) 
             
             # Retrieve only first models...:
             #i = i+1

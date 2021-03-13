@@ -22,6 +22,8 @@ import os
 import csv
 #import pycode.acquisition as acquisition
 import getters as gets
+import io
+import xlwt
 
 #============= VARIABLE INITIALISATION  ====================
 
@@ -62,11 +64,11 @@ try:
 except Exception as e:
             print(e)
             print("ERROR IN FINDING new real data")
-
 try:
     data = gets.getFS(timezero= dates[0])
 
 except:
+   
     import acquisition as acq
 
     limit = dates[0]
@@ -82,7 +84,6 @@ except:
     print("NEW DATES:\n",new_dates)
     acq.retrieve_data(new_dates)
     data = gets.getFS(timezero= dates[0])
-
 
 targs = gets.targets
 
@@ -389,8 +390,91 @@ def getforecastplot(request, state, team,type,date,quantile):
             name = ""
             return JsonResponse({"errors": err, "models": models, "states":states, "radio_activate": active, "radio_filter":all_targs, "name":name})
 
+def exportFile(request, state, team,type,date):
+
+    data = gets.getFS(type=type, model=team, state=state, timezero=date)
+    data = gets.reshape_for_download(data)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=export.csv'
+    data.to_csv(path_or_buf=response)  # with other applicable parameters
+    return response
+    #resp = HttpResponse(content_type='text/csv')
+    #resp['Content-Disposition'] = 'attachment; filename=myFile.csv'
+
+   # data.to_csv(path_or_buf=resp, index=False)
+    #res = json.loads(pd.DataFrame(data))
+    #return JsonResponse({"data": res}, safe = False)
+
+def getforecastdata2(request, state, team,type,date):
 
 
+    print("Parameter from Get request")
+    print(state)
+    print(team)
+    print(type)
+    print(date)
+    name= state +"-"+ team +"-"+  type +"-"+  date
+    data = gets.getFS(type=type, model=team, state=state, timezero=date)
+
+    #data = gets.get_download(state = state,"download/", timezero="all", type="all", model="all"):
+    if(data is None):
+                err = "No data avaiable"
+                print(err)
+                return JsonResponse({"errors": err})
+
+    err = "no"
+
+    # Create a Pandas Excel writer using XlsxWriter as the engine.
+    writer = pd.ExcelWriter('/download/pandas_simple.xlsx', engine='xlsxwriter')
+
+    # Convert the dataframe to an XlsxWriter Excel object.
+    data.to_excel(writer, sheet_name='Sheet1')
+
+
+    # Close the Pandas Excel writer and output the Excel file.
+    writer.save()
+    if os.path.exists("download/pandas_simple.xlsx"):
+        with open("download/pandas_simple.xlsx", 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            response['Content-Disposition'] = 'attachment; filename=pandas_simple.xlsx'
+            return response
+    else:
+        raise Http404
+  #  columns = list(data.columns)
+    #print(columns)
+   # js = data.to_json(orient='records')
+
+    #data = json.loads(js)
+    #print(data)
+    #context = {"columns": columns,"data":data,"name": name,"select_date": date, "errors":err}
+    #return JsonResponse(context, safe=False)
+def download(request):
+    
+        data = pd.read_csv("core/templates/download.csv")
+        data.to_csv("core/templates/download.csv")
+        resp = HttpResponse(content_type='text/csv')
+        resp['Content-Disposition'] = 'attachment; filename=download.csv'
+
+        data.to_csv(path_or_buf=resp, sep=',', index=False)
+        return resp
+    
+def loadExcel(request, state):
+    path="core/templates/download.xlsx"
+    print(state)
+    gets.get_download(state=state,path= path)
+    print('Done!')
+    return JsonResponse({"results": "done"})
+
+def exportExcell(request):     
+       path="core/templates/download.xlsx"
+       if os.path.exists(path):
+            with open(path, "rb") as excel:
+                data = excel.read()
+
+            response = HttpResponse(data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            response['Content-Disposition'] = 'attachment; filename=download.xlsx'
+            return response
 def getforecastdata(request, state, team,type,date):
 
 
@@ -402,7 +486,14 @@ def getforecastdata(request, state, team,type,date):
     name= state +"-"+ team +"-"+  type +"-"+  date
 
     data = gets.getFS(type=type, model=team, state=state, timezero=date)
-    
+
+    exp = gets.reshape_for_download(data)
+    data = gets.reshape_for_download(data)
+    exp.to_csv("core/templates/download.csv")
+    resp1 = HttpResponse(content_type='text/csv')
+    resp1['Content-Disposition'] = 'attachment; filename=myFile.csv'
+    exp.to_csv(path_or_buf=resp1, sep=',', index=False) 
+
     if(data is None):
                 err = "No data avaiable"
                 print(err)

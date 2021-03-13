@@ -151,29 +151,57 @@
 
                     <div class="form-group row" >
 
-                    <div class="col-md-6" style="margin-bottom: 2em;">
+                    <div class="col-md-4" style="margin-bottom: 2em;">
                         <h4 class="card-title">Download</h4>
-                    <button type="button" onclick="download_data()" id="download_button" class="btn btn-success btn-icon-text">
+                        <form name="exportFile" action="/app/export/" method="get">
+                          <a download="download.csv" href="download/"> 
+                        
+                    <button type="button" id="download_button" class="btn btn-success btn-icon-text">
                         <i class="mdi mdi mdi-download btn-icon-prepend"></i> Dowload dataset </button>
+                    </a>
+                  
+                  </form>
 
                   </div>
-                  <div  class = "col-md-6">
+                  <div  class = "col-md-4" style="margin-bottom: 2em;">
                   <h4 class="card-title">Show table</h4>
                   <button type="button" onclick="toggle('excelDataTable','icon_but')" id="showtable" class="btn btn-primary btn-icon-text">
                       <i id="icon_but" class="mdi mdi-arrow-down-drop-circle"></i> Show tables </button>
                 </div>
+                
+                <div class="col-md-4" style="margin-bottom: 2em;">
+                  <h4 class="card-title">Download XLSX file</h4>
+
+                  <button type="button" id="load_button2" onclick="load_data()" class="btn btn-secondary btn-icon-text">
+                    <i class="mdi mdi mdi-download btn-icon-prepend"></i> Load excell </button>
+          
+                  <form id="formdown" name="exportFile" action="/app/exportexcel/" method="get">
+                  <a download="download.xlsx" href="/app/exportexcel/"> 
+
+              <button type="button" id="download_button2" class="btn btn-info btn-icon-text">
+                  <i class="mdi mdi mdi-download btn-icon-prepend"></i> Dowload excel </button>
+                  </a>
+
+
+                   
+                </form>
+               </div>
+
               </div>
 
-                    </form>
-
-               
-
+                    </form>  
+                   
                     <div id="wpbody-content" style="margin: 2em 2em 2em 2em;">
                         <h4 class="card-title text-danger" id="alert_notfound"> </h4>
                   
                       <div class="clear"></div>
                   </div>
 
+                  <div id="alert_load" style="text-align:right;margin: 2em 2em 2em 2em;">
+                    <h4 class="card-title text-warning" id="alert_loading"> </h4>
+              
+                  <div class="clear"></div>
+              </div>
 
             <div class="table-responsive">
 
@@ -189,8 +217,28 @@
 
       <script>
 
+single_toggle("download_button2")
+
 
 toggle("excelDataTable","icon_but")
+
+function download(data, filename, type) {
+    var file = new Blob([data], {type: type});
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+        var a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);  
+        }, 0); 
+    }
+}
 
 function toggle(el, iel) {
   var x = document.getElementById(el);
@@ -201,6 +249,15 @@ function toggle(el, iel) {
   } else {
     x.style.display = "none";
     i.className = "mdi mdi-arrow-up-drop-circle-outline"
+  }
+}
+
+function single_toggle(el) {
+  var x = document.getElementById(el);
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
   }
 }
 
@@ -219,7 +276,9 @@ function activate(elem) {
           x.disabled = false
 
         }
-
+        
+        
+                
         function disable(elem) {
           var x = document.getElementById(elem);
           x.disabled = true
@@ -235,7 +294,57 @@ function activate(elem) {
          return str;
         }, str);
  }
+        function load_data() 
+        {
+          // preventing from page reload and default actions
 
+          // serialize the data for sending the form data.
+
+
+          var fore = document.getElementById("select_forecast");
+          var fore_value = fore.value
+
+          console.log("URL:")
+          console.log("get/ajax/loadexcel/"+fore_value+"/")
+          document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = 'Loading data ... It will take some minutes';
+          document.getElementById("alert_loading").className = "card-title text-warning"
+          disable("load_button2")
+          // make POST ajax call
+          $.ajax({
+            type: 'GET',
+            // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
+            url: "get/ajax/loadexcel/"+fore_value+"/",
+            data: "",
+            success: function (response) {
+
+                  _res = response["results"]
+                  if(_res == "done")
+                  {
+                    document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = 'Data ready for the download';
+                    document.getElementById("alert_loading").className = "card-title text-primary"
+                    activate("load_button2")
+                    single_toggle("load_button2")
+                    single_toggle("download_button2")
+
+
+                  }
+
+
+
+            },
+            error: function (response) {
+              // alert the error if any error occured
+
+
+
+
+
+
+            }
+          })
+       
+        }
+        
         function download_data()
         {
           console.log(_data, _columns)
@@ -381,6 +490,9 @@ update_suggestions()
              {
 
               activate("download_button")
+              activate("download_button2")
+              activate("load_button2")
+
               document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = '';
 
                update_radio(response)
@@ -394,6 +506,7 @@ update_suggestions()
               remove_table('#excelDataTable')
               document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = 'Data not found ';
               disable("download_button")
+              document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = '';
 
 
 
@@ -482,16 +595,26 @@ function addAllColumnHeaders(myList, selector) {
             url: "get/ajax/forecast_data/"+fore_value+"/"+bench_value+"/"+type_value+"/"+date_value+"/",
             data: "",
             success: function (response) {
-
               console.log("ENTER RESPONSE")
               _err = response["errors"]
               console.log("ACK: "+_err)
               if(_err=="no")
               {
+                document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = '';
+
+              hide("download_button2")
+              show("load_button2")
               document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = '';
               activate("download_button")
-            
-                _name = response["name"]
+              activate("download_button2")
+              activate("load_button2")
+              document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = '';
+
+              document.getElementById("formdown").action="/app/loadexcel/"+document.getElementById("select_forecast").value
+              document.getElementById("formdown").href=  "/app/loadexcel/"+document.getElementById("select_forecast").value
+              //document.getElementById("loadbut").href=  "/app/loadexcel/"+document.getElementById("select_forecast").value
+
+              _name = response["name"]
                _data = response["data"]
                if(_data.length > 100)
                {
@@ -510,6 +633,7 @@ function addAllColumnHeaders(myList, selector) {
                 remove_table('#excelDataTable')
               document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = 'Data not found ';
               disable("download_button")
+              document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = '';
 
               }
 
@@ -528,6 +652,7 @@ function addAllColumnHeaders(myList, selector) {
             }
           })
         }
+
 
 
       </script>
