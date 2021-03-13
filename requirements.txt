@@ -1,4 +1,5 @@
 asgiref
+xlsxwriter
 autopep8
 django==2.2.10
 pycodestyle

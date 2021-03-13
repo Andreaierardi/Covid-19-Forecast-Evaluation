@@ -22,10 +22,10 @@ import os
 import csv
 #import pycode.acquisition as acquisition
 import getters as gets
-import io
-import xlwt
 
 #============= VARIABLE INITIALISATION  ====================
+global lock_job
+lock_job = True
 
 values = list()
 labels = list()
@@ -53,38 +53,38 @@ for d in gets.timezeros:
 
 today = datetime.datetime.today()
 last_monday = today + datetime.timedelta(days=-today.weekday(), weeks=1) -  datetime.timedelta(7)
-try: 
-    last_date = datetime.datetime.strptime(gets.real_data.date[0] ,"%Y-%m-%d")
-    print("LAST monday", last_monday.date())
-    print("LAST monday of real data", last_date.date())
-    if(last_date.date() < last_monday.date()):
-        import acquisition
-    else:
-        print("Real data is already up-to-date")
-except Exception as e:
-            print(e)
-            print("ERROR IN FINDING new real data")
-try:
-    data = gets.getFS(timezero= dates[0])
-
-except:
-   
-    import acquisition as acq
-
-    limit = dates[0]
-    print("LIMIT: ",limit)
-    parquet_list = sorted(os.listdir("data"))
-    parquet_list = parquet_list[0:len(parquet_list)-1]
-    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
-    last_parquet = parquet_list[len(parquet_list)-2].split(".parquet")[0]
-    print("LAST PARQUET:" ,last_parquet)
-    ind = dates.index(last_parquet)
-
-    new_dates = dates[0:ind]
-    print("NEW DATES:\n",new_dates)
-    acq.retrieve_data(new_dates)
-    data = gets.getFS(timezero= dates[0])
-
+#try: 
+#    last_date = datetime.datetime.strptime(gets.real_data.date[0] ,"%Y-%m-%d")
+#    print("LAST monday", last_monday.date())
+#    print("LAST monday of real data", last_date.date())
+#    if(last_date.date() < last_monday.date()):
+#        import acquisition
+#    else:
+#        print("Real data is already up-to-date")
+#except Exception as e:
+#            print(e)
+#            print("ERROR IN FINDING new real data")
+#try:
+#    data = gets.getFS(timezero= dates[0])
+#
+#except:
+#   
+#    import acquisition as acq
+#
+#    limit = dates[0]
+#    print("LIMIT: ",limit)
+#    parquet_list = sorted(os.listdir("data"))
+#    parquet_list = parquet_list[0:len(parquet_list)-1]
+#    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
+#    last_parquet = parquet_list[len(parquet_list)-2].split(".parquet")[0]
+#    print("LAST PARQUET:" ,last_parquet)
+#    ind = dates.index(last_parquet)
+#
+#    new_dates = dates[0:ind]
+#    print("NEW DATES:\n",new_dates)
+#    acq.retrieve_data(new_dates)
+#    data = gets.getFS(timezero= dates[0])
+#
 targs = gets.targets
 
 all_targs = []
@@ -253,7 +253,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                     err = "NotFound"
                     print(err)
                     return JsonResponse({"errors": err})
-
+              
                 data_len =len(data)
                 real_data = gets.getRS(timezero= date, type = type , state= state, window= data_len)
 
@@ -369,6 +369,7 @@ def getforecastplot(request, state, team,type,date,quantile):
                 else:
                     type_serie = "spline"
                     type_error = "arearange"
+
                 context = {"type_error":type_error,"type_serie":type_serie, "real_color": real_color,"real_name":real_name,"real_series":real_series,"namesq":namesq, "colorq":colorq,"seriesqs":seriesqs, "quantiles": quantiles, "names1": names1, "names2": names2, "name": name,"select_date": date, "errors":err,"values":values,"series":series, "color": color}
                 return JsonResponse(context)
         else:
@@ -392,6 +393,7 @@ def getforecastplot(request, state, team,type,date,quantile):
 
 def exportFile(request, state, team,type,date):
 
+    
     data = gets.getFS(type=type, model=team, state=state, timezero=date)
     data = gets.reshape_for_download(data)
 
@@ -406,49 +408,6 @@ def exportFile(request, state, team,type,date):
     #res = json.loads(pd.DataFrame(data))
     #return JsonResponse({"data": res}, safe = False)
 
-def getforecastdata2(request, state, team,type,date):
-
-
-    print("Parameter from Get request")
-    print(state)
-    print(team)
-    print(type)
-    print(date)
-    name= state +"-"+ team +"-"+  type +"-"+  date
-    data = gets.getFS(type=type, model=team, state=state, timezero=date)
-
-    #data = gets.get_download(state = state,"download/", timezero="all", type="all", model="all"):
-    if(data is None):
-                err = "No data avaiable"
-                print(err)
-                return JsonResponse({"errors": err})
-
-    err = "no"
-
-    # Create a Pandas Excel writer using XlsxWriter as the engine.
-    writer = pd.ExcelWriter('/download/pandas_simple.xlsx', engine='xlsxwriter')
-
-    # Convert the dataframe to an XlsxWriter Excel object.
-    data.to_excel(writer, sheet_name='Sheet1')
-
-
-    # Close the Pandas Excel writer and output the Excel file.
-    writer.save()
-    if os.path.exists("download/pandas_simple.xlsx"):
-        with open("download/pandas_simple.xlsx", 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            response['Content-Disposition'] = 'attachment; filename=pandas_simple.xlsx'
-            return response
-    else:
-        raise Http404
-  #  columns = list(data.columns)
-    #print(columns)
-   # js = data.to_json(orient='records')
-
-    #data = json.loads(js)
-    #print(data)
-    #context = {"columns": columns,"data":data,"name": name,"select_date": date, "errors":err}
-    #return JsonResponse(context, safe=False)
 def download(request):
     
         data = pd.read_csv("core/templates/download.csv")
@@ -460,11 +419,109 @@ def download(request):
         return resp
     
 def loadExcel(request, state):
+    global lock_job
+    lock_job = True
+    print("SEt lock_job at T:", lock_job)
+    print("ok")
     path="core/templates/download.xlsx"
     print(state)
-    gets.get_download(state=state,path= path)
+    get_download(state=state,path= path)
     print('Done!')
+    if lock_job==False:
+        return JsonResponse({"results": "error"})
     return JsonResponse({"results": "done"})
+
+
+def reshape_for_download(dataset):
+    new = pd.DataFrame({
+        'model': dataset['model'],
+        'forecast_date': pd.to_datetime(dataset['timezero']).dt.strftime('%d/%m/%Y'),
+        'target': dataset['target'],
+        'target_week_end_date': dataset.index.strftime('%d/%m/%Y'),
+        'location_name': dataset['unit'].replace(locations_inv),
+        'point': dataset['point'],
+    })
+    
+    for q in quantiles:
+        qs = str(q)
+        if ('quantile', qs) in dataset.columns:
+            new[f'quantile_{qs}'] = dataset[('quantile', qs)]
+        else:
+            new[f'quantile_{qs}'] = None
+    
+    new.reset_index(drop=True, inplace=True)
+    
+    return new
+
+
+
+def get_download(state, path, timezero="all", type="all", model="all"):
+    """Gets the weekly forecasted series by model, state and forecast date
+
+    Parameters
+    ----------
+    state : str
+        The target state of the forecast (full name). This argument must be a single location.
+    path : str
+        Path where to write the xlsx file.
+    timezero : str or datetime
+        The date when the forecast was performed. If a string, provide the format '%Y-%m-%d'.
+        'all' for all timezeros.
+    type : str
+        'cum case' for cumulative cases.
+        'cum death' for cumulative deaths.
+        'inc case' for incidental cases.
+        'inc death' for incidental deaths.
+        'hosp' for hospitalized.
+        'all' for all types
+    model : str
+        The model of the forecast. Choose 'all' for returning every model.
+
+    Returns
+    -------
+    pandas.DataFrame
+        a data frame indexed by target date, including series:
+           - point series
+           - quantile series
+    """
+    
+    writer = pd.ExcelWriter(path, engine='xlsxwriter')
+    
+    i = 0
+    global lock_job
+    if timezero == "all" and model == "all" and type == "all" and type == "all":
+        for curr_mod in models:
+            if lock_job:
+                print(f'writing {curr_mod}...')
+                print("LOCK:", lock_job)
+                data = pd.DataFrame()
+                for curr_date in gets.timezeros:
+                    curr_date_s = str(curr_date)
+                    if gets.Fexists(model=curr_mod, location=state, timezero=curr_date_s, target='all', quantile='all'):
+                        data_new = gets.getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
+                        data_new = reshape_for_download(data_new)
+                        data = data.append(data_new)
+                if(len(data) != 0):
+                    data.to_excel(excel_writer=writer, sheet_name=curr_mod, index=False) 
+                
+                # Retrieve only first models...:
+                #i = i+1
+                #if i >= 3:
+                #    break
+            else:
+                break
+            
+    
+    else:
+        #data = getFS(timezero=timezero, type=type, model=model, state=state)
+        #data = reshape_for_download(data)
+        #data.to_excel(excel_writer=path, sheet_name=model, index=False)
+        return None
+    
+    writer.save()
+    print('Done!')
+
+
 
 def exportExcell(request):     
        path="core/templates/download.xlsx"
@@ -475,6 +532,7 @@ def exportExcell(request):
             response = HttpResponse(data,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             response['Content-Disposition'] = 'attachment; filename=download.xlsx'
             return response
+
 def getforecastdata(request, state, team,type,date):
 
 
@@ -484,7 +542,11 @@ def getforecastdata(request, state, team,type,date):
     print(type)
     print(date)
     name= state +"-"+ team +"-"+  type +"-"+  date
+    global lock_job
 
+    lock_job = False
+    print("SEt lock_job:", lock_job)
+    print("OK")
     data = gets.getFS(type=type, model=team, state=state, timezero=date)
 
     exp = gets.reshape_for_download(data)
@@ -507,6 +569,8 @@ def getforecastdata(request, state, team,type,date):
     data = json.loads(js)
     #print(data)
     context = {"columns": columns,"data":data,"name": name,"select_date": date, "errors":err}
+    
+   
     return JsonResponse(context, safe=False)
 
 #@login_required(login_url="/login/")
