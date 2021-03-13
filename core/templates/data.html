@@ -10,6 +10,16 @@
 <link rel="stylesheet" href="/static/assets/vendors/owl-carousel-2/owl.theme.default.min.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<style>
+.popover-body
+{
+  background: white;
+}
+</style>
+
 {% endblock plugin_stylesheets %}
 
 <!-- Specific CSS goes HERE -->
@@ -172,7 +182,7 @@
                 <div class="col-md-4" style="margin-bottom: 2em;">
                   <h4 class="card-title">Download XLSX file</h4>
 
-                  <button type="button" id="load_button2" onclick="load_data()" class="btn btn-secondary btn-icon-text">
+                  <button type="button" id="load_button2" onclick="load_data()" class="btn btn-secondary btn-icon-text" data-trigger="hover focus" data-toggle="popover" data-placement="top" title="Download data" data-content="Before the download, you need to load the dataset. NOTE: It will be generated only considering the selected location">
                     <i class="mdi mdi mdi-download btn-icon-prepend"></i> Load excell </button>
           
                   <form id="formdown" name="exportFile" action="/app/exportexcel/" method="get">
@@ -203,7 +213,7 @@
                   <div class="clear"></div>
               </div>
 
-            <div class="table-responsive">
+            <div class="table-responsive table table-dark table-striped">
 
                 <table class="table" id="excelDataTable">
 
@@ -216,6 +226,26 @@
     </div>
 
       <script>
+
+
+$(document).ready(function(){
+  $('[data-toggle="popover"]').popover(
+      {delay: {
+            "show": 300,
+            "hide": 100
+        }
+      }
+  );
+  $('[data-toggle="popover"]').click(function () {
+
+        setTimeout(function () {
+            $('.popover').fadeOut('slow');
+        }, 3000);
+
+    });
+});
+
+
 
 single_toggle("download_button2")
 
@@ -308,6 +338,7 @@ function activate(elem) {
           console.log("get/ajax/loadexcel/"+fore_value+"/")
           document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = 'Loading data ... It will take some minutes';
           document.getElementById("alert_loading").className = "card-title text-warning"
+          document.getElementById("load_button2").blur()
           disable("load_button2")
           // make POST ajax call
           $.ajax({
@@ -666,7 +697,6 @@ function addAllColumnHeaders(myList, selector) {
 <script src="/static/assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
 <script src="/static/assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 <script src="/static/assets/vendors/owl-carousel-2/owl.carousel.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
 <script src="/static/assets/vendors/select2/select2.min.js"></script>
 <script src="/static/assets/vendors/typeahead.js/typeahead.bundle.min.js"></script>
