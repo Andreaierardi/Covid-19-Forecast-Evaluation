@@ -65,7 +65,8 @@ def getFS(timezero, type="all", model="all", state="all"):
            - quantile series
         Columns are multi-indexed. To access a column use ('column_name', '') or ('quantile', '<perc>').
     """
-
+    
+    timezero_dt = pd.to_datetime(timezero, format="%Y-%m-%d")
     data = pd.read_parquet("data/"+str(timezero)+".parquet")
     n = len(data)
     c1 = data['target'].apply(str.endswith, args=(type, 0)) if type != "all" else pd.Series([True]*n)
@@ -84,8 +85,22 @@ def getFS(timezero, type="all", model="all", state="all"):
     # pivoting the orginal table
     out=data.pivot_table(index=["model","timezero","unit","target"], columns=["class","q"], values="value", aggfunc= 'first').reset_index()
     # adding the target date
+    def next_weekday(d, weekday):
+        days_ahead = weekday - d.weekday()
+        if days_ahead <= 0:
+            days_ahead += 7
+        return d + dt.timedelta(days_ahead)
+    if(timezero_dt.weekday() > 0):
+        out.insert(loc=3, column='forecast_date',
+                   value = pd.to_datetime(out['timezero'], format="%Y-%m-%d").apply(lambda x: next_weekday(x, 0)))
+    else:
+        out.insert(loc=3, column='forecast_date',
+                   value = pd.to_datetime(out['timezero'], format="%Y-%m-%d"))
+                   
+    start_saturday = out['forecast_date'].apply(lambda x: next_weekday(x, 5)) - dt.timedelta(7)
     deltadays = out['target'].str.extract('(\d+)')[0].astype(int).apply(dt.timedelta)*7
-    out[('time','')] = pd.to_datetime(out['timezero'], format="%Y-%m-%d") + deltadays
+    out[('time','')] = start_saturday + deltadays
+    
     out.set_index('time', inplace=True)
 
     return out
