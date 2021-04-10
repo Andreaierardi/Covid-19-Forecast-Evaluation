@@ -207,7 +207,7 @@ def get_suggestions(request, state, team):
             dates = sug[0]
             tmp_targs = sug[1]
             quantiles = all_quant
-
+            
             targs = []
             for tar in tmp_targs:
                 sp = tar.split(" ")
@@ -310,61 +310,63 @@ def getforecastplot(request, state, team,type,date,quantile):
 
                 real_series = list(zip(index, real_values))
                 quantiles = []
+                try:    
+                    if len(list(data.values[0])) > 5:
+                        quant = list(data[('quantile')])
+                        quant_list = []
+                        for i in quant[len(quant)//2:len(quant)]:
+                                    for j in quant[0:len(quant)//2+1]:
+                                        #print("===_", i,j)
+                                        if float(i)+float(j) == 1:
+                                            if(float(i)> float(j)):
+                                                quantiles.append(str(i)+"-"+str(j))
+                                            else:
+                                                quantiles.append(str(j)+"-"+str(i))
+                                            quant_list.append(str(i))
+                                            quant_list.append(str(j))
 
-                if len(list(data.values[0])) > 5:
-                    quant = list(data[('quantile')])
-                    quant_list = []
-                    for i in quant[len(quant)//2:len(quant)]:
-                                for j in quant[0:len(quant)//2+1]:
-                                    #print("===_", i,j)
-                                    if float(i)+float(j) == 1:
-                                        if(float(i)> float(j)):
-                                            quantiles.append(str(i)+"-"+str(j))
-                                        else:
-                                            quantiles.append(str(j)+"-"+str(i))
-                                        quant_list.append(str(i))
-                                        quant_list.append(str(j))
-
-                    quantiles = sorted(quantiles, reverse =True)
+                        quantiles = sorted(quantiles, reverse =True)
                   #  print("PREE ======\n\n",quantiles)
                    # print("\n\n\n\n\n\n---\n\n\n\n")
                    # print("quant1:",quant1)
                    # print("quant_list:",quant_list)
-                    if (quant1 is not None) and (not quant1 == ""):
-                        if quant1 in quant_list:
-                            qs = data[("quantile"),(quant1)]
-                            qs2 = data[("quantile"),(quant2)]
-                            for i in range(len(qs)):
-                                qs[i] = int(float(qs[i]))
-                                qs2[i] = int(float(qs2[i]))
-                                seriesqs = list(zip(index,qs,qs2))
-                                print(seriesqs)
+                        if (quant1 is not None) and (not quant1 == ""):
+                          if quant1 in quant_list:
+                              qs = data[("quantile"),(quant1)]
+                              qs2 = data[("quantile"),(quant2)]
+                              for i in range(len(qs)):
+                                  qs[i] = int(float(qs[i]))
+                                  qs2[i] = int(float(qs2[i]))
+                                  seriesqs = list(zip(index,qs,qs2))
+                                  print(seriesqs)
+                          else:
+                              print("QUANT does not exist - auto selection")
+                              quant1 = quant_list[0]
+                              quant2 = quant_list[1]
+                              qs = data[("quantile"),(quant1)]
+                              qs2 = data[("quantile"),(quant2)]
+                              for i in range(len(qs)):
+                                  qs[i] = int(float(qs[i]))
+                                  qs2[i] = int(float(qs2[i]))
+                                  seriesqs = list(zip(index,qs,qs2))
+                                  print(seriesqs)
                         else:
-                            print("QUANT does not exist - auto selection")
-                            quant1 = quant_list[0]
-                            quant2 = quant_list[1]
-                            qs = data[("quantile"),(quant1)]
-                            qs2 = data[("quantile"),(quant2)]
-                            for i in range(len(qs)):
-                                qs[i] = int(float(qs[i]))
-                                qs2[i] = int(float(qs2[i]))
-                                seriesqs = list(zip(index,qs,qs2))
-                                print(seriesqs)
+                          print("QUANT NONE")
+                          quant1 = quant_list[0]
+                          quant2 = quant_list[1]
+                          qs = data[("quantile"),(quant1)]
+                          qs2 = data[("quantile"),(quant2)]
+                          for i in range(len(qs)):
+                              qs[i] = int(float(qs[i]))
+                              qs2[i] = int(float(qs2[i]))
+                              seriesqs = list(zip(index,qs,qs2))
+                              print(seriesqs)
                     else:
-                        print("QUANT NONE")
-                        quant1 = quant_list[0]
-                        quant2 = quant_list[1]
-                        qs = data[("quantile"),(quant1)]
-                        qs2 = data[("quantile"),(quant2)]
-                        for i in range(len(qs)):
-                            qs[i] = int(float(qs[i]))
-                            qs2[i] = int(float(qs2[i]))
-                            seriesqs = list(zip(index,qs,qs2))
-                            print(seriesqs)
-                else:
-                        seriesqs = []
-                        quantiles = [-1]
-
+                            seriesqs = []
+                            quantiles = [-1]
+                except:
+                    seriesqs = []
+                    quantiles = [-1]
                 #print("======\n\n",quantiles)
                 #print("\n\n\n\n\n\n---\n\n\n\n")
                 if type.startswith("inc"):
@@ -504,8 +506,9 @@ def get_download(state, path, timezero="all", type="all", model="all"):
                     curr_date_s = str(curr_date)
                     if gets.Fexists(model=curr_mod, location=state, timezero=curr_date_s, target='all', quantile='all'):
                         data_new = gets.getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
-                        data_new = reshape_for_download(data_new)
-                        data = data.append(data_new)
+                        if data_new is not None:
+                            data_new = reshape_for_download(data_new)
+                            data = data.append(data_new)
                 if(len(data) != 0):
                     data.to_excel(excel_writer=writer, sheet_name=curr_mod, index=False) 
                 

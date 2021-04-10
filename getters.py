@@ -88,7 +88,10 @@ def getFS(timezero, type="all", model="all", state="all"):
     """
     
     timezero_dt = pd.to_datetime(timezero, format="%Y-%m-%d")
-    data = pd.read_parquet("data/"+str(timezero)+".parquet")
+    try:
+        data = pd.read_parquet("data/"+str(timezero)+".parquet")
+    except:
+        return None
     n = len(data)
     c1 = data['target'].apply(str.endswith, args=(type, 0)) if type != "all" else pd.Series([True]*n)
     c2 = data['model'] == model if model != "all" else pd.Series([True]*n)
@@ -259,9 +262,13 @@ def get_download(state, path, timezero="all", type="all", model="all"):
             for curr_date in timezeros:
                 curr_date_s = str(curr_date)
                 if Fexists(model=curr_mod, location=state, timezero=curr_date_s, target='all', quantile='all'):
-                    data_new = getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
-                    data_new = reshape_for_download(data_new)
-                    data = data.append(data_new)
+                    try:
+                        data_new = getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
+                        if data_new is not None:
+                            data_new = reshape_for_download(data_new)
+                            data = data.append(data_new)
+                    except:
+                        continue
             if(len(data) != 0):
                 data.to_excel(excel_writer=writer, sheet_name=curr_mod, index=False) 
             

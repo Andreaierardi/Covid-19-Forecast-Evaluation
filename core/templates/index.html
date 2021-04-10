@@ -178,8 +178,7 @@
                 </form>
 
                     </div>
-
-
+                    <img id="loading" src="/static/assets/images/loading.gif" width="100px" height="100px" alt="image" style="margin:auto"   />
 
                   <div id="container2" style="width:100%; height:400px;"></div>
 
@@ -237,8 +236,16 @@
 
       <script>
 
+function hideLoader() {
+    $('#loading').hide();
+}
+function showLoader() {
+    $('#loading').show();
+}
 
-        function update_selectors(response, selector_name, response_type)
+// Strongly recommended: Hide loader after 20 seconds, even if the page hasn't finished loading
+setTimeout(hideLoader, 20 * 1000);
+function update_selectors(response, selector_name, response_type)
         {
           x = document.getElementById(selector_name)
           last = x.options[x.selectedIndex].value
@@ -389,6 +396,9 @@
 
          console.log("URL:")
          console.log("get/ajax/update_suggestions/"+fore_value+"/"+bench_value)
+         $(window).ready(showLoader);
+         hide("container2")
+
          $.ajax({
            type: 'GET',
            // get/ajax/fore-bench/ 'code=' + code + '&userid=' + userid
@@ -414,11 +424,16 @@
                show("targets")
                show("dates")
                show("quantiles")
+               $(window).ready(hideLoader);
+
                send_forecast_bench_form()
+               show("container2")
+
              }
 
              else {
                document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = _err;
+               $(window).ready(hideLoader);
 
                hide("container2")
                $("#error_alert").fadeIn(400);
@@ -686,6 +701,7 @@
               else if(_err == "No date")
               {
                 document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = _err;
+                $(window).ready(hideLoader);
 
                 hide("container2")
                 $("#error_alert").fadeIn(400);
@@ -695,6 +711,7 @@
               }
               else {
                                 document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = _err;
+                                $(window).ready(hideLoader);
 
                 hide("container2")
                 $("#error_alert").fadeIn(400);
