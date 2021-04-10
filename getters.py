@@ -3,6 +3,19 @@ import datetime as dt
 import bz2
 import pickle
 import _pickle as cPickle
+import time
+
+from zoltpy import util
+import zoltpy
+from zoltpy.connection import QueryType
+
+import os
+os.environ["Z_USERNAME"] = "fabiocaironi"
+os.environ["Z_PASSWORD"] = "p19Q@eKyo95w"
+
+host = os.environ.get('Z_HOST')
+username = os.environ.get('Z_USERNAME')
+password = os.environ.get('Z_PASSWORD')
 
 f = open('data/unique_lists/locations.pkl', 'rb')
 locations = pickle.load(f)
@@ -28,14 +41,22 @@ def decompress_pickle(file):
  data = bz2.BZ2File(file, 'rb')
  data = cPickle.load(data)
  return data
+def get_project():
+  conn = util.authenticate()
+  print('\n* projects')
+  project_name = 'COVID-19 Forecasts'
+  project = [project for project in conn.projects if project.name == project_name][0]
+  return project
 
-corr_dict = decompress_pickle('data/unique_lists/corr_dict.pkl')
+#corr_dict = decompress_pickle('data/unique_lists/corr_dict.pkl')
 
 quantiles = (0.99, 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0.01, 0.975, 0.025)
 
 models = list(pd.read_csv("data/unique_lists/models.csv")['models'])
 
 real_data = pd.read_parquet("data/real_data.parquet")
+
+project = get_project()
 
 # Forecast Series getter
 def getFS(timezero, type="all", model="all", state="all"):
@@ -112,6 +133,7 @@ def getFS(timezero, type="all", model="all", state="all"):
 
 
 def Fexists(model, location, timezero='all', target='all', quantile='all'):
+    return True
     if model == "all" or location== "all":
         return True
     if (model, location) not in corr_dict.keys():
@@ -325,3 +347,51 @@ def getRS(timezero, type, state, window):
 
 
 # Example: out = getRS('2020-05-20', type='inc case', state='Alabama', window=4)
+
+def suggestion(state, model):
+    query = {'units': [locations[state]],'models': [model],'targets':targets}
+    print(query)
+
+    try:
+      job =  project.submit_query(QueryType.FORECASTS,query)
+      busy_poll_job2(job)  # does refresh()
+      rows = job.download_data()
+      print(f"- got {len(rows)} forecast rows as a dataframe.")
+      data = util.dataframe_from_rows(rows)
+      if len(data ) > 0:
+        #print(data)
+        tm = data.timezero.unique()
+        tr = data.target.unique()
+
+        print(tm)
+        print(tr)
+        return (list(tm),list(tr))
+      else:
+        return None    
+
+    except:
+      print("Something went wrong for ",state)
+      return None
+     # missing.append(date)
+
+
+def busy_poll_job2(job):
+    """
+    A simple utility that polls job's status every second until either success or failure.
+    """
+    print(f"\n* polling for status change. job: {job}")
+    while True:
+        status = job.status_as_str
+        failure_message = job.json["failure_message"]
+        if (status == "FAILED") or (status == "TIMEOUT"):
+            print(f"- {status}")
+
+            print(f"x {status}")
+            print("\n", failure_message)
+            raise RuntimeError(f"job failed: job={job}, failure_message={failure_message!r}")
+        if status == "SUCCESS":
+            break
+
+        time.sleep(0.5)
+        job.refresh()
+

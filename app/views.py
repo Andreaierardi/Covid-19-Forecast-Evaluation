@@ -182,39 +182,48 @@ django.http.JsonResponse:
 
 
 def get_suggestions(request, state, team):
-    if(gets.Fexists(model = team, location = state)):
-
-        models = sorted(gets.models)
-        states = list(gets.locations)
-        targs = []
-        dates = []
-        quant = []
-        quantiles = []
 
 
-        if(team == "all" or state == "all"):
+    if(team == "all" or state == "all"):
             targs = all_targs
-            quant = all_quant
+            quantiles = all_quant
             dates = all_dates
-        if(team != "all" and state !="all"):
-            sugg = gets.corr_dict[(team,state)]
-            for s in sugg:
-                if(s is not None) and (type(s) is tuple):
-                    #print("FOUND:",s[0],s[1],s[2])
-                    if s[0] not in dates:
-                        dates.append(s[0])
-                    if s[1] not in targs:
-                        targs.append(s[1])
-                    if s[2] not in quant and s[2] is not None:
-                        quant.append(s[2])
-            #print(quant)
-            dates = sorted(dates, reverse = True)
+            radio_activate = targs
+            err = "no"
 
-            for i in quant[len(quant)//2:len(quant)]:
-                    for j in quant[0:len(quant)//2+1]:
-                        if float(i)+float(j) == 1:
-                            quantiles.append(str(i)+"-"+str(j))
-            quantiles = sorted(quantiles, reverse = True)
+            radio_filter = []
+            for i in all_targs:
+                if i not in radio_activate:
+                    radio_filter.append(i)
+
+            context = { "quantiles":quantiles, "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
+            return JsonResponse(context)
+    
+    else:
+        sug = gets.suggestion(state=state, model = team)
+        print(sug)
+        if sug is not None:
+            print("\n\n\n\n ============================= \n\n\n")
+            dates = sug[0]
+            tmp_targs = sug[1]
+            quantiles = all_quant
+
+            targs = []
+            for tar in tmp_targs:
+                sp = tar.split(" ")
+                targs.append(sp[-2]+" "+sp[-1])
+            targs = list(dict.fromkeys(targs))
+        else:
+            err = "No information found for the selected location and forecast team"
+            print(err)
+            return JsonResponse({"errors": err})
+
+        dates = sorted(dates, reverse = True)
+        quantiles = sorted(quantiles, reverse = True)
+
+        print(dates)
+        print(targs)
+        print(quantiles)
         radio_activate = targs
 
         radio_filter = []
@@ -222,19 +231,15 @@ def get_suggestions(request, state, team):
             if i not in radio_activate:
                 radio_filter.append(i)
 
+        print("\n\n\n\n\n\n========= \n\n")
+        print(radio_filter)
+        print("\n\nACT\n")
+        print(radio_activate)
 
         err = "no"
-      #  print("\n\n=========\n\n")
-      #  print(radio_activate)
-      #  print(radio_filter)
-      # print(dates)
-      #  print(quantiles)
         context = { "quantiles":quantiles, "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
         return JsonResponse(context)
-    else:
-        err = "No information found for the selected location and forecast team"
-        print(err)
-        return JsonResponse({"errors": err})
+    
 
 def getforecastplot(request, state, team,type,date,quantile):
 
