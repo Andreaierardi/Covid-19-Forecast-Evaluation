@@ -53,37 +53,37 @@ for d in gets.timezeros:
 
 today = datetime.datetime.today()
 last_monday = today + datetime.timedelta(days=-today.weekday(), weeks=1) -  datetime.timedelta(7)
-try: 
-    last_date = datetime.datetime.strptime(gets.real_data.date[0] ,"%Y-%m-%d")
-    print("LAST monday", last_monday.date())
-    print("LAST monday of real data", last_date.date())
-    if(last_date.date() < last_monday.date()):
-        import acquisition
-    else:
-        print("Real data is already up-to-date")
-except Exception as e:
-            print(e)
-            print("ERROR IN FINDING new real data")
-try:
-    data = gets.getFS(timezero= dates[0])
-
-except:
-   
-    import acquisition as acq
-
-    limit = dates[0]
-    print("LIMIT: ",limit)
-    parquet_list = sorted(os.listdir("data"))
-    parquet_list = parquet_list[0:len(parquet_list)-1]
-    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
-    last_parquet = parquet_list[len(parquet_list)-2].split(".parquet")[0]
-    print("LAST PARQUET:" ,last_parquet)
-    ind = dates.index(last_parquet)
-
-    new_dates = dates[0:ind]
-    print("NEW DATES:\n",new_dates)
-    acq.retrieve_data(new_dates)
-    data = gets.getFS(timezero= dates[0])
+#try: 
+#    last_date = datetime.datetime.strptime(gets.real_data.date[0] ,"%Y-%m-%d")
+#    print("LAST monday", last_monday.date())
+#    print("LAST monday of real data", last_date.date())
+#    if(last_date.date() < last_monday.date()):
+#        import acquisition
+#    else:
+#        print("Real data is already up-to-date")
+#except Exception as e:
+#            print(e)
+#            print("ERROR IN FINDING new real data")
+#try:
+#    data = gets.getFS(timezero= dates[0])
+#
+#except:
+#   
+#    import acquisition as acq
+#
+#    limit = dates[0]
+#    print("LIMIT: ",limit)
+#    parquet_list = sorted(os.listdir("data"))
+#    parquet_list = parquet_list[0:len(parquet_list)-1]
+#    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
+#    last_parquet = parquet_list[len(parquet_list)-2].split(".parquet")[0]
+#    print("LAST PARQUET:" ,last_parquet)
+#    ind = dates.index(last_parquet)
+#
+#    new_dates = dates[0:ind]
+#    print("NEW DATES:\n",new_dates)
+#    acq.retrieve_data(new_dates)
+#    data = gets.getFS(timezero= dates[0])
 
 targs = gets.targets
 
