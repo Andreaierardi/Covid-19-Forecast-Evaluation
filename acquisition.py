@@ -1,10 +1,6 @@
 ### Imports and function definition
 import os
-#%env Z_USERNAME = fabiocaironi
-#%env Z_PASSWORD = p19Q@eKyo95w
 
-os.environ["Z_USERNAME"] = "fabiocaironi"
-os.environ["Z_PASSWORD"] = "p19Q@eKyo95w"
 
 host = os.environ.get('Z_HOST')
 username = os.environ.get('Z_USERNAME')

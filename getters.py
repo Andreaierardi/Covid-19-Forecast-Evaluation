@@ -10,8 +10,6 @@ import zoltpy
 from zoltpy.connection import QueryType
 
 import os
-os.environ["Z_USERNAME"] = "fabiocaironi"
-os.environ["Z_PASSWORD"] = "p19Q@eKyo95w"
 
 host = os.environ.get('Z_HOST')
 username = os.environ.get('Z_USERNAME')
