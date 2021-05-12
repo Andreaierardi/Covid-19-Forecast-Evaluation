@@ -205,6 +205,13 @@ def get_suggestions(request, state, team):
         if sug is not None:
             print("\n\n\n\n ============================= \n\n\n")
             dates = sug[0]
+            print("SUG:",sug[0])
+            newdates =[]
+            for d in dates:
+                if datetime.datetime.strptime(d, '%Y-%m-%d').date() <= datetime.date(2021,4,5):
+                    newdates.append(d)
+            dates = newdates
+            print(dates)
             tmp_targs = sug[1]
             quantiles = all_quant
             
