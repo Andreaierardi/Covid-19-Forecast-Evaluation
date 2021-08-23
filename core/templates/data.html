@@ -154,15 +154,16 @@
                             </div>
                           </div>
 
-                      </div>
-
+                        </div>
+                        
                       </div>
                     </div>
-
+                    <img id="loading" src="/static/assets/images/loading.gif" width="100px" height="100px" alt="image" style="margin-left: 50%;margin-right: 50%;"/>
+                  
                     <div class="form-group row" >
 
                     <div class="col-md-4" style="margin-bottom: 2em;">
-                        <h4 class="card-title">Download</h4>
+                        <h4 class="card-title">Download CSV file (fast!) </h4>
                         <form name="exportFile" action="/app/export/" method="get">
                           <a download="download.csv" href="download/"> 
                         
@@ -180,7 +181,7 @@
                 </div>
                 
                 <div class="col-md-4" style="margin-bottom: 2em;">
-                  <h4 class="card-title">Download XLSX file</h4>
+                  <h4 class="card-title">Download XLSX file (SLOW!)</h4>
 
                   <button type="button" id="load_button2" onclick="load_data()" class="btn btn-secondary btn-icon-text" data-trigger="hover focus" data-toggle="popover" data-placement="top" title="Download data" data-content="Before the download, you need to load the dataset. NOTE: It will be generated only considering the selected location">
                     <i class="mdi mdi mdi-download btn-icon-prepend"></i> Load excell </button>
@@ -208,7 +209,7 @@
                   </div>
 
                   <div id="alert_load" style="text-align:right;margin: 2em 2em 2em 2em;">
-                    <h4 class="card-title text-warning" id="alert_loading"> </h4>
+                    <h4 class="card-title text-warning text-lowercase" id="alert_loading"> </h4>
               
                   <div class="clear"></div>
               </div>
@@ -226,6 +227,16 @@
     </div>
 
       <script>
+
+function hideLoader() {
+    $('#loading').hide();
+}
+function showLoader() {
+    $('#loading').show();
+}
+
+// Strongly recommended: Hide loader after 20 seconds, even if the page hasn't finished loading
+setTimeout(hideLoader, 20 * 1000);
 
 
 $(document).ready(function(){
@@ -336,8 +347,8 @@ function activate(elem) {
 
           console.log("URL:")
           console.log("get/ajax/loadexcel/"+fore_value+"/")
-          document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = 'Loading data ... It will take some minutes';
           document.getElementById("alert_loading").className = "card-title text-warning"
+          document.getElementById("alert_load").getElementsByTagName('h4')[0].innerHTML = 'Loading data ... It will take some minutes <img src="/static/assets/images/loading_excel.gif" width="60px" height="60px" alt="image" style="margin:auto"/><br>  <p class="text-lowercase">Go grab a coffie <i class="mdi mdi-coffee"></i> </p>'
           document.getElementById("load_button2").blur()
           disable("load_button2")
           // make POST ajax call
@@ -504,6 +515,7 @@ update_suggestions()
          var fore_value = fore.value;
          var bench_value = bench.value;
 
+         $(window).ready(showLoader);
 
          console.log("URL:")
          console.log("get/ajax/update_suggestions/"+fore_value+"/"+bench_value)
@@ -529,11 +541,14 @@ update_suggestions()
                update_radio(response)
 
                update_selectors(response,"select_date","dates")
+               $(window).ready(hideLoader);
 
                send_forecastdata_form()
              }
 
              else {
+              $(window).ready(hideLoader);
+
               remove_table('#excelDataTable')
               document.getElementById("wpbody-content").getElementsByTagName('h4')[0].innerHTML = 'Data not found ';
               disable("download_button")

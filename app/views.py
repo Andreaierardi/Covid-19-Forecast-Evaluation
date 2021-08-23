@@ -53,37 +53,37 @@ for d in gets.timezeros:
 
 today = datetime.datetime.today()
 last_monday = today + datetime.timedelta(days=-today.weekday(), weeks=1) -  datetime.timedelta(7)
-try: 
-    last_date = datetime.datetime.strptime(gets.real_data.date[0] ,"%Y-%m-%d")
-    print("LAST monday", last_monday.date())
-    print("LAST monday of real data", last_date.date())
-    if(last_date.date() < last_monday.date()):
-        import acquisition
-    else:
-        print("Real data is already up-to-date")
-except Exception as e:
-            print(e)
-            print("ERROR IN FINDING new real data")
-try:
-    data = gets.getFS(timezero= dates[0])
-
-except:
-   
-    import acquisition as acq
-
-    limit = dates[0]
-    print("LIMIT: ",limit)
-    parquet_list = sorted(os.listdir("data"))
-    parquet_list = parquet_list[0:len(parquet_list)-1]
-    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
-    last_parquet = parquet_list[len(parquet_list)-2].split(".parquet")[0]
-    print("LAST PARQUET:" ,last_parquet)
-    ind = dates.index(last_parquet)
-
-    new_dates = dates[0:ind]
-    print("NEW DATES:\n",new_dates)
-    acq.retrieve_data(new_dates)
-    data = gets.getFS(timezero= dates[0])
+#try: 
+#    last_date = datetime.datetime.strptime(gets.real_data.date[0] ,"%Y-%m-%d")
+#    print("LAST monday", last_monday.date())
+#    print("LAST monday of real data", last_date.date())
+#    if(last_date.date() < last_monday.date()):
+#        import acquisition
+#    else:
+#        print("Real data is already up-to-date")
+#except Exception as e:
+#            print(e)
+#            print("ERROR IN FINDING new real data")
+#try:
+#    data = gets.getFS(timezero= dates[0])
+#
+#except:
+#   
+#    import acquisition as acq
+#
+#    limit = dates[0]
+#    print("LIMIT: ",limit)
+#    parquet_list = sorted(os.listdir("data"))
+#    parquet_list = parquet_list[0:len(parquet_list)-1]
+#    print("\nPARQUET LIST\n\n\n", parquet_list,"\n\n===========")
+#    last_parquet = parquet_list[len(parquet_list)-2].split(".parquet")[0]
+#    print("LAST PARQUET:" ,last_parquet)
+#    ind = dates.index(last_parquet)
+#
+#    new_dates = dates[0:ind]
+#    print("NEW DATES:\n",new_dates)
+#    acq.retrieve_data(new_dates)
+#    data = gets.getFS(timezero= dates[0])
 
 targs = gets.targets
 
@@ -182,39 +182,55 @@ django.http.JsonResponse:
 
 
 def get_suggestions(request, state, team):
-    if(gets.Fexists(model = team, location = state)):
-
-        models = sorted(gets.models)
-        states = list(gets.locations)
-        targs = []
-        dates = []
-        quant = []
-        quantiles = []
 
 
-        if(team == "all" or state == "all"):
+    if(team == "all" or state == "all"):
             targs = all_targs
-            quant = all_quant
+            quantiles = all_quant
             dates = all_dates
-        if(team != "all" and state !="all"):
-            sugg = gets.corr_dict[(team,state)]
-            for s in sugg:
-                if(s is not None) and (type(s) is tuple):
-                    #print("FOUND:",s[0],s[1],s[2])
-                    if s[0] not in dates:
-                        dates.append(s[0])
-                    if s[1] not in targs:
-                        targs.append(s[1])
-                    if s[2] not in quant and s[2] is not None:
-                        quant.append(s[2])
-            #print(quant)
-            dates = sorted(dates, reverse = True)
+            radio_activate = targs
+            err = "no"
 
-            for i in quant[len(quant)//2:len(quant)]:
-                    for j in quant[0:len(quant)//2+1]:
-                        if float(i)+float(j) == 1:
-                            quantiles.append(str(i)+"-"+str(j))
-            quantiles = sorted(quantiles, reverse = True)
+            radio_filter = []
+            for i in all_targs:
+                if i not in radio_activate:
+                    radio_filter.append(i)
+
+            context = { "quantiles":quantiles, "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
+            return JsonResponse(context)
+    
+    else:
+        sug = gets.suggestion(state=state, model = team)
+        print(sug)
+        if sug is not None:
+            print("\n\n\n\n ============================= \n\n\n")
+            dates = sug[0]
+            print("SUG:",sug[0])
+            newdates =[]
+            for d in dates:
+                if datetime.datetime.strptime(d, '%Y-%m-%d').date() <= datetime.date(2021,4,5):
+                    newdates.append(d)
+            dates = newdates
+            print(dates)
+            tmp_targs = sug[1]
+            quantiles = all_quant
+            
+            targs = []
+            for tar in tmp_targs:
+                sp = tar.split(" ")
+                targs.append(sp[-2]+" "+sp[-1])
+            targs = list(dict.fromkeys(targs))
+        else:
+            err = "No information found for the selected location and forecast team"
+            print(err)
+            return JsonResponse({"errors": err})
+
+        dates = sorted(dates, reverse = True)
+        quantiles = sorted(quantiles, reverse = True)
+
+        print(dates)
+        print(targs)
+        print(quantiles)
         radio_activate = targs
 
         radio_filter = []
@@ -222,19 +238,15 @@ def get_suggestions(request, state, team):
             if i not in radio_activate:
                 radio_filter.append(i)
 
+        print("\n\n\n\n\n\n========= \n\n")
+        print(radio_filter)
+        print("\n\nACT\n")
+        print(radio_activate)
 
         err = "no"
-      #  print("\n\n=========\n\n")
-      #  print(radio_activate)
-      #  print(radio_filter)
-      # print(dates)
-      #  print(quantiles)
         context = { "quantiles":quantiles, "radio_filter": radio_filter, "radio_activate":radio_activate, "errors":err,"models":models, "states": states, "dates":dates}
         return JsonResponse(context)
-    else:
-        err = "No information found for the selected location and forecast team"
-        print(err)
-        return JsonResponse({"errors": err})
+    
 
 def getforecastplot(request, state, team,type,date,quantile):
 
@@ -305,61 +317,63 @@ def getforecastplot(request, state, team,type,date,quantile):
 
                 real_series = list(zip(index, real_values))
                 quantiles = []
+                try:    
+                    if len(list(data.values[0])) > 5:
+                        quant = list(data[('quantile')])
+                        quant_list = []
+                        for i in quant[len(quant)//2:len(quant)]:
+                                    for j in quant[0:len(quant)//2+1]:
+                                        #print("===_", i,j)
+                                        if float(i)+float(j) == 1:
+                                            if(float(i)> float(j)):
+                                                quantiles.append(str(i)+"-"+str(j))
+                                            else:
+                                                quantiles.append(str(j)+"-"+str(i))
+                                            quant_list.append(str(i))
+                                            quant_list.append(str(j))
 
-                if len(list(data.values[0])) > 5:
-                    quant = list(data[('quantile')])
-                    quant_list = []
-                    for i in quant[len(quant)//2:len(quant)]:
-                                for j in quant[0:len(quant)//2+1]:
-                                    #print("===_", i,j)
-                                    if float(i)+float(j) == 1:
-                                        if(float(i)> float(j)):
-                                            quantiles.append(str(i)+"-"+str(j))
-                                        else:
-                                            quantiles.append(str(j)+"-"+str(i))
-                                        quant_list.append(str(i))
-                                        quant_list.append(str(j))
-
-                    quantiles = sorted(quantiles, reverse =True)
+                        quantiles = sorted(quantiles, reverse =True)
                   #  print("PREE ======\n\n",quantiles)
                    # print("\n\n\n\n\n\n---\n\n\n\n")
                    # print("quant1:",quant1)
                    # print("quant_list:",quant_list)
-                    if (quant1 is not None) and (not quant1 == ""):
-                        if quant1 in quant_list:
-                            qs = data[("quantile"),(quant1)]
-                            qs2 = data[("quantile"),(quant2)]
-                            for i in range(len(qs)):
-                                qs[i] = int(float(qs[i]))
-                                qs2[i] = int(float(qs2[i]))
-                                seriesqs = list(zip(index,qs,qs2))
-                                print(seriesqs)
+                        if (quant1 is not None) and (not quant1 == ""):
+                          if quant1 in quant_list:
+                              qs = data[("quantile"),(quant1)]
+                              qs2 = data[("quantile"),(quant2)]
+                              for i in range(len(qs)):
+                                  qs[i] = int(float(qs[i]))
+                                  qs2[i] = int(float(qs2[i]))
+                                  seriesqs = list(zip(index,qs,qs2))
+                                  print(seriesqs)
+                          else:
+                              print("QUANT does not exist - auto selection")
+                              quant1 = quant_list[0]
+                              quant2 = quant_list[1]
+                              qs = data[("quantile"),(quant1)]
+                              qs2 = data[("quantile"),(quant2)]
+                              for i in range(len(qs)):
+                                  qs[i] = int(float(qs[i]))
+                                  qs2[i] = int(float(qs2[i]))
+                                  seriesqs = list(zip(index,qs,qs2))
+                                  print(seriesqs)
                         else:
-                            print("QUANT does not exist - auto selection")
-                            quant1 = quant_list[0]
-                            quant2 = quant_list[1]
-                            qs = data[("quantile"),(quant1)]
-                            qs2 = data[("quantile"),(quant2)]
-                            for i in range(len(qs)):
-                                qs[i] = int(float(qs[i]))
-                                qs2[i] = int(float(qs2[i]))
-                                seriesqs = list(zip(index,qs,qs2))
-                                print(seriesqs)
+                          print("QUANT NONE")
+                          quant1 = quant_list[0]
+                          quant2 = quant_list[1]
+                          qs = data[("quantile"),(quant1)]
+                          qs2 = data[("quantile"),(quant2)]
+                          for i in range(len(qs)):
+                              qs[i] = int(float(qs[i]))
+                              qs2[i] = int(float(qs2[i]))
+                              seriesqs = list(zip(index,qs,qs2))
+                              print(seriesqs)
                     else:
-                        print("QUANT NONE")
-                        quant1 = quant_list[0]
-                        quant2 = quant_list[1]
-                        qs = data[("quantile"),(quant1)]
-                        qs2 = data[("quantile"),(quant2)]
-                        for i in range(len(qs)):
-                            qs[i] = int(float(qs[i]))
-                            qs2[i] = int(float(qs2[i]))
-                            seriesqs = list(zip(index,qs,qs2))
-                            print(seriesqs)
-                else:
-                        seriesqs = []
-                        quantiles = [-1]
-
+                            seriesqs = []
+                            quantiles = [-1]
+                except:
+                    seriesqs = []
+                    quantiles = [-1]
                 #print("======\n\n",quantiles)
                 #print("\n\n\n\n\n\n---\n\n\n\n")
                 if type.startswith("inc"):
@@ -499,8 +513,9 @@ def get_download(state, path, timezero="all", type="all", model="all"):
                     curr_date_s = str(curr_date)
                     if gets.Fexists(model=curr_mod, location=state, timezero=curr_date_s, target='all', quantile='all'):
                         data_new = gets.getFS(timezero=curr_date_s, type='all', model=curr_mod, state=state)
-                        data_new = reshape_for_download(data_new)
-                        data = data.append(data_new)
+                        if data_new is not None:
+                            data_new = reshape_for_download(data_new)
+                            data = data.append(data_new)
                 if(len(data) != 0):
                     data.to_excel(excel_writer=writer, sheet_name=curr_mod, index=False) 
                 

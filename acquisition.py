@@ -1,10 +1,7 @@
 ### Imports and function definition
+from datetime import datetime
 import os
-#%env Z_USERNAME = fabiocaironi
-#%env Z_PASSWORD = p19Q@eKyo95w
 
-os.environ["Z_USERNAME"] = "fabiocaironi"
-os.environ["Z_PASSWORD"] = "p19Q@eKyo95w"
 
 host = os.environ.get('Z_HOST')
 username = os.environ.get('Z_USERNAME')
@@ -68,7 +65,9 @@ def get_dates():
   dates =[]
 
   for item in project.timezeros:
-    dates.append(item.timezero_date)
+    if item < datetime.date(2021,4,5):
+          dates.append(item.timezero_date)
+
   return dates
 
 def get_targets(onlyhosp=False):
